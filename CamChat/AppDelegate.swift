@@ -34,7 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.makeKeyAndVisible()
         
-        window?.rootViewController = SCPagerViewController()
+        window?.rootViewController = Screen()
         
         
         window?.gestureRecognizers?.remove(at: 0)

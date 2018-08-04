@@ -164,6 +164,7 @@ fileprivate class ChatControllerAnimationPositioningBrain{
     
     func prepareForDismissal(){
         container.insertSubview(presentingView, at: 0)
+        NotificationCenter.default.removeObserver(self)
         NotificationCenter.default.addObserver(self, selector: #selector(respondToKeyboardDismissal), name: UIResponder.keyboardDidHideNotification, object: nil)
     }
 

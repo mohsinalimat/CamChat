@@ -12,7 +12,7 @@ import HelpKit
 
 
 
-class SCSearchBar: UIView{
+class CCSearchBar: UIView{
     
     
     init(){

@@ -43,13 +43,7 @@ class ChatViewController: UIViewController, ChatControllerProtocol{
         
     }
     
-  
-   
     
-    
-    
-
-
 
     override func loadView() {
         let view = HKView()
@@ -135,11 +129,3 @@ class ChatViewController: UIViewController, ChatControllerProtocol{
     
     
 }
-
-
-
-
-
-
-
-

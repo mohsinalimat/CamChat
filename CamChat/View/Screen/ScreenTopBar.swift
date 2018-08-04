@@ -16,8 +16,8 @@ class ScreenTopBar: HKView{
         topSearchBar.pinAllSides(addTo: self, pinTo: self)
     }
     
-    private let topSearchBar: SCSearchBar = {
-        let x = SCSearchBar()
+    private let topSearchBar: CCSearchBar = {
+        let x = CCSearchBar()
         x.isUserInteractionEnabled = false
         return x
     }()

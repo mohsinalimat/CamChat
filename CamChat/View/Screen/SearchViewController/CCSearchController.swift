@@ -7,3 +7,12 @@
 //
 
 import HelpKit
+
+class CCSearchController: UIViewController{
+    
+    
+      
+}
+
+
+

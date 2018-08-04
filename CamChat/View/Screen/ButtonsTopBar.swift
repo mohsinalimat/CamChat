@@ -123,7 +123,6 @@ class ScreenButtonsTopBar: UIView{
                 else if rightScreenIcon.alpha == 1 {activeButtons = [rightScreenIcon]}
                 
                 if activeButtons.contains(subview){return subview}
-                
             }
         }
         return nil
