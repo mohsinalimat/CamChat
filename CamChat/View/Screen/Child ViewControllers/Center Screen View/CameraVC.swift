@@ -24,9 +24,9 @@ class CameraVC: UIViewController{
     }
     
     let captureSession = AVCaptureSession()
-    var previewLayer:AVCaptureVideoPreviewLayer!
+    var previewLayer: AVCaptureVideoPreviewLayer!
     
-    var captureDevice:AVCaptureDevice!
+    var captureDevice: AVCaptureDevice!
     
     
     

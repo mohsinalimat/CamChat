@@ -23,17 +23,15 @@ extension Screen{
         view.addSubview(rightScreen.view)
         view.addSubview(bottomScreen.view)
         view.addSubview(topGradientView)
-        view.addSubview(topBar)
-        view.addSubview(topSearchBar)
+        view.addSubview(topBar_typed)
         view.addSubview(bottomGradientView)
         view.addSubview(navigationView)
-        view.addLayoutGuide(topBarLayoutGuide)
         
         
-        let topLayoutGuideConstraints = topBarLayoutGuide.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .top: view.safeAreaLayoutGuide.topAnchor], constants: [.height: topBarHeight])
+        let topBarConstraints = topBar.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .top: view.safeAreaLayoutGuide.topAnchor], constants: [.height: topBarHeight])
         
-        topLayoutGuideTopConstraint = topLayoutGuideConstraints.top!
-        topLayoutGuideHeightConstraint = topLayoutGuideConstraints.height!
+        topBarTopContraint = topBarConstraints.top!
+        topBarHeightConstraint = topBarConstraints.height!
         
         
         let leftScreenPins = leftScreen.view.pin(anchors: [.top: view.topAnchor, .bottom: view.bottomAnchor, .width: view.widthAnchor, .right: view.leftAnchor])
@@ -56,14 +54,13 @@ extension Screen{
         bottomGradientView.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .top: navigationView.topAnchor, .bottom: view.bottomAnchor])
         
         
-        topGradientView.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .top: view.topAnchor, .bottom: topBarLayoutGuide.bottomAnchor], constants: [.bottom: -30])
+        topGradientView.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .top: view.topAnchor, .bottom: topBar.bottomAnchor], constants: [.bottom: -30])
         
         
         navigationView.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.safeAreaLayoutGuide.bottomAnchor], constants: [.height: 150])
-        topBar.pinAllSides(pinTo: topBarLayoutGuide)
-        topSearchBar.pinAllSides(pinTo: topBarLayoutGuide)
         
-        topBarBottomLine.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: topBarLayoutGuide.bottomAnchor], constants: [.height: 0.5])
+        
+        topBarBottomLine.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: topBar.bottomAnchor], constants: [.height: 0.5])
         
     }
     

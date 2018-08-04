@@ -9,43 +9,64 @@
 import HelpKit
 
 
-class ChatViewController: UIViewController{
+class ChatViewController: UIViewController, ChatControllerProtocol{
     
-    private let topInset: CGFloat = 50
+    
+    
+  
+    var tappedCell: UIView?{
+        get{ return chatTransitioningDelegate.tappedCell }
+        set{ chatTransitioningDelegate.tappedCell = newValue}
+    }
 
     init(){
         super.init(nibName: nil, bundle: nil)
-        transitioningDelegate = slideTransitionDelegate
+        self.chatTransitioningDelegate = ChatControllerTransitioningDelegate(chatVC: self)
+        transitioningDelegate = chatTransitioningDelegate
     }
+    
+   
+
+    private var chatTransitioningDelegate: ChatControllerTransitioningDelegate!
 
     
+    private let topInset: CGFloat = 45
+
     
-    private lazy var slideTransitionDelegate = SlideInTransitioningDelegate(viewController: self, direction: .left)
      
     override func viewDidLoad() {
         super.viewDidLoad()
+        additionalSafeAreaInsets.top = topInset
         
-        
-        topBarLayoutGuide.pin(addTo: view, anchors: [.top: view.safeAreaLayoutGuide.topAnchor, .left: view.leftAnchor, .right: view.rightAnchor], constants: [.height: topInset])
-        collectionView.pin(addTo: view, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor, .top: topBarLayoutGuide.bottomAnchor])
-        topLabel.pin(addTo: view, anchors: [.centerX: topBarLayoutGuide.centerXAnchor, .centerY: topBarLayoutGuide.centerYAnchor])
-        topBarLeftIcon.pin(addTo: view, anchors: [.centerY: topBarLayoutGuide.centerYAnchor, .left: topBarLayoutGuide.leftAnchor], constants: [.left: 10])
-        topBarRightIcon.pin(addTo: view, anchors: [.centerY: topBarLayoutGuide.centerYAnchor, .right: topBarLayoutGuide.rightAnchor], constants: [.right: 10])
-        
+        topBarView_typed.topBarRightIcon.addAction({[weak self] in self?.dismiss(animated: true)})
+        collectionView.pin(addTo: view, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor, .top: view.safeAreaLayoutGuide.topAnchor])
         
     }
     
+  
+   
     
+    
+    
+
+
 
     override func loadView() {
         let view = HKView()
-        view.backgroundColor = BLUECOLOR
-        view.didMoveToSuperviewAction = {
-            self.becomeFirstResponder()
-        }
-        view.isUserInteractionEnabled = true
+        view.backgroundColor = .clear
+        view.didMoveToSuperviewAction = { [weak self] in self?.becomeFirstResponder() }
+        view.hitTestAction = {[weak self] in self?.hitTestView(point: $0, event: $1) }
+        
         self.view = view
         
+    }
+    
+    private func hitTestView(point: CGPoint, event: UIEvent?) -> UIView?{
+        let convertedPoint = collectionView.convert(point, from: view)
+        if collectionView.point(inside: convertedPoint, with: event){
+            return collectionView
+        }
+        return nil
     }
     
     
@@ -65,33 +86,28 @@ class ChatViewController: UIViewController{
         return ChatMessagesCollectionView()
     }()
     
-    private lazy var topLabel: UILabel = {
-        let x = UILabel()
-        x.font = SCFonts.getFont(type: .medium, size: 20)
-        x.text = "Pharez"
-        x.textColor = .white
-        return x
-    }()
-
-    private lazy var topBarRightIcon: BouncyButton = {
-        let x = BouncyButton(image: AssetImages.arrowChevron)
-        x.pin(constants: [.height: 20, .width: 20])
-        x.addAction({
-            self.dismiss(animated: true, completion: nil)
-        })
-        return x
+    
+    lazy var topBarView_typed: ChatTopBar = {
+        return ChatTopBar(size: CGSize(width: UIScreen.main.bounds.width, height: topInset))
     }()
     
-    private lazy var topBarLeftIcon: BouncyButton = {
-        let x = BouncyButton(image: AssetImages.threeLineMenuIcon)
-        x.pin(constants: [.height: 20, .width: 20])
+    var topBarView: UIView{
+        return topBarView_typed
+    }
+    
+    lazy var backgroundView: UIView = {
+        let x = HKGradientView(colors: [BLUECOLOR, DARKER_BLUECOLOR])
+        x.gradientLayer.transform = CATransform3DRotate(x.gradientLayer.transform, (CGFloat.pi * 2) * 0.75, 0, 0, 1)
+        
         return x
     }()
+    var participatingView: UIView!{
+        return view
+    }
     
-
-   
     
-    private lazy var topBarLayoutGuide = UILayoutGuide()
+    
+    
     
     private lazy var accessoryView: ChatKeyboardShortcutView = {
         return ChatKeyboardShortcutView()

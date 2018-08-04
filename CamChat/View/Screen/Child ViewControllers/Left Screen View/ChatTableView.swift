@@ -40,8 +40,10 @@ class ChatTableView: SCTableView{
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        present(ChatViewController(), animated: true, completion: nil)
+        DispatchQueue.main.async {
+            let vc = ChatViewController()
+            vc.tappedCell = tableView.cellForRow(at: indexPath)!
+            self.present(vc, animated: true, completion: nil)
+        }
     }
-    
-    
 }

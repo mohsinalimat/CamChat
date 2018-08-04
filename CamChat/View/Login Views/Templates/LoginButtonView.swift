@@ -79,8 +79,8 @@ class LoginButtonView: HKView{
         action()
     }
     
-    private lazy var gradientView: GradientView = {
-        let x = GradientView(colors: [UIColor.white.withAlphaComponent(0), UIColor.white.withAlphaComponent(1)])
+    private lazy var gradientView: HKGradientView = {
+        let x = HKGradientView(colors: [UIColor.white.withAlphaComponent(0), UIColor.white.withAlphaComponent(1)])
         return x
     }()
     

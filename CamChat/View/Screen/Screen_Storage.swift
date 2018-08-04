@@ -22,10 +22,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
-        
         setUpViews()
-        
         
         // This is only to ensure they are initialized right now, since they are being lazily loaded. Page Scrolling Interactors are active by default.
         verticalScrollInteractor.activate()
@@ -33,11 +30,13 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         
     }
     
+
     
+ 
     
+   
     
-    
-    
+
     
     
     
@@ -59,7 +58,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     }()
     
     lazy var rightScreen: SCScrollView = {
-        let x = PhotoLibraryTableView()
+        let x = PhotoLibraryCollectionVC()
         self.addChild(x)
         x.delegate = self
         x.additionalSafeAreaInsets.bottom = subviewsBottomSafeAreaInset
@@ -72,13 +71,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         self.addChild(x)
         return x
     }()
-    
-    let topSearchBar: SCSearchBar = {
-        let x = SCSearchBar()
-        x.isUserInteractionEnabled = false
-        return x
-    }()
-    
+
     lazy var centerScreenCoverView: UIView = {
         let x = UIView()
         x.isUserInteractionEnabled = false
@@ -86,24 +79,26 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         return x
     }()
 
-    lazy var topGradientView: GradientView = {
-        let x = GradientView(colors: [UIColor.black.withAlphaComponent(0.5), UIColor.black.withAlphaComponent(0)])
+    lazy var topGradientView: HKGradientView = {
+        let x = HKGradientView(colors: [UIColor.black.withAlphaComponent(0.5), UIColor.black.withAlphaComponent(0)])
         x.alpha = 0
         return x
     }()
     
-    lazy var bottomGradientView: GradientView = {
-        let  x = GradientView(colors: [UIColor.black.withAlphaComponent(0), UIColor.black.withAlphaComponent(0.5)])
+    lazy var bottomGradientView: HKGradientView = {
+        let  x = HKGradientView(colors: [UIColor.black.withAlphaComponent(0), UIColor.black.withAlphaComponent(0.5)])
         x.alpha = 0
         return x
     }()
     
+    var topBar: UIView{
+        return topBar_typed
+    }
     
-    lazy var topBar: ScreenTopBar = {
-        let x = ScreenTopBar()
-        return x
-
+    lazy var topBar_typed: ScreenTopBar = {
+        return ScreenTopBar()
     }()
+    
     
     lazy var topBarBottomLine: UIView = {
         let x = UIView()
@@ -112,10 +107,8 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         return x
     }()
     
-    
 
     
-    lazy var topBarLayoutGuide: UILayoutGuide = UILayoutGuide()
  
     lazy var navigationView: ButtonNavigationView = {
         let x = ButtonNavigationView()
@@ -145,8 +138,8 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     let subviewsBottomSafeAreaInset: CGFloat = 100
     
     
-    var topLayoutGuideHeightConstraint: NSLayoutConstraint!
-    var topLayoutGuideTopConstraint: NSLayoutConstraint!
+    var topBarHeightConstraint: NSLayoutConstraint!
+    var topBarTopContraint: NSLayoutConstraint!
     
     var bottomScreenTopAnchor: NSLayoutConstraint!
     var rightScreenLeftAnchor: NSLayoutConstraint!
@@ -156,6 +149,33 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     var leftScreenColor = BLUECOLOR
     var rightScreenColor = REDCOLOR
     var bottomScreenColor = UIColor.orange
+    
+    
+    
+    
+    let navigationViewBackingAlphaEquation_horizontal = CGLinearEquation(xy(-1, 1), xy(-0.8, 0), min: 0, max: 1)!
+    let navigationViewBackingAlphaEquation_vertical = CGLinearEquation(xy(1, 1), xy(0.8, 0), min: 0, max: 1)!
+    
+    let navigationViewTintColorEquation_horizontal = CGLinearEquation(xy(-1, 190), xy(0, 255), min: 190, max: 255)!
+    let navigationViewTintColorEquation_vertical = CGLinearEquation(xy(0, 255), xy(1, 190), min: 190, max: 255)!
+    
+    let navigationButtonsShadowAlphaEquation = CGQuadEquation(xy(-1, 0), xy(0, 1), xy(1, 0), min: 0, max: 1)!
+    let bottomGradientViewAlpha_horizontal = CGLinearEquation(xy(0, 0), xy(1, 1), min: 0, max: 1)!
+    
+    let backgroundViewAlphaEquation = CGQuadEquation(xy(-0.7, 1), xy(0, 0), xy(0.7, 1), min: 0, max: 1)!
+    
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     override var preferredStatusBarStyle: UIStatusBarStyle{

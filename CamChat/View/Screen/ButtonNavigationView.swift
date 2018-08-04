@@ -6,7 +6,7 @@
 //  Copyright © 2018 Patrick Hanna. All rights reserved.
 //
 
-import UIKit
+import HelpKit
 
 fileprivate typealias ButtonType = ButtonNavigationView.ButtonType
 
@@ -125,31 +125,45 @@ class ButtonNavigationView: UIView{
     }
     
     
-    func getGradientValue(minVal: CGFloat, maxVal: CGFloat, percentage: CGFloat) -> CGFloat{
-        
-        return minVal + ((maxVal - minVal) * abs(percentage))
-        
-    }
+ 
     
+    private lazy var sideIconsSizeScaleEquation: CGEquation = {
+        let endingIconSizeScale = endingIconSize / beginningIconSize
+        return CGQuadEquation(xy(0, 1), xy(-1, endingIconSizeScale), xy(1, endingIconSizeScale), min: endingIconSizeScale, max: 1)!
+    }()
     
+    private lazy var circleSizeScaleEquation: CGEquation = {
+        let endingCircleSizeScale = endingBigCircleSize / beginningBigCircleSize
+        return CGQuadEquation(xy(-1, endingCircleSizeScale), xy(0, 1), xy(1, endingCircleSizeScale), min: endingCircleSizeScale, max: 1)!
+    }()
+    
+    private lazy var sideIconXTranslationEquation: CGEquation = {
+        let sideInsetDifference = endingSideInset - beginningIconSideInset
+        return CGQuadEquation(xy(-1, sideInsetDifference), xy(0, 0), xy(1, sideInsetDifference), min: 0, max: sideInsetDifference)!
+    }()
+    
+    private lazy var circleXTranslationEquation: CGEquation = {
+        let circleInsetDifference = beginningBigCircleBottomInset - endingBigCircleBottomInset
+        return CGQuadEquation(xy(-1, circleInsetDifference), xy(0, 0), xy(1, circleInsetDifference), min: 0, max: circleInsetDifference)!
+    }()
+    
+    private lazy var settingsRotationEquation: CGEquation = {
+        let rotationVal: CGFloat = 20
+        return CGQuadEquation(xy(-1, rotationVal), xy(0, 1), xy(1, rotationVal), min: 1, max: rotationVal)!
+    }()
+    
+    private var settingsAlphaEquation = CGQuadEquation(xy(-1, 0), xy(0,1), xy(1, 0))!
     
     
     func changeObjectPositionsBy(gradient: CGFloat){
-        let percentage = abs(gradient)
-        let endingIconSizeScale = endingIconSize / beginningIconSize
-        let endingCircleSizeScale = endingBigCircleSize / beginningBigCircleSize
-        
-        let sideInsetDifference = endingSideInset - beginningIconSideInset
-        let circleInsetDifference = beginningBigCircleBottomInset - endingBigCircleBottomInset
-        
+    
 
-        let iconSizeScale = getGradientValue(minVal: 1 , maxVal: endingIconSizeScale, percentage: percentage)
-        let circleSizeScale = getGradientValue(minVal: 1, maxVal: endingCircleSizeScale, percentage: percentage)
-        let iconTranslation = getGradientValue(minVal: 0, maxVal: sideInsetDifference, percentage: percentage)
-        let circleTranslation = getGradientValue(minVal: 0, maxVal: circleInsetDifference, percentage: percentage)
+        let iconSizeScale = sideIconsSizeScaleEquation.solve(for: gradient)
+        let circleSizeScale = circleSizeScaleEquation.solve(for: gradient)
+        let iconTranslation = sideIconXTranslationEquation.solve(for: gradient)
+        let circleTranslation = circleXTranslationEquation.solve(for: gradient)
+        let settingsRotation = settingsRotationEquation.solve(for: gradient)
         
-        let settingsRotation = getGradientValue(minVal: 0, maxVal: 5 * CGFloat.pi, percentage: percentage)
-
         chatButton.transform = CGAffineTransform(translationX: iconTranslation, y: 0).scaledBy(x: iconSizeScale, y: iconSizeScale)
         
         cameraButton.transform = CGAffineTransform(scaleX: circleSizeScale, y: circleSizeScale)
@@ -161,7 +175,7 @@ class ButtonNavigationView: UIView{
         
         settingsButton.transform = CGAffineTransform(translationX: 0, y: circleTranslation)
         settingsButton.imageView.transform = CGAffineTransform(rotationAngle: settingsRotation)
-        settingsButton.alpha = 1 - percentage
+        settingsButton.alpha = settingsAlphaEquation.solve(for: gradient)
         
     }
     
@@ -254,7 +268,7 @@ fileprivate class CameraCaptureButton: SCNavigationButton{
     
   
     private lazy var _iconBacking: UIView = {
-        let x = CircleView()
+        let x = HKCircleView()
         x.backgroundColor = .white
         return x
     }()
@@ -303,19 +317,6 @@ fileprivate class SCNavigationButton: BouncyButton{
     }
     
 
-    
-    
-   
-    
-    
-    
-    
-    
-    
-  
-    
-    
-    
     private(set) lazy var iconBacking: UIView = {
         let x = UIView()
         
@@ -326,21 +327,11 @@ fileprivate class SCNavigationButton: BouncyButton{
     }()
     
     
-    
-    
-    
-    
-    
+
     func setAction(action: @escaping (ButtonType) -> Void){
         addAction { action(self.type) }
     }
  
-    
-    
-
-    
-    
-    
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init coder has not been implemented")

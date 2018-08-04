@@ -22,8 +22,8 @@ class SCSearchBar: UIView{
         
     }
     
-    private let searchLabelAlphaEquation = CGQuadEquation(xy(0.5, 0), xy(0, 1), c3: xy(-0.5, 0), min: 0, max: 1)
-    private let secondaryLabelAlphaEquation = CGQuadEquation(xy(-1, 1), xy(-0.5, 0), c3: xy(0.5, 0), min: 0, max: 1)
+    private let searchLabelAlphaEquation = CGQuadEquation(xy(0.5, 0), xy(0, 1), xy(-0.5, 0), min: 0, max: 1)!
+    private let secondaryLabelAlphaEquation = CGQuadEquation(xy(-1, 1), xy(-0.5, 0), xy(0.5, 0), min: 0, max: 1)!
    
     func changeGradientTo(gradient: CGFloat, direction: ScrollingDirection){
         

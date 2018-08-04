@@ -41,6 +41,7 @@ class Login_MainVC: UIViewController{
     
     private lazy var ghostImage: UIImageView = {
         let x = UIImageView(image: AssetImages.snapchatGhost)
+        
         x.contentMode = .scaleAspectFit
         return x
     }()

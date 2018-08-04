@@ -16,20 +16,13 @@ class ChatMessagesCollectionView: UICollectionView, UIGestureRecognizerDelegate{
         super.init(frame: CGRect.zero, collectionViewLayout: UICollectionViewLayout())
         alwaysBounceVertical = true
         backgroundColor = .white
-        isUserInteractionEnabled = false
         keyboardDismissMode = .interactive
         layer.cornerRadius = 10
         layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
         layer.masksToBounds = true
         panGestureRecognizer.delegate = self
     }
-//    
-//    
-//    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRequireFailureOf otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-//        return true
-//    }
-//    
-//    shouldreco
+
     
     
     required init?(coder aDecoder: NSCoder) {

@@ -164,7 +164,7 @@ class SCScrollView: UIViewController, UIScrollViewDelegate {
         return x
     }()
     
-    private lazy var backgroundView: UIView = {
+    lazy var backgroundView: UIView = {
         let x = UIView()
         x.backgroundColor = .white
         x.layer.masksToBounds = true

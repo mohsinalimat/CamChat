@@ -19,11 +19,16 @@ class ChatCell: UITableViewCell{
         addSubview(customImageView)
         addSubview(labelStackView)
         self.selectionStyle = .none
-        
+        backgroundColor = .clear
         customImageView.pin(anchors: [.left: leftAnchor, .top: topAnchor, .bottom: bottomAnchor, .width: customImageView.heightAnchor], constants: [.top: padding, .left: padding, .bottom: padding])
 
         labelStackView.pin(anchors: [.left: customImageView.rightAnchor, .right: rightAnchor, .centerY: centerYAnchor], constants: [.left: padding, .right: padding])
         
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        customImageView.layer.cornerRadius = customImageView.frame.width / 2
     }
     
     

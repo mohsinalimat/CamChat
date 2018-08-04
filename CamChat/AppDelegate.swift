@@ -6,7 +6,6 @@
 //  Copyright © 2018 Patrick Hanna. All rights reserved.
 //
 
-import UIKit
 import CoreData
 import HelpKit
 
@@ -35,14 +34,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.makeKeyAndVisible()
         
-        window?.rootViewController = Screen()
+        window?.rootViewController = SCPagerViewController()
         
         
         window?.gestureRecognizers?.remove(at: 0)
         window?.gestureRecognizers?.remove(at: 0)
-        
-        
-       
         
         return true
     }

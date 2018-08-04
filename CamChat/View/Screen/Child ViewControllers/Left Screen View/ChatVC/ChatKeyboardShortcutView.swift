@@ -19,7 +19,6 @@ class ChatKeyboardShortcutView: HKView{
         
         textView.pinAllSides(addTo: self, pinTo: self)
         topLine.pin(addTo: self, anchors: [.left: leftAnchor, .right: rightAnchor, .top: topAnchor])
-        textView.becomeFirstResponder()
         
         NotificationCenter.default.addObserver(self, selector: #selector(respondToTextDidChange), name: UITextView.textDidChangeNotification, object: self.textView)
         
@@ -94,3 +93,5 @@ class ChatKeyboardShortcutView: HKView{
         previousTextViewSize = textView.contentSize
     }
 }
+
+

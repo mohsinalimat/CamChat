@@ -23,6 +23,7 @@ class BouncyButton: HKButtonTemplate{
         self.alternateImage = alternateImage
         super.init()
         imageView.image = image
+        
         addSubview(imageView)
         imageView.pinAllSides(pinTo: self)
         tintColor = .white

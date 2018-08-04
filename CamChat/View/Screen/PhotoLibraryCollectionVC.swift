@@ -9,22 +9,32 @@
 import UIKit
 
 
-class PhotoLibraryTableView: SCCollectionView, PhotoLibraryLayoutDelegate{
+class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate{
     func collectionView(_ collectionView: UICollectionView, heightForItemAt indexPath: IndexPath) -> CGFloat {
+        
         switch indexPath.item{
         case 0, 2, 4, 6: return 300 - 30
         default: return 300
-        
         }
     }
+    
+    @objc private func respondToGesture(gesture: UIPanGestureRecognizer){
+        switch gesture.state{
+        case .began: print("gesture began")
+        case .ended: print("gesture ended")
+        default: break
+        }
+    }
+    
     
     
     private let cellID = "The Best cell ever"
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: cellID)
+        collectionView.panGestureRecognizer.addTarget(self, action: #selector(respondToGesture(gesture:)))
+        collectionView.register(PhotoLibraryCollectionViewCell.self, forCellWithReuseIdentifier: cellID)
+        collectionView.panGestureRecognizer.stopInterferingWithTouchesInView()
     }
     
     override var topLabelText: String{
@@ -54,6 +64,4 @@ class PhotoLibraryTableView: SCCollectionView, PhotoLibraryLayoutDelegate{
         layout.delegate = self
         return layout
     }
-    
-    
 }
