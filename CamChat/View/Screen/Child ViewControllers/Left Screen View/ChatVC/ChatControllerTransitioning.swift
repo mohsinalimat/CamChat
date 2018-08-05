@@ -109,7 +109,6 @@ fileprivate class ChatControllerAnimationPositioningBrain{
 
         chatTopBar.pin(addTo: container, anchors: [.centerX: container.centerXAnchor, .top: container.safeAreaLayoutGuide.topAnchor])
         
-        chatView.frame = container.bounds
         chatBackgroundView.frame = container.bounds
 
         chatTopBar.transform = CGAffineTransform(translationX: -chatView.frame.width, y: 0)

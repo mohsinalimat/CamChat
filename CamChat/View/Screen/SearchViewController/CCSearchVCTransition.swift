@@ -11,12 +11,15 @@ import HelpKit
 
 
 class CCSearchVCTransition: NSObject, UIViewControllerTransitioningDelegate{
+    init(searchController: UIViewController){
+        searchController.modalPresentationStyle = .overCurrentContext
+    }
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return nil
+        return CCSearchVCTransitionAnimator(config: .presentation)
     }
     
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return nil
+        return CCSearchVCTransitionAnimator(config: .dismissal)
     }
     
 }
@@ -29,7 +32,7 @@ private class CCSearchVCTransitionAnimator: NSObject, UIViewControllerAnimatedTr
         self.config = config
     }
     
-    private let duration = 0.4
+    private let duration = 0.3
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         return duration
@@ -38,6 +41,20 @@ private class CCSearchVCTransitionAnimator: NSObject, UIViewControllerAnimatedTr
     
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
         
+        let fromView = transitionContext.view(forKey: .from)
+        let toView = transitionContext.view(forKey: .to)
+        if config == .presentation{
+            transitionContext.containerView.addSubview(toView!)
+            toView?.alpha = 0
+        }
+        let viewToChange = (config == .presentation) ? toView : fromView
+        let endingAlpha: CGFloat = (config == .presentation) ? 1 : 0
+        
+        UIView.animate(withDuration: duration, animations: {
+            viewToChange!.alpha = endingAlpha
+        }) { _ in
+            transitionContext.completeTransition(true)
+        }
     }
     
     

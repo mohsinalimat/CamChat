@@ -33,6 +33,7 @@ struct AssetImages{
     static var newChatIcon = get("newChatIcon").templateImage
     static var arrowChevron = get("backArrow").templateImage
     static var threeLineMenuIcon = get("threeLineMenuIcon").templateImage
+    static var xIcon = get("xButton").templateImage
 }
 
 

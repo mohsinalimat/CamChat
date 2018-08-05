@@ -91,12 +91,12 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         return x
     }()
     
-    var topBar: UIView{
-        return topBar_typed
-    }
+   
     
     lazy var topBar_typed: ScreenTopBar = {
-        return ScreenTopBar()
+        let x = ScreenTopBar()
+        x.topSearchBar.searchTappedAction = self.respondToSearchButtonTapped
+        return x
     }()
     
     

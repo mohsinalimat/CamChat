@@ -47,10 +47,10 @@ class ChatViewController: UIViewController, ChatControllerProtocol{
 
     override func loadView() {
         let view = HKView()
+        view.frame = UIScreen.main.bounds
         view.backgroundColor = .clear
         view.didMoveToSuperviewAction = { [weak self] in self?.becomeFirstResponder() }
         view.hitTestAction = {[weak self] in self?.hitTestView(point: $0, event: $1) }
-        
         self.view = view
         
     }

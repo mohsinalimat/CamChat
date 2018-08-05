@@ -12,17 +12,16 @@ import HelpKit
 class ScreenTopBar: HKView{
     
     override func setUpView() {
-        buttonTopBar.pinAllSides(addTo: self, pinTo: self)
-        topSearchBar.pinAllSides(addTo: self, pinTo: self)
+        topSearchBar.pin(addTo: self, anchors: [.left: leftAnchor, .top: topAnchor, .bottom: bottomAnchor, .right: centerXAnchor])
+        buttonTopBar.pin(addTo: self, anchors: [.left: topSearchBar.rightAnchor, .top: topAnchor, .bottom: bottomAnchor, .right: rightAnchor])
     }
     
-    private let topSearchBar: CCSearchBar = {
+    let topSearchBar: CCSearchBar = {
         let x = CCSearchBar()
-        x.isUserInteractionEnabled = false
         return x
     }()
     
-    private lazy var buttonTopBar: ScreenButtonsTopBar = {
+    lazy var buttonTopBar: ScreenButtonsTopBar = {
         let x = ScreenButtonsTopBar()
         return x
         

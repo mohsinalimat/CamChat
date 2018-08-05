@@ -18,8 +18,35 @@ class CCSearchBar: UIView{
     init(){
         super.init(frame: CGRect.zero)
         setUpViews()
+        addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(respondToTap)))
+        
+    }
+    
+    
+    private func setUpViews(){
+        
+        addSubview(searchIcon)
+        addSubview(secondaryLabel)
+        addSubview(searchTextLabel)
         
         
+        
+        
+        searchIcon.pin(anchors: [.left: leftAnchor, .centerY: centerYAnchor], constants: [.width: CCSearchConstants.searchIconSize.width, .height: CCSearchConstants.searchIconSize.height, .left: CCSearchConstants.searchIconLeftPadding])
+        
+        
+        searchTextLabel.pin(anchors: [.left: searchIcon.rightAnchor, .centerY: centerYAnchor], constants: [.width: 200, .left: CCSearchConstants.searchIconRightPadding])
+        
+        secondaryLabel.pin(anchors: [.left: searchTextLabel.leftAnchor, .centerY: searchTextLabel.centerYAnchor], constants: [.width: 200])
+    }
+    
+    
+    
+    
+    var searchTappedAction = {}
+    
+    @objc private func respondToTap(){
+        searchTappedAction()
     }
     
     private let searchLabelAlphaEquation = CGQuadEquation(xy(0.5, 0), xy(0, 1), xy(-0.5, 0), min: 0, max: 1)!
@@ -48,22 +75,7 @@ class CCSearchBar: UIView{
     private let bottomText = "Settings"
     
     
-    private func setUpViews(){
-        
-        addSubview(searchIcon)
-        addSubview(secondaryLabel)
-        addSubview(searchTextLabel)
-        
-        
-        
-        
-        searchIcon.pin(anchors: [.left: leftAnchor, .centerY: centerYAnchor, .height: searchTextLabel.heightAnchor], constants: [.width: 20, .height: 2, .left: 15])
-    
-        
-        searchTextLabel.pin(anchors: [.left: searchIcon.rightAnchor, .centerY: centerYAnchor], constants: [.width: 200, .left: 10])
-        
-        secondaryLabel.pin(anchors: [.left: searchTextLabel.leftAnchor, .centerY: searchTextLabel.centerYAnchor], constants: [.width: 200])
-    }
+ 
     
     private lazy var secondaryLabel: UILabel = {
         let x = UILabel()
@@ -77,16 +89,15 @@ class CCSearchBar: UIView{
     private lazy var searchTextLabel: UILabel = {
         let x = UILabel()
         x.text = centerText
-        x.textColor = .white
-        x.font = SCFonts.getFont(type: .demiBold, size: 20)
+        x.textColor = CCSearchConstants.searchTintColor
+        x.font = CCSearchConstants.searchLabelFont
         return x
     }()
     
     private lazy var searchIcon: UIImageView = {
         let x = UIImageView(image: AssetImages.magnifyingGlass)
-        x.tintColor = .white
-
-        x.contentMode = .scaleAspectFill
+        x.tintColor = CCSearchConstants.searchTintColor
+        x.contentMode = .scaleAspectFit
         return x
     }()
     

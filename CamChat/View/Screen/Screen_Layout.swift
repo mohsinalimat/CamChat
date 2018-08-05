@@ -28,7 +28,7 @@ extension Screen{
         view.addSubview(navigationView)
         
         
-        let topBarConstraints = topBar.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .top: view.safeAreaLayoutGuide.topAnchor], constants: [.height: topBarHeight])
+        let topBarConstraints = topBar_typed.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .top: view.safeAreaLayoutGuide.topAnchor], constants: [.height: topBarHeight])
         
         topBarTopContraint = topBarConstraints.top!
         topBarHeightConstraint = topBarConstraints.height!
@@ -54,13 +54,13 @@ extension Screen{
         bottomGradientView.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .top: navigationView.topAnchor, .bottom: view.bottomAnchor])
         
         
-        topGradientView.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .top: view.topAnchor, .bottom: topBar.bottomAnchor], constants: [.bottom: -30])
+        topGradientView.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .top: view.topAnchor, .bottom: topBar_typed.bottomAnchor], constants: [.bottom: -30])
         
         
         navigationView.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.safeAreaLayoutGuide.bottomAnchor], constants: [.height: 150])
         
         
-        topBarBottomLine.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: topBar.bottomAnchor], constants: [.height: 0.5])
+        topBarBottomLine.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: topBar_typed.bottomAnchor], constants: [.height: 0.5])
         
     }
     

@@ -19,7 +19,7 @@ extension UIEdgeInsets {
 }
 #endif
 
-
+private(set) var APP_INSETS = UIEdgeInsets.zero
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -35,7 +35,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
         
         window?.rootViewController = Screen()
-        
+        APP_INSETS = window!.safeAreaInsets
         
         window?.gestureRecognizers?.remove(at: 0)
         window?.gestureRecognizers?.remove(at: 0)
