@@ -16,7 +16,7 @@ class CCSearchConstants{
     static let searchTintColor = UIColor.white
     static var opaqueBackingColor: UIColor{
         let val: CGFloat = 70
-        return UIColor(red: val, green: val, blue: val).withAlphaComponent(0.9)
+        return UIColor(red: val, green: val, blue: val).withAlphaComponent(0.6)
     }
 }
 

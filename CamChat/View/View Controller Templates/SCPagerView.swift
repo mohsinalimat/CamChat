@@ -15,7 +15,7 @@ class SCPagerViewController: UIViewController, SCPagerDataSource{
    
     
     func pagerView(numberOfItemsIn pagerView: SCPagerView) -> Int {
-        return 10
+        return 10 
     }
     
     func pagerView(_ pagerView: SCPagerView, viewForItemAt index: Int, cachedView: UIView?) -> UIView {
@@ -29,6 +29,7 @@ class SCPagerViewController: UIViewController, SCPagerDataSource{
     override func loadView() {
         let newView = SCPagerView(dataSource: self)
         self.pagerView = newView
+        newView.frame = UIScreen.main.bounds
         self.view = newView
     }
 }
@@ -57,8 +58,12 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         interactor.activate()
         interactor.onlyAcceptInteractionInSpecifiedDirection = false
         
-        centerView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: 0, cachedView: nil))
-        rightView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: 1, cachedView: nil))
+        if numberOfItems >= 1{
+            centerView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: 0, cachedView: nil))
+            if numberOfItems >= 2{
+                rightView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: 1, cachedView: nil))
+            }
+        } else {fatalError("You must have at least one item to display in an SCPagerView")}
     }
     
 
@@ -107,28 +112,36 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
     
     private var currentItemIndex = 0
     
-    
     func gradientDidSnap(fromScreen: PageScrollingInteractor.ScreenType, toScreen: PageScrollingInteractor.ScreenType, direction: ScrollingDirection, interactor: PageScrollingInteractor) {
         
-        if toScreen != .center{
-            interactor.snapGradientTo(screen: .center, animated: false)
-            switch toScreen{
-            case .first:
-                currentItemIndex -= 1
-                let cachedView = rightView.containedView
-                rightView.setContainedView(to: centerView.containedView!)
-                centerView.setContainedView(to: leftView.containedView!)
-                leftView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: currentItemIndex, cachedView: cachedView))
-                
-            case .last:
-                currentItemIndex += 1
-                let cachedView = leftView.containedView
-                leftView.setContainedView(to: centerView.containedView!)
-                centerView.setContainedView(to: rightView.containedView!)
-                rightView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: currentItemIndex, cachedView: cachedView))
-            default: break
+        if toScreen == .center{return}
+        
+        interactor.snapGradientTo(screen: .center, animated: false)
+        
+        switch toScreen{
+        case .first:
+            currentItemIndex -= 1
+            rightView.setContainedView(to: centerView.containedView!)
+            centerView.setContainedView(to: leftView.containedView!)
+            if currentItemIndex > 0{
+                leftView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: currentItemIndex - 1, cachedView: nil))
             }
+            
+            
+        case .last:
+            currentItemIndex += 1
+            leftView.setContainedView(to: centerView.containedView!)
+            centerView.setContainedView(to: rightView.containedView!)
+            if currentItemIndex < numberOfItems - 1{
+                rightView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: currentItemIndex + 1, cachedView: nil))
+            }
+            
+            
+        default: break
         }
+        
+        
+        
     }
     
     var view: UIView!{
@@ -136,27 +149,22 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
     }
     
     private let minimumViewTransform: CGFloat = 0.5
-    
-    
-    
-    
+
     private lazy var centerViewTransformEquation = CGAbsEquation(xy(-1, minimumViewTransform), xy(0, 1), xy(1, minimumViewTransform), min: minimumViewTransform, max: 1)!
     private lazy var centerViewAlphaEquation = CGAbsEquation(xy(-1, 0), xy(0, 1), xy(1, 0), min: 0, max: 1)!
-    
-    
     private lazy var sideViewsTransformEquation = CGAbsEquation(xy(-1, 1), xy(0, minimumViewTransform), xy(1, 1), min: minimumViewTransform, max: 1)!
     private lazy var sideViewsAlphaEquation = CGAbsEquation(xy(-1, 1), xy(0, 0), xy(1, 1), min: 0, max: 1)!
     
     
     
     func gradientDidChange(to gradient: CGFloat, direction: ScrollingDirection, interactor: PageScrollingInteractor) {
+       
         if (currentItemIndex == 0 && gradient < 0) ||
             (currentItemIndex == numberOfItems - 1 && gradient > 0){
             interactor.snapGradientTo(screen: .center, animated: false)
             return
         }
         
-
         let centerVal = centerViewTransformEquation.solve(for: gradient)
         let sideVals = sideViewsTransformEquation.solve(for: gradient)
         
@@ -171,7 +179,7 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         leftView.alpha = sideAlphas
         rightView.alpha = sideAlphas
         
-        longViewOffset = interactor.currentGradientPointValue * -1
+        longViewOffset = -interactor.currentGradientPointValue
     }
     
     

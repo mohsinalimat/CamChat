@@ -134,8 +134,8 @@ private class CCSearchTableViewHeader: UIView{
     private lazy var labelBacking: UIView = {
         let x = UIView()
         x.layer.masksToBounds = true
-        let val: CGFloat = 55
-        x.backgroundColor = UIColor(red: val, green: val, blue: val)
+        let val: CGFloat = 65
+        x.backgroundColor = UIColor(red: val, green: val, blue: val).withAlphaComponent(0.8)
         return x
     }()
     

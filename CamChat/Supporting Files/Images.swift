@@ -34,6 +34,7 @@ struct AssetImages{
     static var arrowChevron = get("backArrow").templateImage
     static var threeLineMenuIcon = get("threeLineMenuIcon").templateImage
     static var xIcon = get("xButton").templateImage
+    static var cancelButton = get("cancelButton").templateImage
 }
 
 

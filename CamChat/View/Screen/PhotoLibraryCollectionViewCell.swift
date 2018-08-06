@@ -15,18 +15,39 @@ class PhotoLibraryCollectionViewCell: UICollectionViewCell{
         super.init(frame: CGRect.zero)
         
         
-        
+        imageView.pinAllSides(addTo: self, pinTo: self)
         
     }
     
+  
+    
+    
+    lazy var imageView: UIImageView = {
+        let x = UIImageView()
+        x.contentMode = .scaleAspectFill
+        return x
+    }()
+    
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
-        print("touches began")
+        UIView.animate(withDuration: 0.2) {
+            self.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
+        }
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        print("touches ended")
+        UIView.animate(withDuration: 0.2) {
+            self.transform = CGAffineTransform.identity
+        }
+    }
+    
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesCancelled(touches, with: event)
+        UIView.animate(withDuration: 0.2) {
+            self.transform = CGAffineTransform.identity
+        }
     }
     
     

@@ -18,7 +18,11 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
     
         setUpViews()
         view.layoutIfNeeded()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(respondToTextFieldTextDidChange), name: UITextField.textDidChangeNotification, object: searchTextField)
     }
+    
+    
 
     private lazy var fadeTransitionDelegate = CCSearchVCTransition(searchController: self)
     
@@ -40,14 +44,10 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
         
        
         tableView.pin(addTo: contentView, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor, .top: topBarLayoutGuide.bottomAnchor], constants: [.left: tableViewPadding, .right: tableViewPadding])
-        
-        
-        
-        
-        
+     
         searchIcon.pin(addTo: contentView, anchors: [.left: topBarLayoutGuide.leftAnchor, .centerY: topBarLayoutGuide.centerYAnchor],constants: [.left: CCSearchConstants.searchIconLeftPadding])
-        xButton.pin(addTo: contentView, anchors: [.right: topBarLayoutGuide.rightAnchor, .centerY: topBarLayoutGuide.centerYAnchor], constants: [.right: CCSearchConstants.searchIconLeftPadding])
-        searchTextField.pin(addTo: contentView, anchors: [.left: searchIcon.rightAnchor, .centerY: topBarLayoutGuide.centerYAnchor, .right: xButton.leftAnchor], constants: [.right: 15, .left: CCSearchConstants.searchIconRightPadding])
+        dissmiss_cancelButton.pin(addTo: contentView, anchors: [.right: topBarLayoutGuide.rightAnchor, .centerY: topBarLayoutGuide.centerYAnchor], constants: [.right: CCSearchConstants.searchIconLeftPadding])
+        searchTextField.pin(addTo: contentView, anchors: [.left: searchIcon.rightAnchor, .centerY: topBarLayoutGuide.centerYAnchor, .right: dissmiss_cancelButton.leftAnchor], constants: [.right: 15, .left: CCSearchConstants.searchIconRightPadding])
         
         
     }
@@ -85,7 +85,18 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
         searchIcon.bounce()
     }
     
- 
+    @objc private func respondToTextFieldTextDidChange(){
+        if let text = searchTextField.text{
+            if text.removeWhiteSpaces().isEmpty {
+                dissmiss_cancelButton.showDismissButton()
+            } else {
+                dissmiss_cancelButton.showCancelButton()
+            }
+        } else {
+            dissmiss_cancelButton.showDismissButton()
+        }
+    }
+
     
     
     
@@ -108,9 +119,10 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
         return x
     }()
     
-    private lazy var xButton: BouncyButton = {
-        let x = BouncyButton(image: AssetImages.xIcon)
-        x.addAction({[weak self] in self?.dismiss(animated: true)})
+    private lazy var dissmiss_cancelButton: SearchVCXDeleteButton = {
+        let x = SearchVCXDeleteButton()
+        x.dismissButton.addAction({[weak self] in self?.dismiss(animated: true)})
+        x.cancelButton.addAction({[weak self] in self?.searchTextField.text = nil; self?.respondToTextFieldTextDidChange()})
         x.pin(constants: [.height: 25, .width: 25])
         return x
     }()

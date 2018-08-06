@@ -46,11 +46,13 @@
 		6096CCDF20F168490052EE16 /* CCSearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6096CCDE20F168490052EE16 /* CCSearchBar.swift */; };
 		60A8955320F572FB00E4E644 /* SCPagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A8955220F572FB00E4E644 /* SCPagerView.swift */; };
 		60B1078720EA46DA006E0866 /* ChatCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B1078620EA46DA006E0866 /* ChatCell.swift */; };
+		60B1566E211710F300D1B2AA /* SearchVCXDeleteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B1566D211710F300D1B2AA /* SearchVCXDeleteButton.swift */; };
 		60B506702104915600A9E94A /* Templates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B5066F2104915600A9E94A /* Templates.swift */; };
 		60B506732104A00700A9E94A /* ChatControllerTransitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B506722104A00700A9E94A /* ChatControllerTransitioning.swift */; };
 		60B99EA020EE3F4800660F9B /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B99E9F20EE3F4800660F9B /* SettingsVC.swift */; };
 		60C23F0E2103BA1B00D78F77 /* ChatMessagesCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C23F0D2103BA1B00D78F77 /* ChatMessagesCollectionView.swift */; };
 		60CABF4320FD85D4008D5780 /* Login_SignUp_Password.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60CABF4220FD85D4008D5780 /* Login_SignUp_Password.swift */; };
+		60D93EFC2117A1F600706BC4 /* PagerViewTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60D93EFB2117A1F600706BC4 /* PagerViewTester.swift */; };
 		60DA8A5C2115F74E00722B78 /* CCSearchVCTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DA8A5B2115F74E00722B78 /* CCSearchVCTransition.swift */; };
 		60DA8A5E2115FE4000722B78 /* Screen_ButtonResponses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DA8A5D2115FE4000722B78 /* Screen_ButtonResponses.swift */; };
 		60DA8A602116063600722B78 /* CCSearchConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DA8A5F2116063600722B78 /* CCSearchConstants.swift */; };
@@ -135,11 +137,13 @@
 		60A8955220F572FB00E4E644 /* SCPagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SCPagerView.swift; sourceTree = "<group>"; };
 		60A8955420F5817500E4E644 /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		60B1078620EA46DA006E0866 /* ChatCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatCell.swift; sourceTree = "<group>"; };
+		60B1566D211710F300D1B2AA /* SearchVCXDeleteButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchVCXDeleteButton.swift; sourceTree = "<group>"; };
 		60B5066F2104915600A9E94A /* Templates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Templates.swift; sourceTree = "<group>"; };
 		60B506722104A00700A9E94A /* ChatControllerTransitioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatControllerTransitioning.swift; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; wrapsLines = 1; };
 		60B99E9F20EE3F4800660F9B /* SettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
 		60C23F0D2103BA1B00D78F77 /* ChatMessagesCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesCollectionView.swift; sourceTree = "<group>"; };
 		60CABF4220FD85D4008D5780 /* Login_SignUp_Password.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Login_SignUp_Password.swift; sourceTree = "<group>"; };
+		60D93EFB2117A1F600706BC4 /* PagerViewTester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagerViewTester.swift; sourceTree = "<group>"; };
 		60DA8A5B2115F74E00722B78 /* CCSearchVCTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCSearchVCTransition.swift; sourceTree = "<group>"; };
 		60DA8A5D2115FE4000722B78 /* Screen_ButtonResponses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screen_ButtonResponses.swift; sourceTree = "<group>"; };
 		60DA8A5F2116063600722B78 /* CCSearchConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCSearchConstants.swift; sourceTree = "<group>"; };
@@ -187,6 +191,7 @@
 			children = (
 				6044ED7320E44A9700098F22 /* SCTableView.swift */,
 				60A8955220F572FB00E4E644 /* SCPagerView.swift */,
+				60D93EFB2117A1F600706BC4 /* PagerViewTester.swift */,
 			);
 			path = "View Controller Templates";
 			sourceTree = "<group>";
@@ -272,6 +277,7 @@
 				60DA8A6321161CE500722B78 /* CCSearchTableView.swift */,
 				60DA8A6121161AFC00722B78 /* CCSearchTableViewCell.swift */,
 				60DA8A652116674300722B78 /* CCBouncySearchIcon.swift */,
+				60B1566D211710F300D1B2AA /* SearchVCXDeleteButton.swift */,
 			);
 			path = SearchViewController;
 			sourceTree = "<group>";
@@ -475,6 +481,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				605F1B7B20FC109D003CCD0B /* Login_SignUp_Username.swift in Sources */,
+				60B1566E211710F300D1B2AA /* SearchVCXDeleteButton.swift in Sources */,
 				605F1B7D20FC137C003CCD0B /* Variations.swift in Sources */,
 				605F1B8120FCB3E4003CCD0B /* Login_SignUp_Name.swift in Sources */,
 				60F4CD0220E47B0000B06458 /* Screen_Storage.swift in Sources */,
@@ -510,6 +517,7 @@
 				60A8955320F572FB00E4E644 /* SCPagerView.swift in Sources */,
 				60DA8A602116063600722B78 /* CCSearchConstants.swift in Sources */,
 				603C830A2111E15900592E18 /* PhotoLibraryCollectionViewCell.swift in Sources */,
+				60D93EFC2117A1F600706BC4 /* PagerViewTester.swift in Sources */,
 				6011896B20FEDA3600C87C74 /* BouncyButton.swift in Sources */,
 				60C23F0E2103BA1B00D78F77 /* ChatMessagesCollectionView.swift in Sources */,
 				601D0D36210DEDCA007C47C9 /* ScreenTopBar.swift in Sources */,

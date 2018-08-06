@@ -18,13 +18,19 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate{
         }
     }
     
-    @objc private func respondToGesture(gesture: UIPanGestureRecognizer){
-        switch gesture.state{
-        case .began: print("gesture began")
-        case .ended: print("gesture ended")
-        default: break
+    private let imageArray: [UIImage] = {
+        var images = [UIImage]()
+        for i in 0...4{
+            images.append(UIImage(named: "iphoneImage\(i)")!)
         }
-    }
+        
+        var imagesToReturn = [UIImage]()
+        for i in 1...30{
+            imagesToReturn.append(images.randomElement()!)
+        }
+        
+        return imagesToReturn
+    }()
     
     
     
@@ -32,9 +38,7 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate{
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        collectionView.panGestureRecognizer.addTarget(self, action: #selector(respondToGesture(gesture:)))
         collectionView.register(PhotoLibraryCollectionViewCell.self, forCellWithReuseIdentifier: cellID)
-        collectionView.panGestureRecognizer.stopInterferingWithTouchesInView()
     }
     
     override var topLabelText: String{
@@ -45,16 +49,15 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate{
         return REDCOLOR
     }
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
-        cell.backgroundColor = UIColor.random
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath) as! PhotoLibraryCollectionViewCell
+        cell.imageView.image = imageArray[indexPath.item]
         cell.layer.masksToBounds = true
         cell.layer.cornerRadius = 10
-        cell.isUserInteractionEnabled = false
         return cell
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 50
+        return imageArray.count
     }
     
     
@@ -65,3 +68,9 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate{
         return layout
     }
 }
+
+
+
+
+
+

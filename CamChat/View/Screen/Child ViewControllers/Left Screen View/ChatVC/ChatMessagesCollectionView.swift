@@ -12,7 +12,7 @@ import HelpKit
 
 class ChatMessagesCollectionView: UICollectionView, UIGestureRecognizerDelegate{
     
-    init(){
+    init() {
         super.init(frame: CGRect.zero, collectionViewLayout: UICollectionViewLayout())
         alwaysBounceVertical = true
         backgroundColor = .white
