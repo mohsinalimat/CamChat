@@ -12,14 +12,7 @@ import UIKit
 class SCCollectionView: SCScrollView, UICollectionViewDelegate, UICollectionViewDataSource {
     
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        collectionView.setContentOffset(CGPoint(x: 0, y: -collectionView.adjustedContentInset.top), animated: false)
-    }
     
     
     
@@ -106,7 +99,10 @@ class SCScrollView: UIViewController, UIScrollViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpViews()
+        
+        // I'm doing the below because sometimes my photoLibrary collectionView controller is be feeling itself..... and appears to be scrolled up a bit when it's first loaded.
         scrollView.setContentOffset(CGPoint(x: 0, y: -scrollView.adjustedContentInset.top), animated: false)
+        scrollView.layoutIfNeeded()
         
         
     }

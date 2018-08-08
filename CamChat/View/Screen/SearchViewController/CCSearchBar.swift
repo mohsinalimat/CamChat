@@ -37,7 +37,9 @@ class CCSearchBar: UIView{
         
         searchTextLabel.pin(anchors: [.left: searchIcon.rightAnchor, .centerY: centerYAnchor], constants: [.width: 200, .left: CCSearchConstants.searchIconRightPadding])
         
-        secondaryLabel.pin(anchors: [.left: searchTextLabel.leftAnchor, .centerY: searchTextLabel.centerYAnchor], constants: [.width: 200])
+        secondaryLabel.pin(anchors: [.left: searchTextLabel.leftAnchor, .centerY: searchTextLabel.centerYAnchor], constants: [.width: 100])
+        
+        fingerHitArea.pin(addTo: self, anchors: [.left: searchIcon.leftAnchor, .right: secondaryLabel.rightAnchor, .top: searchIcon.topAnchor, .bottom: searchIcon.bottomAnchor], constants: [.top: -20, .bottom: -20, .left: -20, .right: -20])
     }
     
     
@@ -101,9 +103,14 @@ class CCSearchBar: UIView{
         return x
     }()
     
+    private lazy var fingerHitArea: UIView = UIView()
+    
    
     
-  
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let newPoint = fingerHitArea.convert(point, from: self)
+        return fingerHitArea.hitTest(newPoint, with: event)
+    }
     
     
     required init?(coder aDecoder: NSCoder) {

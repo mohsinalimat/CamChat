@@ -40,6 +40,13 @@ class PhotoLibraryLayout: UICollectionViewLayout{
         return attributesToReturn
     }
     
+    override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        for i in attributes where i.indexPath == indexPath{
+            return i
+        }
+        return nil
+    }
+    
     
     private var attributes = [UICollectionViewLayoutAttributes]()
 
@@ -47,7 +54,7 @@ class PhotoLibraryLayout: UICollectionViewLayout{
     var margins: CGFloat = 10
 
     override func prepare() {
-        
+        attributes = []
         let columnWidth = (self.width - (margins * CGFloat(numberOfColumns + 1))) / CGFloat(numberOfColumns)
         var xOffsets = Array<CGFloat>.init(repeating: 0, count: numberOfColumns)
         

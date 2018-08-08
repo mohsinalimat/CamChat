@@ -301,34 +301,13 @@ private class ChatControllerAnimationController: NSObject, UIViewControllerAnima
 
 
 
-private class InteractionController: NSObject, UIViewControllerInteractiveTransitioning{
-    private var context: UIViewControllerContextTransitioning?
-    
-    func startInteractiveTransition(_ transitionContext: UIViewControllerContextTransitioning) {
-        self.context = transitionContext
-    }
-    
-    func update(_ percentage: CGFloat){
-        context?.updateInteractiveTransition(percentage)
-    }
-    func cancelInteraction(){
-        context?.cancelInteractiveTransition()
-    }
-    
-    func completeTransition(_ didComplete: Bool){
-        context?.completeTransition(didComplete)
-    }
-    
-    func completeInteraction(){
-        context?.finishInteractiveTransition()
-    }
-}
 
 
 
 
 
-private class ChatControllerInteractionController: InteractionController{
+
+private class ChatControllerInteractionController: HKInteractionController{
     
     
     private weak var brain: ChatControllerAnimationPositioningBrain!
@@ -393,7 +372,7 @@ private class ChatControllerInteractionController: InteractionController{
     }
     
     @objc private func respondToGesture(gesture: DirectionAwarePanGesture){
-        if gesture.direction != .horizontal{return}
+        if gesture.scrollingDirection != .horizontal{return}
         
         
         let translation = gesture.translation(in: chatVC.view).x

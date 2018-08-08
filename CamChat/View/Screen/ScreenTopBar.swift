@@ -16,6 +16,15 @@ class ScreenTopBar: HKView{
         buttonTopBar.pin(addTo: self, anchors: [.left: topSearchBar.rightAnchor, .top: topAnchor, .bottom: bottomAnchor, .right: rightAnchor])
     }
     
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        for subview in [topSearchBar, buttonTopBar] {
+            let newPoint = subview.convert(point, from: self)
+            if let view = subview.hitTest(newPoint, with: event){return view}
+        }
+        
+        return nil
+    }
+    
     let topSearchBar: CCSearchBar = {
         let x = CCSearchBar()
         return x

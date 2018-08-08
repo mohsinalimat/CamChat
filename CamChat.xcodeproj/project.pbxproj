@@ -50,9 +50,10 @@
 		60B506702104915600A9E94A /* Templates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B5066F2104915600A9E94A /* Templates.swift */; };
 		60B506732104A00700A9E94A /* ChatControllerTransitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B506722104A00700A9E94A /* ChatControllerTransitioning.swift */; };
 		60B99EA020EE3F4800660F9B /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B99E9F20EE3F4800660F9B /* SettingsVC.swift */; };
+		60BAF21E21186E1000860E51 /* PhotoLibraryViewerVCTransitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60BAF21D21186E1000860E51 /* PhotoLibraryViewerVCTransitioning.swift */; };
 		60C23F0E2103BA1B00D78F77 /* ChatMessagesCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C23F0D2103BA1B00D78F77 /* ChatMessagesCollectionView.swift */; };
 		60CABF4320FD85D4008D5780 /* Login_SignUp_Password.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60CABF4220FD85D4008D5780 /* Login_SignUp_Password.swift */; };
-		60D93EFC2117A1F600706BC4 /* PagerViewTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60D93EFB2117A1F600706BC4 /* PagerViewTester.swift */; };
+		60D93EFC2117A1F600706BC4 /* PhotoLibraryViewerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60D93EFB2117A1F600706BC4 /* PhotoLibraryViewerVC.swift */; };
 		60DA8A5C2115F74E00722B78 /* CCSearchVCTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DA8A5B2115F74E00722B78 /* CCSearchVCTransition.swift */; };
 		60DA8A5E2115FE4000722B78 /* Screen_ButtonResponses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DA8A5D2115FE4000722B78 /* Screen_ButtonResponses.swift */; };
 		60DA8A602116063600722B78 /* CCSearchConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60DA8A5F2116063600722B78 /* CCSearchConstants.swift */; };
@@ -141,9 +142,10 @@
 		60B5066F2104915600A9E94A /* Templates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Templates.swift; sourceTree = "<group>"; };
 		60B506722104A00700A9E94A /* ChatControllerTransitioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatControllerTransitioning.swift; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; wrapsLines = 1; };
 		60B99E9F20EE3F4800660F9B /* SettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
+		60BAF21D21186E1000860E51 /* PhotoLibraryViewerVCTransitioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryViewerVCTransitioning.swift; sourceTree = "<group>"; };
 		60C23F0D2103BA1B00D78F77 /* ChatMessagesCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesCollectionView.swift; sourceTree = "<group>"; };
 		60CABF4220FD85D4008D5780 /* Login_SignUp_Password.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Login_SignUp_Password.swift; sourceTree = "<group>"; };
-		60D93EFB2117A1F600706BC4 /* PagerViewTester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagerViewTester.swift; sourceTree = "<group>"; };
+		60D93EFB2117A1F600706BC4 /* PhotoLibraryViewerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryViewerVC.swift; sourceTree = "<group>"; };
 		60DA8A5B2115F74E00722B78 /* CCSearchVCTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCSearchVCTransition.swift; sourceTree = "<group>"; };
 		60DA8A5D2115FE4000722B78 /* Screen_ButtonResponses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screen_ButtonResponses.swift; sourceTree = "<group>"; };
 		60DA8A5F2116063600722B78 /* CCSearchConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCSearchConstants.swift; sourceTree = "<group>"; };
@@ -178,20 +180,11 @@
 			path = "Child ViewControllers";
 			sourceTree = "<group>";
 		};
-		6036552920F22D3E00536DEF /* View Mechanisms */ = {
-			isa = PBXGroup;
-			children = (
-				606FBAD420E91CD800F6FA58 /* PhotoLibraryLayout.swift */,
-			);
-			path = "View Mechanisms";
-			sourceTree = "<group>";
-		};
 		6036552A20F22DF300536DEF /* View Controller Templates */ = {
 			isa = PBXGroup;
 			children = (
 				6044ED7320E44A9700098F22 /* SCTableView.swift */,
 				60A8955220F572FB00E4E644 /* SCPagerView.swift */,
-				60D93EFB2117A1F600706BC4 /* PagerViewTester.swift */,
 			);
 			path = "View Controller Templates";
 			sourceTree = "<group>";
@@ -228,6 +221,7 @@
 			children = (
 				606FBAD220E9112200F6FA58 /* PhotoLibraryCollectionVC.swift */,
 				603C83092111E15900592E18 /* PhotoLibraryCollectionViewCell.swift */,
+				60BAF21C21186ADF00860E51 /* PhotoLibraryViewer */,
 			);
 			name = "Right Screen View";
 			path = ..;
@@ -352,7 +346,6 @@
 			children = (
 				6036553420F22F7900536DEF /* Login Views */,
 				6036552B20F22E1600536DEF /* Screen */,
-				6036552920F22D3E00536DEF /* View Mechanisms */,
 				6036553520F233DB00536DEF /* Custom Views */,
 				6036552A20F22DF300536DEF /* View Controller Templates */,
 			);
@@ -365,6 +358,16 @@
 				60B5066F2104915600A9E94A /* Templates.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		60BAF21C21186ADF00860E51 /* PhotoLibraryViewer */ = {
+			isa = PBXGroup;
+			children = (
+				60D93EFB2117A1F600706BC4 /* PhotoLibraryViewerVC.swift */,
+				606FBAD420E91CD800F6FA58 /* PhotoLibraryLayout.swift */,
+				60BAF21D21186E1000860E51 /* PhotoLibraryViewerVCTransitioning.swift */,
+			);
+			path = PhotoLibraryViewer;
 			sourceTree = "<group>";
 		};
 		60CABF4420FE1745008D5780 /* Templates */ = {
@@ -504,6 +507,7 @@
 				605F1B8320FCB575003CCD0B /* SimpleInteractiveButton.swift in Sources */,
 				60920BD22103726500B4AFEF /* ChatKeyboardShortcutView.swift in Sources */,
 				605B1C2D20E7A595008584BC /* CameraVC.swift in Sources */,
+				60BAF21E21186E1000860E51 /* PhotoLibraryViewerVCTransitioning.swift in Sources */,
 				6044ED7A20E44A9700098F22 /* CamChat.xcdatamodeld in Sources */,
 				60DED93C20FE198E007DD680 /* Colors.swift in Sources */,
 				60B506702104915600A9E94A /* Templates.swift in Sources */,
@@ -517,7 +521,7 @@
 				60A8955320F572FB00E4E644 /* SCPagerView.swift in Sources */,
 				60DA8A602116063600722B78 /* CCSearchConstants.swift in Sources */,
 				603C830A2111E15900592E18 /* PhotoLibraryCollectionViewCell.swift in Sources */,
-				60D93EFC2117A1F600706BC4 /* PagerViewTester.swift in Sources */,
+				60D93EFC2117A1F600706BC4 /* PhotoLibraryViewerVC.swift in Sources */,
 				6011896B20FEDA3600C87C74 /* BouncyButton.swift in Sources */,
 				60C23F0E2103BA1B00D78F77 /* ChatMessagesCollectionView.swift in Sources */,
 				601D0D36210DEDCA007C47C9 /* ScreenTopBar.swift in Sources */,

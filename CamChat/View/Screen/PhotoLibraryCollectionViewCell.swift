@@ -16,7 +16,6 @@ class PhotoLibraryCollectionViewCell: UICollectionViewCell{
         
         
         imageView.pinAllSides(addTo: self, pinTo: self)
-        
     }
     
   
@@ -28,26 +27,34 @@ class PhotoLibraryCollectionViewCell: UICollectionViewCell{
         return x
     }()
     
+    func pushViewIn(){
+    
+        
+        UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut], animations:  {
+            self.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
+        })
+    }
+    
+    func pushViewOut(){
+        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseOut], animations:  {
+            self.transform = CGAffineTransform.identity
+        })
+    }
+    
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
-        UIView.animate(withDuration: 0.2) {
-            self.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
-        }
+        pushViewIn()
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        UIView.animate(withDuration: 0.2) {
-            self.transform = CGAffineTransform.identity
-        }
+        pushViewOut()
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
-        UIView.animate(withDuration: 0.2) {
-            self.transform = CGAffineTransform.identity
-        }
+        pushViewOut()
     }
     
     

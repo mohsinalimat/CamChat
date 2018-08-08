@@ -41,7 +41,6 @@ protocol SCPagerDataSource{
 }
 
 
-//TODO: IF YOU SWIPE TOO FAST THE VIEW SNAPS TO ANOTHER VIEW WITHOUT AN ANIMATION. FIX IT.
 
 class SCPagerView: UIView, PageScrollingInteractorDelegate{
     
@@ -66,8 +65,26 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         } else {fatalError("You must have at least one item to display in an SCPagerView")}
     }
     
+    func setIndex(to newIndex: Int){
+        if newIndex > numberOfItems - 1{fatalError("index out of bounds")}
+        currentItemIndex = newIndex
+        
+        centerView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: newIndex, cachedView: nil))
+        if numberOfItems <= 1{return}
+        if newIndex > 0 {
+            leftView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: newIndex - 1, cachedView: nil))
+        }
+        if newIndex < numberOfItems - 1{
+            rightView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: newIndex + 1, cachedView: nil))
+        }
+        
+        
+    }
+    
+   
+    
 
-    private lazy var interactor: PageScrollingInteractor = {
+    lazy var interactor: PageScrollingInteractor = {
         let x = PageScrollingInteractor(delegate: self, direction: .horizontal)
         x.multiplier = 1
         return x
@@ -110,7 +127,7 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         return dataSource.pagerView(numberOfItemsIn: self)
     }
     
-    private var currentItemIndex = 0
+    private(set) var currentItemIndex = 0
     
     func gradientDidSnap(fromScreen: PageScrollingInteractor.ScreenType, toScreen: PageScrollingInteractor.ScreenType, direction: ScrollingDirection, interactor: PageScrollingInteractor) {
         
@@ -209,6 +226,10 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         for x in 1...3{
             let x = SCPagerContainerView()
             x.backgroundColor = .orange
+            
+           
+            
+            
             views.append(x)
         }
         return views

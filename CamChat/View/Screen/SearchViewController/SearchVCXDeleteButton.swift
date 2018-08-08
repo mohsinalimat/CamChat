@@ -16,9 +16,6 @@ class SearchVCXDeleteButton: UIView{
         [dismissButton, cancelButton].forEach{$0.pin(addTo: self, anchors: [.centerX: centerXAnchor, .centerY: centerYAnchor])}
         
         cancelButton.transform = CGAffineTransform(scaleX: 0, y: 0)
-        
-        
-        
     }
     
     func showDismissButton(){

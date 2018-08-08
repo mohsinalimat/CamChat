@@ -9,27 +9,38 @@
 import HelpKit
 
 
-class PagerViewTester: SCPagerViewController{
+class PhotoLibraryViewerVC: SCPagerViewController, PhotoLibraryViewerTransitioningPresented{
+    
+    var viewControllerForPhotoLibraryTransition: UIViewController{
+        return self
+    }
+    
+    var currentItemIndex: Int{
+        return pagerView.currentItemIndex
+    }
     
     
-    private let imageArray: [UIImage] = {
-        var images = [UIImage]()
-        for i in 0...4{
-            images.append(UIImage(named: "iphoneImage\(i)")!)
-        }
-        
-        var imagesToReturn = [UIImage]()
-        for i in 1...10{
-            imagesToReturn.append(images.randomElement()!)
-        }
-        
-        return imagesToReturn
-    }()
+    
+
+    private let imageArray: [UIImage]
+    private let beginningIndex: Int
+    init(imageArray: [UIImage], currentIndex: Int, presenter: PhotoLibraryViewerTransitioningPresenter){
+      
+        self.beginningIndex = currentIndex
+        self.imageArray = imageArray
+        super.init(nibName: nil, bundle: nil)
+          self.libraryViewerTransitioningDelegate = PhotoLibraryViewerTransitioningDelegate(presenter: presenter, presented: self)
+        self.transitioningDelegate = libraryViewerTransitioningDelegate
+        pagerView.interactor.onlyAcceptInteractionInSpecifiedDirection = true
+    }
+    
+    private var libraryViewerTransitioningDelegate: PhotoLibraryViewerTransitioningDelegate!
+    
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        pagerView.setIndex(to: beginningIndex)
         
     }
     
@@ -53,7 +64,9 @@ class PagerViewTester: SCPagerViewController{
     }
     
     
-    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError()
+    }
 }
 
 
@@ -71,6 +84,3 @@ private class PagerView: HKView{
     
     
 }
-
-
-

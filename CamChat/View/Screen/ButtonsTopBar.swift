@@ -112,18 +112,18 @@ class ScreenButtonsTopBar: UIView{
    
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        for subview in [flashIcon, cameraFlipIcon, rightScreenIcon, leftScreenIcon]{
+        
+        
+        var activeButtons = [BouncyButton]()
+        
+        if centerScreenIcons.alpha == 1{activeButtons = [flashIcon, cameraFlipIcon]}
+        else if leftScreenIcon.alpha == 1 {activeButtons = [leftScreenIcon]}
+        else if rightScreenIcon.alpha == 1 {activeButtons = [rightScreenIcon]}
+        
+        
+        for subview in activeButtons{
             let newPoint = subview.convert(point, from: self)
-            if subview.point(inside: newPoint, with: event){
-                
-                var activeButtons = [BouncyButton]()
-                
-                if centerScreenIcons.alpha == 1{activeButtons = [flashIcon, cameraFlipIcon]}
-                else if leftScreenIcon.alpha == 1 {activeButtons = [leftScreenIcon]}
-                else if rightScreenIcon.alpha == 1 {activeButtons = [rightScreenIcon]}
-                
-                if activeButtons.contains(subview){return subview}
-            }
+            if let view = subview.hitTest(newPoint, with: event){return view}
         }
         return nil
     }

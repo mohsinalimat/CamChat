@@ -34,7 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.makeKeyAndVisible()
         
-        window?.rootViewController = PagerViewTester()
+        window?.rootViewController = Screen()
         APP_INSETS = window!.safeAreaInsets
         
         window?.gestureRecognizers?.remove(at: 0)
