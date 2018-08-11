@@ -33,20 +33,20 @@ class ChatTopBar: HKView{
     lazy var topLabel: UILabel = {
         let x = UILabel()
         x.font = SCFonts.getFont(type: .medium, size: 20)
-        x.text = "Pharez"
+        x.text = "Patrick"
         x.textColor = .white
         return x
     }()
     
-    lazy var topBarRightIcon: BouncyButton = {
-        let x = BouncyButton(image: AssetImages.arrowChevron)
+    lazy var topBarRightIcon: BouncyImageButton = {
+        let x = BouncyImageButton(image: AssetImages.arrowChevron)
         x.pin(constants: [.height: 20, .width: 20])
         
         return x
     }()
     
-    lazy var topBarLeftIcon: BouncyButton = {
-        let x = BouncyButton(image: AssetImages.threeLineMenuIcon)
+    lazy var topBarLeftIcon: BouncyImageButton = {
+        let x = BouncyImageButton(image: AssetImages.threeLineMenuIcon)
         x.pin(constants: [.height: 20, .width: 20])
         return x
     }()

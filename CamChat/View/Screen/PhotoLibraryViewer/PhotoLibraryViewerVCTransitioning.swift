@@ -174,6 +174,7 @@ private class PhotoLibraryViewerTransitioningBrain{
     func performAfterDismissalCleanUp(){
         thumbnailInfo.snapshot.removeFromSuperview()
         dimmerView.removeFromSuperview()
+        presented.view.layoutIfNeeded()
         presenter.view.isUserInteractionEnabled = true
     }
 }
@@ -300,7 +301,6 @@ private class PhotoLibraryViewerInteractionController: HKInteractionController{
     
     private func begin(){
         interactionInProgress = true
-        assert
         presented.viewController.dismiss(animated: true)
         brain.prepareForDismissal(fingerPositionInPresentedView: gesture.location(in: presented.view))
     }

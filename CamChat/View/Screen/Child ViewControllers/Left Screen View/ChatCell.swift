@@ -20,10 +20,10 @@ class ChatCell: UITableViewCell{
         addSubview(labelStackView)
         self.selectionStyle = .none
         backgroundColor = .clear
+        
         customImageView.pin(anchors: [.left: leftAnchor, .top: topAnchor, .bottom: bottomAnchor, .width: customImageView.heightAnchor], constants: [.top: padding, .left: padding, .bottom: padding])
 
         labelStackView.pin(anchors: [.left: customImageView.rightAnchor, .right: rightAnchor, .centerY: centerYAnchor], constants: [.left: padding, .right: padding])
-        
     }
     
     override func layoutSubviews() {

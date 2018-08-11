@@ -35,6 +35,7 @@ struct AssetImages{
     static var threeLineMenuIcon = get("threeLineMenuIcon").templateImage
     static var xIcon = get("xButton").templateImage
     static var cancelButton = get("cancelButton").templateImage
+    static var sendIcon = get("sendIcon").templateImage
 }
 
 

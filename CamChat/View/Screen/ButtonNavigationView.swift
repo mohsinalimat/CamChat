@@ -297,7 +297,7 @@ fileprivate class CameraCaptureButton: SCNavigationButton{
 
 
 
-fileprivate class SCNavigationButton: BouncyButton{
+fileprivate class SCNavigationButton: BouncyImageButton{
     
     private let type: ButtonType
     init(type: ButtonType){

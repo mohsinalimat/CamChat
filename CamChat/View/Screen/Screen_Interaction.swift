@@ -13,8 +13,9 @@ extension Screen{
     
     
     func SCScrollViewDidScroll(scrollView: SCScrollView, topContentOffset: CGFloat) {
+        guard let topBarHeightConstraint = topBarHeightConstraint else {return}
         
-        let actualOutset = ((topContentOffset >= 0) ? topContentOffset : 0) - view.safeAreaInsets.top
+        let actualOutset = max(topContentOffset, 0) - APP_INSETS.top
         let totalOutset = topBarHeight
         
         if actualOutset >= totalOutset{
@@ -27,7 +28,6 @@ extension Screen{
             
         } else {
             adjustTopGradientLayerViewTo_ScrollViewScrolled(scrollView: scrollView)
-            
         }
     }
     

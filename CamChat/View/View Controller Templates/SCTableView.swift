@@ -68,14 +68,11 @@ class SCTableView: SCScrollView, UITableViewDataSource, UITableViewDelegate{
     
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell()
-        cell.textLabel?.text = "Patrick"
-        cell.backgroundColor = .clear
-        cell.selectionStyle = .none
-        return cell
+        return UITableViewCell()
+        
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 50
+        return 0
     }
     
     
@@ -99,11 +96,11 @@ class SCScrollView: UIViewController, UIScrollViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpViews()
-        
-        // I'm doing the below because sometimes my photoLibrary collectionView controller is be feeling itself..... and appears to be scrolled up a bit when it's first loaded.
+        registerCells()
+        scrollView.contentInsetAdjustmentBehavior = .never
+        // I'm doing the below because sometimes my photoLibrary collectionView controller is be freaking itself out..... and appears to be scrolled up a bit when it's first loaded.
         scrollView.setContentOffset(CGPoint(x: 0, y: -scrollView.adjustedContentInset.top), animated: false)
         scrollView.layoutIfNeeded()
-        
         
     }
     
@@ -112,11 +109,10 @@ class SCScrollView: UIViewController, UIScrollViewDelegate {
 
     
     private func setUpViews(){
-        view = UIView()
         view.addSubview(backgroundView)
-
+ 
         backgroundView.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor])
-        backgroundViewTopAnchor = backgroundView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: self.scrollView.contentOffset.y * -1)
+        backgroundViewTopAnchor = backgroundView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: -self.scrollView.contentOffset.y - backgroundViewTopInset)
         backgroundViewTopAnchor.isActive = true
 
         view.addSubview(scrollView)
@@ -124,12 +120,21 @@ class SCScrollView: UIViewController, UIScrollViewDelegate {
 
     }
     
+    /// Override this method in subclasses so that tableView and collectionViewCells will be registered at the appropriate times to avoid crashing. NEVER CALL THIS FUNCTION DIRECTLY.
+    func registerCells(){
+        
+    }
+    
+    
+    /// Please use this function to set the top content inset of the scrollView
+   
+    
     override var additionalSafeAreaInsets: UIEdgeInsets{
         get{ return super.additionalSafeAreaInsets }
         set{
-            var val = newValue
-            val.top += backgroundViewTopInset
-            super.additionalSafeAreaInsets = val
+            super.additionalSafeAreaInsets = newValue
+            scrollView.contentInset.top = newValue.top + backgroundViewTopInset + APP_INSETS.top
+            scrollView.contentInset.bottom = newValue.bottom + APP_INSETS.bottom
         }
     }
     
@@ -209,7 +214,7 @@ class SCScrollView: UIViewController, UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
         
-        backgroundViewTopAnchor.constant = max((scrollView.contentOffset.y * -1),-(backgroundView.layer.cornerRadius / 2) - 10)  - backgroundViewTopInset
+        backgroundViewTopAnchor.constant = max((-scrollView.contentOffset.y ),-(backgroundView.layer.cornerRadius / 2) - 10)  - backgroundViewTopInset
         backgroundView.layoutIfNeeded()
         
         delegate?.SCScrollViewDidScroll(scrollView: self, topContentOffset: topContentOffset)

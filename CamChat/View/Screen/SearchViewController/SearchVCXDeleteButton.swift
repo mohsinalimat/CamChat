@@ -39,14 +39,14 @@ class SearchVCXDeleteButton: UIView{
         
     }
     
-    lazy var dismissButton: BouncyButton = {
-        let x = BouncyButton(image: AssetImages.xIcon)
+    lazy var dismissButton: BouncyImageButton = {
+        let x = BouncyImageButton(image: AssetImages.xIcon)
         x.pin(constants: [.height: 25, .width: 25])
         return x
     }()
     
-    lazy var cancelButton: BouncyButton = {
-        let x = BouncyButton(image: AssetImages.cancelButton)
+    lazy var cancelButton: BouncyImageButton = {
+        let x = BouncyImageButton(image: AssetImages.cancelButton)
         x.pin(constants: [.height: 20, .width: 20])
         return x
     }()

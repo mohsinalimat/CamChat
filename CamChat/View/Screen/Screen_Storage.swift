@@ -16,8 +16,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     
     
     
-    
-    
+ 
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,12 +26,11 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         // This is only to ensure they are initialized right now, since they are being lazily loaded. Page Scrolling Interactors are active by default.
         verticalScrollInteractor.activate()
         horizontalScrollInteractor.activate()
-        
     }
     
 
     
- 
+    
     
    
     
@@ -46,6 +44,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         x.delegate = self
         x.additionalSafeAreaInsets.bottom = subviewsBottomSafeAreaInset
         x.additionalSafeAreaInsets.top = topBarHeight
+        
         return x
     }()
     

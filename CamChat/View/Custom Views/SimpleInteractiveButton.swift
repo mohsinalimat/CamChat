@@ -11,12 +11,19 @@ import HelpKit
 
 class SimpleInteractiveButton: HKButtonTemplate{
     
-    override func setUpView() {
+    
+    override init(){
+        super.init()
         addSubview(label)
         addSubview(shadeView)
         label.pin(anchors: [.centerX: centerXAnchor, .centerY: centerYAnchor])
         shadeView.pinAllSides(pinTo: self)
+        
     }
+    
+    
+    
+    
     
 
     
@@ -47,7 +54,9 @@ class SimpleInteractiveButton: HKButtonTemplate{
     
     
 
-    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError()
+    }
 }
 
 

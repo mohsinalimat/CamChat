@@ -310,7 +310,7 @@ private class ChatControllerAnimationController: NSObject, UIViewControllerAnima
 private class ChatControllerInteractionController: HKInteractionController{
     
     
-    private weak var brain: ChatControllerAnimationPositioningBrain!
+    private var brain: ChatControllerAnimationPositioningBrain
     private weak var chatVC: UIViewController!
     init(chatVC: UIViewController, brain: ChatControllerAnimationPositioningBrain){
         self.brain = brain

@@ -12,7 +12,8 @@ import HelpKit
 
 class SCPagerViewController: UIViewController, SCPagerDataSource{
     
-   
+    override var prefersStatusBarHidden: Bool{return true}
+    
     
     func pagerView(numberOfItemsIn pagerView: SCPagerView) -> Int {
         return 10 
@@ -35,7 +36,7 @@ class SCPagerViewController: UIViewController, SCPagerDataSource{
 }
 
 
-protocol SCPagerDataSource{
+protocol SCPagerDataSource: class {
     func pagerView(numberOfItemsIn pagerView: SCPagerView) -> Int
     func pagerView(_ pagerView: SCPagerView, viewForItemAt index: Int, cachedView: UIView?) -> UIView
 }
@@ -44,7 +45,19 @@ protocol SCPagerDataSource{
 
 class SCPagerView: UIView, PageScrollingInteractorDelegate{
     
-    private var dataSource: SCPagerDataSource
+    private weak var dataSource: SCPagerDataSource?
+    
+    private var cachedViews = [UIView]()
+    
+    
+    private func getView(for index: Int) -> UIView{
+        let cachedView = cachedViews.first
+        let cell = dataSource!.pagerView(self, viewForItemAt: index, cachedView: cachedView)
+        if cell === cachedView{cachedViews.remove(at: 0)}
+        return cell
+    }
+    
+    
     
     init(dataSource: SCPagerDataSource){
         self.dataSource = dataSource
@@ -58,37 +71,18 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         interactor.onlyAcceptInteractionInSpecifiedDirection = false
         
         if numberOfItems >= 1{
-            centerView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: 0, cachedView: nil))
+            centerView.setContainedView(to: getView(for: 0))
             if numberOfItems >= 2{
-                rightView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: 1, cachedView: nil))
+                rightView.setContainedView(to: getView(for: 1))
             }
         } else {fatalError("You must have at least one item to display in an SCPagerView")}
     }
     
-    func setIndex(to newIndex: Int){
-        if newIndex > numberOfItems - 1{fatalError("index out of bounds")}
-        currentItemIndex = newIndex
-        
-        centerView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: newIndex, cachedView: nil))
-        if numberOfItems <= 1{return}
-        if newIndex > 0 {
-            leftView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: newIndex - 1, cachedView: nil))
-        }
-        if newIndex < numberOfItems - 1{
-            rightView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: newIndex + 1, cachedView: nil))
-        }
-        
-        
+    deinit {
+        print("I have been deinitted")
     }
     
-   
     
-
-    lazy var interactor: PageScrollingInteractor = {
-        let x = PageScrollingInteractor(delegate: self, direction: .horizontal)
-        x.multiplier = 1
-        return x
-    }()
     
     private func setUpViews(){
         [leftView, centerView, rightView].forEach{$0.layer.masksToBounds = true}
@@ -118,13 +112,42 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         rightView.pinAllSides(pinTo: rightSegmentView)
         centerView.pinAllSides(pinTo: centerSegmentView)
         leftView.pinAllSides(pinTo: leftSegmentView)
-        
-        
-        
     }
     
+    
+    
+    
+    func setIndex(to newIndex: Int){
+        if newIndex > numberOfItems - 1 || newIndex < 0 {fatalError("index out of bounds")}
+        currentItemIndex = newIndex
+        
+        let cache = [leftView.removeContainedView(), rightView.removeContainedView(), centerView.removeContainedView()].filter({$0 != nil}) as! [UIView]
+        
+        cachedViews.append(contentsOf: cache)
+        
+        centerView.setContainedView(to: getView(for: newIndex))
+        if numberOfItems <= 1{return}
+        if newIndex > 0 {
+            leftView.setContainedView(to: getView(for: newIndex - 1))
+        }
+        if newIndex < numberOfItems - 1{
+            rightView.setContainedView(to: getView(for: newIndex + 1))
+        }
+    }
+    
+   
+    
+
+    lazy var interactor: PageScrollingInteractor = {
+        let x = PageScrollingInteractor(delegate: self, direction: .horizontal)
+        x.multiplier = 1
+        return x
+    }()
+    
+
+    
     private var numberOfItems: Int{
-        return dataSource.pagerView(numberOfItemsIn: self)
+        return dataSource!.pagerView(numberOfItemsIn: self)
     }
     
     private(set) var currentItemIndex = 0
@@ -138,19 +161,25 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         switch toScreen{
         case .first:
             currentItemIndex -= 1
-            rightView.setContainedView(to: centerView.containedView!)
-            centerView.setContainedView(to: leftView.containedView!)
+            
+            if let view = rightView.removeContainedView(){cachedViews.append(view)}
+            
+            rightView.setContainedView(to: centerView.removeContainedView()!)
+            centerView.setContainedView(to: leftView.removeContainedView()!)
             if currentItemIndex > 0{
-                leftView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: currentItemIndex - 1, cachedView: nil))
+                leftView.setContainedView(to: getView(for: currentItemIndex - 1))
             }
             
             
         case .last:
             currentItemIndex += 1
-            leftView.setContainedView(to: centerView.containedView!)
-            centerView.setContainedView(to: rightView.containedView!)
+            
+            if let view = leftView.removeContainedView(){cachedViews.append(view)}
+            
+            leftView.setContainedView(to: centerView.removeContainedView()!)
+            centerView.setContainedView(to: rightView.removeContainedView()!)
             if currentItemIndex < numberOfItems - 1{
-                rightView.setContainedView(to: dataSource.pagerView(self, viewForItemAt: currentItemIndex + 1, cachedView: nil))
+                rightView.setContainedView(to: getView(for: currentItemIndex + 1))
             }
             
             
@@ -213,6 +242,11 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         return x
     }()
     
+    /// Use this method to add decorative views or buttons or whatever you wanna add to the holder views. Holder view transforms are not changed at all when swiping. They only hold the views whose transforms are changed. Their dimensions remain constant alwyas.
+    func configureHolderViews(using action: (UIView) -> Void){
+        [leftSegmentView, centerSegmentView, rightSegmentView].forEach(action)
+    }
+    
     private lazy var leftSegmentView = self.segmentViews[0]
     private lazy var centerSegmentView = self.segmentViews[1]
     private lazy var rightSegmentView = self.segmentViews[2]
@@ -226,10 +260,6 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         for x in 1...3{
             let x = SCPagerContainerView()
             x.backgroundColor = .orange
-            
-           
-            
-            
             views.append(x)
         }
         return views
@@ -255,7 +285,12 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
 
 fileprivate class SCPagerContainerView: UIView {
     
-    private(set) var containedView: UIView?
+    private var containedView: UIView?
+    
+    func removeContainedView() -> UIView?{
+        containedView?.removeFromSuperview()
+        return containedView
+    }
     
     func setContainedView(to view: UIView){
         subviews.forEach{$0.removeFromSuperview()}

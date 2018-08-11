@@ -13,6 +13,7 @@ import HelpKit
 extension Screen{
     
     
+
     func setUpViews(){
         view.backgroundColor = .black
         
@@ -28,7 +29,7 @@ extension Screen{
         view.addSubview(navigationView)
         
         
-        let topBarConstraints = topBar_typed.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .top: view.safeAreaLayoutGuide.topAnchor], constants: [.height: topBarHeight])
+        let topBarConstraints = topBar_typed.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .top: view.topAnchor], constants: [.height: topBarHeight, .top: APP_INSETS.top])
         
         topBarTopContraint = topBarConstraints.top!
         topBarHeightConstraint = topBarConstraints.height!

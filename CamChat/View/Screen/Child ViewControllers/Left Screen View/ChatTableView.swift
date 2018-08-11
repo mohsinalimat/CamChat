@@ -12,16 +12,26 @@ import UIKit
 class ChatTableView: SCTableView{
     let cellID = "cell reuse identifier"
     
+ 
+    
+    
     override func viewDidLoad() {
+
         super.viewDidLoad()
         tableView.rowHeight = 70
         tableView.separatorStyle = .none
-        tableView.register(ChatCell.self, forCellReuseIdentifier: cellID)
         
         
         
         
     }
+    
+    override func registerCells() {
+        tableView.register(ChatCell.self, forCellReuseIdentifier: cellID)
+    }
+    
+    
+    
     override var topLabelText: String{
         return "Chats"
     }
@@ -40,9 +50,13 @@ class ChatTableView: SCTableView{
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+      
+        let vc = ChatViewController()
+        vc.tappedCell = tableView.cellForRow(at: indexPath)!
+        
         DispatchQueue.main.async {
-            let vc = ChatViewController()
-            vc.tappedCell = tableView.cellForRow(at: indexPath)!
+            
             self.present(vc, animated: true, completion: nil)
         }
     }

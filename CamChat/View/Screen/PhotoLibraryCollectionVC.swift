@@ -51,6 +51,9 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate, Ph
     
     override func viewDidLoad() {
         super.viewDidLoad()
+    }
+    
+    override func registerCells() {
         collectionView.register(PhotoLibraryCollectionViewCell.self, forCellWithReuseIdentifier: cellID)
     }
     

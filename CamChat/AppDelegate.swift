@@ -12,12 +12,6 @@ import HelpKit
 
 
 
-#if swift(>=4.2)
-import UIKit.UIGeometry
-extension UIEdgeInsets {
-    public static let zero = UIEdgeInsets()
-}
-#endif
 
 private(set) var APP_INSETS = UIEdgeInsets.zero
 
@@ -28,21 +22,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     
     
-    
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    func applicationDidFinishLaunching(_ application: UIApplication) {
         
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.makeKeyAndVisible()
-        
-        window?.rootViewController = Screen()
         APP_INSETS = window!.safeAreaInsets
         
-        window?.gestureRecognizers?.remove(at: 0)
-        window?.gestureRecognizers?.remove(at: 0)
+        window?.rootViewController = Screen()
         
-        return true
+        window?.gestureRecognizers?.remove(at: 0)
+        window?.gestureRecognizers?.remove(at: 0)
+    
     }
     
+    
+
+    func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        return true
+    }
     
     
 

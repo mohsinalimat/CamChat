@@ -27,6 +27,24 @@ class ScreenButtonsTopBar: UIView{
         rightScreenIcon.transform = CGAffineTransform(translationX: maxTransform, y: 0)
         leftScreenIcon.alpha = 0
         rightScreenIcon.alpha = 0
+        
+        setCustomActivationAreaForCenterIcons()
+        
+    }
+    
+    private func setCustomActivationAreaForCenterIcons(){
+        self.layoutIfNeeded()
+        
+        let val: CGFloat = -10
+        flashIcon.activationArea = {[weak self] in
+            let centerButtonSpacing = self!.cameraFlipIcon.leftSide - self!.flashIcon.rightSide
+            return self!.flashIcon.bounds.inset(by: UIEdgeInsets(top: val, left: val, bottom: val, right: -centerButtonSpacing.half))
+        }
+        cameraFlipIcon.activationArea = {[weak self] in
+            let centerButtonSpacing = self!.cameraFlipIcon.leftSide - self!.flashIcon.rightSide
+            return self!.cameraFlipIcon.bounds.inset(by: UIEdgeInsets(top: val, left: -centerButtonSpacing.half, bottom: val, right: val))
+        }
+        
     }
     
     
@@ -96,8 +114,8 @@ class ScreenButtonsTopBar: UIView{
     
     
     
-    private func getImageView(for image: UIImage, alternativeImage: UIImage? = nil, applyLightShadow: Bool = false) -> BouncyButton{
-        let x = BouncyButton(image: image, alternateImage: alternativeImage)
+    private func getImageView(for image: UIImage, alternativeImage: UIImage? = nil, applyLightShadow: Bool = false) -> BouncyImageButton{
+        let x = BouncyImageButton(image: image, alternateImage: alternativeImage)
         x.tintColor = .white
         
         x.pin(constants: [.width: preferredIconSize.width, .height: preferredIconSize.height])
@@ -114,7 +132,7 @@ class ScreenButtonsTopBar: UIView{
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         
         
-        var activeButtons = [BouncyButton]()
+        var activeButtons = [BouncyImageButton]()
         
         if centerScreenIcons.alpha == 1{activeButtons = [flashIcon, cameraFlipIcon]}
         else if leftScreenIcon.alpha == 1 {activeButtons = [leftScreenIcon]}

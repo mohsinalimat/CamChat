@@ -32,7 +32,14 @@ class PhotoLibraryViewerVC: SCPagerViewController, PhotoLibraryViewerTransitioni
           self.libraryViewerTransitioningDelegate = PhotoLibraryViewerTransitioningDelegate(presenter: presenter, presented: self)
         self.transitioningDelegate = libraryViewerTransitioningDelegate
         pagerView.interactor.onlyAcceptInteractionInSpecifiedDirection = true
+        
+   
     }
+    
+ 
+    
+    
+    
     
     private var libraryViewerTransitioningDelegate: PhotoLibraryViewerTransitioningDelegate!
     
@@ -44,9 +51,7 @@ class PhotoLibraryViewerVC: SCPagerViewController, PhotoLibraryViewerTransitioni
         
     }
     
-    override var preferredStatusBarStyle: UIStatusBarStyle{
-        return .lightContent
-    }
+
     
     override func pagerView(_ pagerView: SCPagerView, viewForItemAt index: Int, cachedView: UIView?) -> UIView {
         let viewToUse: PagerView
@@ -70,11 +75,21 @@ class PhotoLibraryViewerVC: SCPagerViewController, PhotoLibraryViewerTransitioni
 }
 
 
+
+
+
+
+
+
+
 private class PagerView: HKView{
     
     override func setUpView() {
         imageView.pinAllSides(addTo: self, pinTo: self)
+        sendButton.pin(addTo: self, anchors: [.bottom: bottomAnchor, .right: rightAnchor], constants: [.height: 50, .width: 50, .right: 20, .bottom: APP_INSETS.bottom + 20])
     }
+    
+    private lazy var sendButton = SendButton()
     
     lazy var imageView: UIImageView = {
         let x = UIImageView()
