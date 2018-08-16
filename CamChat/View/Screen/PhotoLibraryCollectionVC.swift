@@ -9,7 +9,7 @@
 import UIKit
 
 
-class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate, PhotoLibraryViewerTransitioningPresenter{
+class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
     
 
     func collectionView(_ collectionView: UICollectionView, heightForItemAt indexPath: IndexPath) -> CGFloat {
@@ -21,10 +21,8 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate, Ph
     }
     
     private let imageArray: [UIImage] = {
-        var images = [UIImage]()
-        for i in 0...4{
-            images.append(UIImage(named: "iphoneImage\(i)")!)
-        }
+        let images = AssetImages.examplePhotos
+        
         
         var imagesToReturn = [UIImage]()
         for i in 1...30{
@@ -35,17 +33,7 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate, Ph
     }()
     
    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
-    }
-    private var previousContentOffset: CGFloat = 0
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        
-    }
     
     private let cellID = "The Best cell ever"
     
@@ -70,13 +58,7 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate, Ph
   
     
     
-    var viewForSnapshotToEnterForDismissal: UIView!{
-        return self.view
-    }
-    
-    var viewControllerForPhotoLibraryTransition: UIViewController{
-        return parent!
-    }
+   
     
     
     
@@ -88,42 +70,12 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate, Ph
         }
     }
     
-    func photoViewerPresentationDidBegin() {
-        if let cell = cellToHideForPhotoViewerDismissal{
-            cell.alpha = 0
-        }
-    }
-    func photoViewerDismissalWillBegin() {
-        if let cell = cellToHideForPhotoViewerDismissal{
-            cell.alpha = 0
-        }
-    }
+  
     
     private var cellToHideForPhotoViewerDismissal: UICollectionViewCell?
     
     
-    func getThumbnailInfo(forItemAt index: Int) -> (snapshot: UIView, frame: CGRect, cornerRadius: CGFloat) {
-        if let cell = cellToHideForPhotoViewerDismissal{cell.alpha = 1}
-        let indexPath = IndexPath(item: index, section: 0)
-        
-        var cell: UICollectionViewCell!
-        
-        if let gottenCell = collectionView.cellForItem(at: indexPath){
-            cell = gottenCell
-            
-        } else {
-            let frame = collectionViewLayout.layoutAttributesForItem(at: indexPath)!.frame
-            collectionView.scrollRectToVisible(frame, animated: false)
-            view.layoutIfNeeded()
-            cell = collectionView.cellForItem(at: indexPath)!
-            cell.layoutIfNeeded()
-        }
-        
-        
-        cellToHideForPhotoViewerDismissal = cell
     
-        return (cell.snapshotView(afterScreenUpdates: true)!, view.convert(cell.frame, from: collectionView), cell.layer.cornerRadius)
-    }
     
     
     
@@ -156,6 +108,59 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate, Ph
         return _collectionViewLayout
     }
 }
+
+
+
+
+
+extension PhotoLibraryCollectionVC: PhotoLibraryViewerTransitioningPresenter{
+    
+    override var viewControllerForTransition: UIViewController {return parent!}
+    
+    var viewForSnapshotToEnterForDismissal: UIView!{
+        return self.view
+    }
+    
+    var viewControllerForPhotoLibraryTransition: UIViewController{
+        return parent!
+    }
+    
+    func photoViewerPresentationDidBegin() {
+        if let cell = cellToHideForPhotoViewerDismissal{
+            cell.alpha = 0
+        }
+    }
+    func photoViewerDismissalWillBegin() {
+        if let cell = cellToHideForPhotoViewerDismissal{
+            cell.alpha = 0
+        }
+    }
+    
+    func getThumbnailInfo(forItemAt index: Int) -> (snapshot: UIView, frame: CGRect, cornerRadius: CGFloat) {
+        if let cell = cellToHideForPhotoViewerDismissal{cell.alpha = 1}
+        let indexPath = IndexPath(item: index, section: 0)
+        
+        var cell: UICollectionViewCell!
+        
+        if let gottenCell = collectionView.cellForItem(at: indexPath){
+            cell = gottenCell
+            
+        } else {
+            let frame = collectionViewLayout.layoutAttributesForItem(at: indexPath)!.frame
+            collectionView.scrollRectToVisible(frame, animated: false)
+            view.layoutIfNeeded()
+            cell = collectionView.cellForItem(at: indexPath)!
+            cell.layoutIfNeeded()
+        }
+        
+        
+        cellToHideForPhotoViewerDismissal = cell
+        
+        return (cell.snapshotView(afterScreenUpdates: true)!, view.convert(cell.frame, from: collectionView), cell.layer.cornerRadius)
+    }
+}
+
+
 
 
 

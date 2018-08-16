@@ -11,43 +11,47 @@ import HelpKit
 
 
 /// The ViewController presenting the Chat Controller may conform to this protocol so that it's topBar (if it has one) may be animated.
-@objc protocol ChatControllerTransitionAnimationParticipator: class{
-    var view: UIView!{get}
+protocol ChatControllerTransitionAnimationParticipator: HKVCTransParticipator{
     var viewToDim: UIView! {get}
     var topBarView: UIView {get}
 }
 
 /// The Chat Controller conforms to this protocol.
-@objc protocol ChatControllerProtocol: class{
-    var backgroundView: UIView{get}
+protocol ChatControllerProtocol: HKVCTransParticipator{
+    var backgroundView: UIView {get}
     var topBarView: UIView {get}
-    var view: UIView! {get}
+    
 }
 
 
 
 
-fileprivate class ChatControllerAnimationPositioningBrain{
+class ChatControllerAnimationPositioningBrain: HKVCTransBrain{
     
-    
-    
-    init(){
-        adjustKeyboardWindows{$0.transform = CGAffineTransform.identity}
+    var presenter_typed: ChatControllerTransitionAnimationParticipator?{
+        return presenter as? ChatControllerTransitionAnimationParticipator
     }
     
-    private weak var container: UIView!
     
-    private weak var chatControllerDelegate: ChatControllerProtocol?
+    var presenter: HKVCTransParticipator{
+        return _presenter
+    }
     
-    private weak var chatView: UIView!
-    private weak var chatBackgroundView: UIView!
-    private weak var chatTopBar: UIView!
+    var presented: ChatControllerProtocol{
+        return _presented as! ChatControllerProtocol
+    }
     
-    private weak var presentingView: UIView!
-    private weak var presentingViewTopBar: UIView?
-    private weak var presentingViewToDim: UIView?
-    private weak var presentingParticipator: ChatControllerTransitionAnimationParticipator?
-    private weak var presentingViewController: UIViewController!
+    
+    
+   
+    
+    required init(presenter: HKVCTransParticipator, presented: HKVCTransParticipator) {
+        super.init(presenter: presenter, presented: presented)
+        adjustKeyboardWindows{$0.transform = CGAffineTransform.identity}
+
+    }
+    
+    
     
     weak var tappedCell: UIView?{
         didSet{
@@ -67,53 +71,29 @@ fileprivate class ChatControllerAnimationPositioningBrain{
   
     
     
-    private func initializeVars(basedOn transitionContext: UIViewControllerContextTransitioning){
-        
-        guard let chatVC = transitionContext.viewController(forKey: .to)! as? ChatControllerProtocol else {
-            fatalError("ChatControllerAnimationPositioningBrain is being used to present a viewController that is not a ChatController")
-        }
-        chatControllerDelegate = chatVC
-        
-        chatView = chatVC.view
-        chatBackgroundView = chatVC.backgroundView
-        chatTopBar = chatVC.topBarView
-        
-        if let participator = transitionContext.viewController(forKey: .from)! as? ChatControllerTransitionAnimationParticipator{
-            self.presentingView = participator.view
-            self.presentingViewTopBar = participator.topBarView
-            self.presentingViewToDim = participator.viewToDim
-        } else {
-            presentingView = transitionContext.view(forKey: .from)!
-        }
-        container = transitionContext.containerView
-        presentingViewController = transitionContext.viewController(forKey: .from)!
-    }
-    
+  
     
     
     
     /// This function must be called before any other function so that all of this class's vars may be initialized.
-    func prepareForPresentation(using transitionContext: UIViewControllerContextTransitioning){
+    override func prepareForPresentation(using transitionContext: UIViewControllerContextTransitioning){
+        super.prepareForPresentation(using: transitionContext)
         
-        initializeVars(basedOn: transitionContext)
-        presentingViewController.view.isUserInteractionEnabled = false
-        container.addSubview(chatBackgroundView)
-        container.addSubview(chatView)
+        presenter.view.isUserInteractionEnabled = false
+        container.addSubview(presented.backgroundView)
+        container.addSubview(presented.view)
         
-        if let viewToDim = presentingViewToDim{
+        if let viewToDim = presenter_typed?.viewToDim{
             presentingViewDimmer.pinAllSides(addTo: viewToDim, pinTo: viewToDim)
         }
         
+        presented.topBarView.pin(addTo: container, anchors: [.centerX: container.centerXAnchor, .top: container.safeAreaLayoutGuide.topAnchor])
         
-        
+        presented.backgroundView.frame = container.bounds
 
-        chatTopBar.pin(addTo: container, anchors: [.centerX: container.centerXAnchor, .top: container.safeAreaLayoutGuide.topAnchor])
-        
-        chatBackgroundView.frame = container.bounds
-
-        chatTopBar.transform = CGAffineTransform(translationX: -chatView.frame.width, y: 0)
-        chatBackgroundView.alpha = chatBackgroundViewAlphaEquation.solve(for: 1)
-        chatView.transform = CGAffineTransform(translationX: -chatView.frame.width, y: 0)
+        presented.topBarView.transform = CGAffineTransform(translationX: -presented.view.frame.width, y: 0)
+        presented.backgroundView.alpha = chatBackgroundViewAlphaEquation.solve(for: 1)
+        presented.view.transform = CGAffineTransform(translationX: -presented.view.frame.width, y: 0)
     }
     
     
@@ -145,13 +125,12 @@ fileprivate class ChatControllerAnimationPositioningBrain{
     
     
     
-    /// This basically performs the unanimated presentation action.
     
-    func adjustViewPositionsForPresentation(){
-        chatView.transform = CGAffineTransform.identity
-        chatTopBar.transform = CGAffineTransform(translationX: chatBackgroundViewAlphaEquation.solve(for: 0), y: 0)
-        presentingViewTopBar?.alpha = presentingTopBarAlphaEquation.solve(for: 0)
-        chatBackgroundView.alpha = chatBackgroundViewAlphaEquation.solve(for: 0)
+    override func carryOutUnanimatedPresentationAction() {
+        presented.view.transform = CGAffineTransform.identity
+        presented.topBarView.transform = CGAffineTransform(translationX: chatBackgroundViewAlphaEquation.solve(for: 0), y: 0)
+        presenter_typed?.topBarView.alpha = presentingTopBarAlphaEquation.solve(for: 0)
+        presented.backgroundView.alpha = chatBackgroundViewAlphaEquation.solve(for: 0)
         presentingViewDimmer.alpha = presentingViewDimmerEquation.solve(for: 0)
         if let tappedCell = tappedCell, let equation = tappedCellTransformEquation{
             tappedCell.transform = CGAffineTransform(translationX: equation.solve(for: 0), y: 0)
@@ -159,10 +138,12 @@ fileprivate class ChatControllerAnimationPositioningBrain{
     }
     
     
+    
+    
    
     
-    func prepareForDismissal(){
-        container.insertSubview(presentingView, at: 0)
+    override func prepareForDismissal(){
+        container.insertSubview(presenter.view, at: 0)
         NotificationCenter.default.removeObserver(self)
         NotificationCenter.default.addObserver(self, selector: #selector(respondToKeyboardDismissal), name: UIResponder.keyboardDidHideNotification, object: nil)
     }
@@ -170,13 +151,17 @@ fileprivate class ChatControllerAnimationPositioningBrain{
     
     /// This basically performs the unanimated dismissal action.
     
+    override func carryOutUnanimatedDismissalAction() {
+        adjustViewPositionsForDismissal(accordingTo: 1)
+    }
+    
     func adjustViewPositionsForDismissal(accordingTo percentage: CGFloat = 1){
-        chatView.transform = CGAffineTransform(translationX: -(chatView.frame.width * percentage), y: 0)
-        adjustKeyboardWindows{$0.transform = chatView.transform}
-        chatTopBar.transform = CGAffineTransform(translationX: chatTopBarTranslationEquation.solve(for: percentage), y: 0)
-        chatBackgroundView.alpha = chatBackgroundViewAlphaEquation.solve(for: percentage)
-        presentingViewTopBar?.alpha = presentingTopBarAlphaEquation.solve(for: percentage)
-        chatTopBar.alpha = chatBackgroundViewAlphaEquation.solve(for: percentage)
+        presented.view.transform = CGAffineTransform(translationX: -(presented.view.frame.width * percentage), y: 0)
+        adjustKeyboardWindows{$0.transform = presented.view.transform}
+        presented.topBarView.transform = CGAffineTransform(translationX: chatTopBarTranslationEquation.solve(for: percentage), y: 0)
+        presented.backgroundView.alpha = chatBackgroundViewAlphaEquation.solve(for: percentage)
+        presenter_typed?.topBarView.alpha = presentingTopBarAlphaEquation.solve(for: percentage)
+        presented.topBarView.alpha = chatBackgroundViewAlphaEquation.solve(for: percentage)
         presentingViewDimmer.alpha = presentingViewDimmerEquation.solve(for: percentage)
         
         
@@ -191,13 +176,15 @@ fileprivate class ChatControllerAnimationPositioningBrain{
         NotificationCenter.default.removeObserver(self)
     }
     
-    
-    func afterDismissalCleanUp(){
+    override func cleanUpAfterDismissal() {
         tappedCell?.transform = CGAffineTransform.identity
         presentingViewDimmer.removeFromSuperview()
-        chatTopBar.removeFromSuperview()
-        presentingViewController.view.isUserInteractionEnabled = true
+        presented.topBarView.removeFromSuperview()
+        presenter.view.isUserInteractionEnabled = true
     }
+    
+    
+    
 
 }
 
@@ -205,33 +192,27 @@ fileprivate class ChatControllerAnimationPositioningBrain{
 
 
 
-class ChatControllerTransitioningDelegate: NSObject, UIViewControllerTransitioningDelegate{
+class ChatControllerTransitioningDelegate: HKVCTransDelegate<ChatControllerAnimationPositioningBrain, ChatControllerAnimationController>{
     
-    private let brain = ChatControllerAnimationPositioningBrain()
-    private let interactor: ChatControllerInteractionController
-    init(chatVC: UIViewController){
-        
-        self.interactor = ChatControllerInteractionController(chatVC: chatVC, brain: brain)
-        super.init()
+    private var interactor: ChatControllerInteractionController!
+    
+    
+    
+    init(presenter: HKVCTransParticipator, presented: ChatControllerProtocol) {
+        super.init(presenter: presenter, presented: presented)
+        interactor = ChatControllerInteractionController(brain: brain)
+
     }
+    
+    
     
     var tappedCell: UIView?{
         get{return brain.tappedCell}
         set{brain.tappedCell = newValue}
     }
     
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return ChatControllerAnimationController(config: .presentation, brain: brain)
-    }
-    
-    
-    
-    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return ChatControllerAnimationController(config: .dismissal, brain: brain)
-    }
-    
-    func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-        if self.interactor.interactionInProgress{
+    override func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+        if interactor.interactionInProgress{
             return interactor
         }
         return nil
@@ -249,53 +230,23 @@ class ChatControllerTransitioningDelegate: NSObject, UIViewControllerTransitioni
 
 
 
+class ChatControllerAnimationController: HKVCTransAnimationController<ChatControllerAnimationPositioningBrain> {
+    
+    
+    override var duration: TimeInterval{
+        if config == .presentation{return 0.4} else {return 0.2}
+    }
+    
 
-private class ChatControllerAnimationController: NSObject, UIViewControllerAnimatedTransitioning{
     
-    enum Config{ case presentation, dismissal }
-    
-    private let config: Config
-    private weak var brain: ChatControllerAnimationPositioningBrain!
-    
-    init(config: Config, brain: ChatControllerAnimationPositioningBrain){
-        self.config = config
-        self.brain = brain
-        super.init()
-    }
-    
-    private let presentationDuration = 0.4
-    private let dismissalDuration = 0.2
-    
-    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        switch config{
-        case .presentation: return presentationDuration
-        case .dismissal: return dismissalDuration
+    override func getAnimator() -> (TimeInterval, @escaping () -> Void, @escaping (Bool) -> Void) -> Void {
+        if config == .presentation{
+            return {UIView.animate(withDuration: $0, delay: 0, usingSpringWithDamping: 0.85, initialSpringVelocity: 1, options: .curveEaseIn, animations: $1, completion: $2)}
+        } else {
+            return {UIView.animate(withDuration: $0, delay: 0, options: .curveEaseOut, animations: $1, completion: $2)}
         }
     }
     
-    
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        
-        let completion: (Bool) -> Void = { _ in
-            
-            transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
-        }
-        
-        switch config{
-        
-        case .presentation:
-            brain.prepareForPresentation(using: transitionContext)
-            UIView.animate(withDuration: presentationDuration, delay: 0, usingSpringWithDamping: 0.85, initialSpringVelocity: 1, options: .curveEaseIn, animations: {
-                self.brain.adjustViewPositionsForPresentation()
-            }, completion: completion)
-        
-        case .dismissal:
-            brain.prepareForDismissal()
-            UIView.animate(withDuration: dismissalDuration, delay: 0, options: .curveEaseOut, animations: {
-                self.brain.adjustViewPositionsForDismissal()
-            }, completion: {_ in completion(true); self.brain.afterDismissalCleanUp() })
-        }
-    }
 }
 
 
@@ -307,23 +258,26 @@ private class ChatControllerAnimationController: NSObject, UIViewControllerAnima
 
 
 
-private class ChatControllerInteractionController: HKInteractionController{
+private class ChatControllerInteractionController: HKVCTransInteractionController<ChatControllerAnimationPositioningBrain>{
     
     
-    private var brain: ChatControllerAnimationPositioningBrain
-    private weak var chatVC: UIViewController!
-    init(chatVC: UIViewController, brain: ChatControllerAnimationPositioningBrain){
-        self.brain = brain
-        self.chatVC = chatVC
-        super.init()
-        setUpGesture(for: chatVC)
+    override init(brain: ChatControllerAnimationPositioningBrain) {
+        super.init(brain: brain)
+        setUpGesture(for: presented.viewController)
+
     }
     
+   
     
+   
     
+    private var presenter: HKVCTransParticipator{
+        return brain.presenter
+    }
     
-    private var shouldCompleteAnimation = false
-    var interactionInProgress = false
+    private var presented: ChatControllerProtocol{
+        return brain.presented
+    }
     
     private func setUpGesture(for vc: UIViewController){
         
@@ -334,7 +288,7 @@ private class ChatControllerInteractionController: HKInteractionController{
     
     private func begin(){
         interactionInProgress = true
-        chatVC.dismiss(animated: true)
+        presented.viewController.dismiss(animated: true)
         brain.prepareForDismissal()
     }
     
@@ -359,14 +313,14 @@ private class ChatControllerInteractionController: HKInteractionController{
         interactionInProgress = false
         shouldCompleteAnimation = false
         let remainingProgress = 1 - progress
-        let remainingPoints = remainingProgress * chatVC.view.frame.width
+        let remainingPoints = remainingProgress * presented.view.frame.width
         let time = min(Double(remainingPoints / velocity), 0.3)
         
         UIView.animate(withDuration: time, delay: 0, options: .curveEaseOut, animations: {
             self.brain.adjustViewPositionsForDismissal(accordingTo: 1)
         }) { (success) in
             super.completeTransition(true)
-            self.brain.afterDismissalCleanUp()
+            self.brain.cleanUpAfterDismissal()
         }
         self.completeInteraction()
     }
@@ -374,11 +328,9 @@ private class ChatControllerInteractionController: HKInteractionController{
     @objc private func respondToGesture(gesture: DirectionAwarePanGesture){
         if gesture.scrollingDirection != .horizontal{return}
         
-        
-        let translation = gesture.translation(in: chatVC.view).x
-        let velocity = abs(gesture.velocity(in: chatVC.view).x)
-        let percentage = max(min(-translation / chatVC.view.frame.width, 1), 0)
-        
+        let translation = gesture.translation(in: presented.view).x
+        let velocity = abs(gesture.velocity(in: presented.view).x)
+        let percentage = max(min(-translation / presented.view.frame.width, 1), 0)
         switch gesture.state {
         case .began: begin()
         case .changed: update(percentage: percentage, velocity: velocity)
@@ -388,8 +340,6 @@ private class ChatControllerInteractionController: HKInteractionController{
         default: break
             
         }
-        
-        
     }
 }
 

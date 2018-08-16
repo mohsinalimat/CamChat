@@ -121,7 +121,7 @@ extension Screen{
     }
     
     private func adjustVerticalViewsToGradientChange(gradient: CGFloat){
-        let endingHeight = self.view.frame.height - topBarHeight - self.view.safeAreaInsets.top
+        let endingHeight = self.view.frame.height - topBarHeight - APP_INSETS.top
         bottomScreenTopAnchor.constant = -(endingHeight * abs(gradient))
         self.view.layoutIfNeeded()
     }

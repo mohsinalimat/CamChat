@@ -80,19 +80,5 @@ class PhotoLibraryLayout: UICollectionViewLayout{
 
             column = (column < numberOfColumns - 1) ? column + 1 : 0
         }
-        
-        
-        
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 }
-

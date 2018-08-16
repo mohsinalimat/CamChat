@@ -12,7 +12,9 @@ import UIKit
 
 struct AssetImages{
     
-    private static func get(_ name: String) -> UIImage{
+  
+    
+    private static func getPhoto(_ name: String) -> UIImage{
         guard let image = UIImage(named: name) else {
             print("The image named \(name) could not be found!")
             fatalError()
@@ -20,22 +22,39 @@ struct AssetImages{
         return image
     }
     
-    static var chatBubble = get("chatBubble").templateImage
-    static var me = get("me")
-    static var photoIcon = get("photoIcon").templateImage
-    static var snapchatGhost = get("snapchatGhost")
-    static var settingsIcon = get("settingsIcon").templateImage
-    static var flashOnIcon = get("flashOn").templateImage
-    static var flashOffIcon = get("flashOff").templateImage
-    static var cameraFlipIcon = get("cameraFlipIcon").templateImage
-    static var magnifyingGlass = get("magnifyingGlass").templateImage
-    static var selectItemsIcon = get("selectItemsIcon").templateImage
-    static var newChatIcon = get("newChatIcon").templateImage
-    static var arrowChevron = get("backArrow").templateImage
-    static var threeLineMenuIcon = get("threeLineMenuIcon").templateImage
-    static var xIcon = get("xButton").templateImage
-    static var cancelButton = get("cancelButton").templateImage
-    static var sendIcon = get("sendIcon").templateImage
+    private static func getIcon(_ name: String) -> UIImage{
+        return getPhoto(name).templateImage
+    }
+    
+    static var chatBubble = getIcon("chatBubble")
+    static var me = getPhoto("me")
+    static var photoIcon = getIcon("photoIcon")
+    static var snapchatGhost = getPhoto("snapchatGhost")
+    static var settingsIcon = getIcon("settingsIcon")
+    static var flashOnIcon = getIcon("flashOn")
+    static var flashOffIcon = getIcon("flashOff")
+    static var cameraFlipIcon = getIcon("cameraFlipIcon")
+    static var magnifyingGlass = getIcon("magnifyingGlass")
+    static var selectItemsIcon = getIcon("selectItemsIcon")
+    static var newChatIcon = getIcon("newChatIcon")
+    static var arrowChevron = getIcon("backArrow")
+    static var threeLineMenuIcon = getIcon("threeLineMenuIcon")
+    static var xIcon = getIcon("xButton")
+    static var cancelButton = getIcon("cancelButton")
+    static var sendIcon = getIcon("sendIcon")
+    static var shareIcon = getIcon("shareIcon")
+    static var trashIcon = getIcon("trashIcon")
+    static var threeDotMoreIcon = getIcon("moreIcon")
+    
+    
+    static var examplePhotos = [
+        getPhoto("iphoneImage0"),
+        getPhoto("iphoneImage1"),
+        getPhoto("iphoneImage2"),
+        getPhoto("iphoneImage3"),
+        getPhoto("iphoneImage4")
+    ]
+    
 }
 
 

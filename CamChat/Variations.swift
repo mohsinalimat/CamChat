@@ -57,6 +57,26 @@ class Variations{
             action()
         }
     }
+    
+    static var notchHeight: CGFloat{
+        switch currentDevice{
+        case .iPhoneX: return 30
+        default: return 0
+        }
+    }
+    
+    static var homeIndicatorHeight: CGFloat{
+        switch currentDevice{
+        case .iPhoneX: return 22
+        default: return 0
+        }
+    }
+    
+    
+    
+    static func currentDevice(is device: Devices) -> Bool{
+        return device.contains(currentDevice)
+    }
 }
 
 

@@ -43,6 +43,10 @@ class BouncyButton: HKButtonTemplate{
         }, completion: nil)
     }
     
+    override func tapCancelled() {
+        tapEnded()
+    }
+    
     
     required init?(coder aDecoder: NSCoder) {
         fatalError()

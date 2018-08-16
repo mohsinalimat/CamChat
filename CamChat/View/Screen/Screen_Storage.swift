@@ -26,6 +26,9 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         // This is only to ensure they are initialized right now, since they are being lazily loaded. Page Scrolling Interactors are active by default.
         verticalScrollInteractor.activate()
         horizontalScrollInteractor.activate()
+        let line = UIView()
+        line.backgroundColor = .white
+        
     }
     
 

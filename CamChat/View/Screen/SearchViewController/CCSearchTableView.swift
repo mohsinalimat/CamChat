@@ -12,9 +12,9 @@ import HelpKit
 
 class CCSearchTableView: UITableView, UITableViewDataSource, UITableViewDelegate{
     private let cellID = "The Best cell ever"
-    private let viewController: UIViewController
+    let vcOwner: UIViewController
     init(owner: UIViewController){
-        self.viewController = owner
+        self.vcOwner = owner
         super.init(frame: CGRect.zero, style: .plain)
         tableFooterView = UIView()
         dataSource = self
@@ -27,8 +27,16 @@ class CCSearchTableView: UITableView, UITableViewDataSource, UITableViewDelegate
         showsVerticalScrollIndicator = false
         showsHorizontalScrollIndicator = false
         register(CCSearchTableViewCell.self, forCellReuseIdentifier: cellID)
+        
+        
+        
+        
+        
     }
     
+   
+    
+   
     
     
     
@@ -48,7 +56,7 @@ class CCSearchTableView: UITableView, UITableViewDataSource, UITableViewDelegate
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         deselectRow(at: indexPath, animated: true)
-        viewController.present(ChatViewController(), animated: true, completion: nil)
+        vcOwner.present(ChatViewController(presenter: self), animated: true, completion: nil)
         
     }
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -70,8 +78,6 @@ class CCSearchTableView: UITableView, UITableViewDataSource, UITableViewDelegate
     
     private func configureTopLine_And_Corners(for cell: CCSearchTableViewCell, indexPath: IndexPath){
         cell.layer.cornerRadius = 0
-        
-        
         
         if indexPath.isFirstInSection() && indexPath.isLastInSection(for: self){
             cell.layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMaxXMinYCorner, .layerMinXMaxYCorner, .layerMinXMinYCorner]
@@ -101,6 +107,18 @@ class CCSearchTableView: UITableView, UITableViewDataSource, UITableViewDelegate
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
+}
+
+extension CCSearchTableView: HKVCTransParticipator{
+    
+    var viewControllerForTransition: UIViewController{
+        return vcOwner
+    }
+   
+    
+    
+    
+    
 }
 
 

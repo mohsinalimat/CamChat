@@ -1,48 +1,33 @@
 //
-//  SimpleInteractiveButton.swift
+//  SimpleLabelledButton.swift
 //  CamChat
 //
-//  Created by Patrick Hanna on 7/16/18.
+//  Created by Patrick Hanna on 8/11/18.
 //  Copyright © 2018 Patrick Hanna. All rights reserved.
 //
 
-import UIKit
 import HelpKit
 
 class SimpleInteractiveButton: HKButtonTemplate{
     
-    
     override init(){
         super.init()
-        addSubview(label)
         addSubview(shadeView)
-        label.pin(anchors: [.centerX: centerXAnchor, .centerY: centerYAnchor])
         shadeView.pinAllSides(pinTo: self)
-        
     }
     
-    
-    
-    
-    
-
-    
+    var maximumDimmingAlpha: CGFloat = 0.2
     
     override func tapBegan() {
-        shadeView.alpha = 0.2
+        shadeView.alpha = maximumDimmingAlpha
     }
     
     override func tapEnded() {
+        UIView.animate(withDuration: 0.3, animations: {self.shadeView.alpha = 0})
+    }
+    override func tapCancelled() {
         shadeView.alpha = 0
     }
-    
-    lazy var label: UILabel = {
-        let x = UILabel()
-        x.textColor = .white
-        x.font = SCFonts.getFont(type: .demiBold, size: 26)
-        return x
-        
-    }()
     
     private lazy var shadeView: UIView = {
         let x = UIView()
@@ -52,12 +37,9 @@ class SimpleInteractiveButton: HKButtonTemplate{
         return x
     }()
     
-    
-
     required init?(coder aDecoder: NSCoder) {
-        fatalError()
+        fatalError("init coder has not being implemented")
     }
+    
 }
-
-
 

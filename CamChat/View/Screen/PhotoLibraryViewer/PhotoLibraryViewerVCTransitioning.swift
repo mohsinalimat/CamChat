@@ -9,39 +9,31 @@
 import HelpKit
 
 
-@objc protocol PhotoLibraryTransitioningParticipator{
-    var viewControllerForPhotoLibraryTransition: UIViewController {get}
-}
-extension PhotoLibraryTransitioningParticipator{
-    var view: UIView!{
-        return viewController.view
-    }
-    var viewController: UIViewController{
-        return viewControllerForPhotoLibraryTransition
-    }
-}
 
 
-protocol PhotoLibraryViewerTransitioningPresenter: PhotoLibraryTransitioningParticipator{
+
+protocol PhotoLibraryViewerTransitioningPresenter: HKVCTransParticipator{
     var viewForSnapshotToEnterForDismissal: UIView! {get}
     func photoViewerPresentationDidBegin()
     func photoViewerDismissalWillBegin()
     func getThumbnailInfo(forItemAt index: Int) -> (snapshot: UIView, frame: CGRect, cornerRadius: CGFloat)
 }
 
-protocol PhotoLibraryViewerTransitioningPresented: PhotoLibraryTransitioningParticipator{
-    var currentItemIndex: Int {get}
+protocol PhotoLibraryViewerTransitioningPresented: HKVCTransParticipator{
+    var currentItemIndex: Int { get }
 }
 
 
 
-private class PhotoLibraryViewerTransitioningBrain{
+private class PhotoLibraryViewerTransitioningBrain: HKVCTransBrain{
     
     
-    init(presenter: PhotoLibraryViewerTransitioningPresenter, presented: PhotoLibraryViewerTransitioningPresented){
-        
-        self.presenter = presenter
-        self.presented = presented
+    var presenter: PhotoLibraryViewerTransitioningPresenter{
+        return _presenter as! PhotoLibraryViewerTransitioningPresenter
+    }
+    
+    var presented: PhotoLibraryViewerTransitioningPresented{
+        return _presented as! PhotoLibraryViewerTransitioningPresented
     }
     
     
@@ -52,10 +44,8 @@ private class PhotoLibraryViewerTransitioningBrain{
     }
     
     
-    let presenter: PhotoLibraryViewerTransitioningPresenter
-    let presented: PhotoLibraryViewerTransitioningPresented
     
-    private var container: UIView!
+    
     
     private lazy var dimmerView: UIView = {
         let x = UIView()
@@ -67,9 +57,8 @@ private class PhotoLibraryViewerTransitioningBrain{
     
     
     
-    func prepareForPresentation(using context: UIViewControllerContextTransitioning){
-        
-        container = context.containerView
+    override func prepareForPresentation(using context: UIViewControllerContextTransitioning){
+        super.prepareForPresentation(using: context)
         
         dimmerView.frame = container.bounds
         
@@ -88,7 +77,7 @@ private class PhotoLibraryViewerTransitioningBrain{
         presenter.photoViewerPresentationDidBegin()
     }
     
-    func adjustViewsForPresentation(){
+    override func carryOutUnanimatedPresentationAction() {
         dimmerView.alpha = 1
         
         thumbnailInfo.snapshot.alpha = 0
@@ -100,15 +89,24 @@ private class PhotoLibraryViewerTransitioningBrain{
         presented.view.layoutIfNeeded()
     }
     
-    func performAfterPresentationCleanUp(){
+    
+    
+    override func cleanUpAfterPresentation() {
         thumbnailInfo.snapshot.removeFromSuperview()
+
     }
     
     
     
     
     
+    
+    
     private var originalFingerPositionInPresentedViewBounds: CGPoint?
+    
+    override func prepareForDismissal() {
+        prepareForDismissal(fingerPositionInPresentedView: nil)
+    }
     
     func prepareForDismissal(fingerPositionInPresentedView: CGPoint? = nil){
         refreshThumbnailInfo()
@@ -135,6 +133,7 @@ private class PhotoLibraryViewerTransitioningBrain{
     private lazy var presentedViewTranslationEquation = CGLinearEquation(xy(0, 1), xy(UIScreen.main.bounds.height - 200, minimumPresentedViewScale), min: minimumPresentedViewScale, max: 1)!
     
     
+    
     func adjustViewsForDismissal(accordingTo translation: CGPoint){
         
         guard let fingerPosition = originalFingerPositionInPresentedViewBounds else {return}
@@ -156,7 +155,7 @@ private class PhotoLibraryViewerTransitioningBrain{
         presenter.viewForSnapshotToEnterForDismissal.addSubview(thumbnailInfo.snapshot)
     }
     
-    func carryOutEndingDismissalAnimationAction(){
+    override func carryOutUnanimatedDismissalAction() {
         presented.view.transform = CGAffineTransform.identity
         presented.view.frame = thumbnailInfo.frame
         presented.view.layer.cornerRadius = thumbnailInfo.cornerRadius
@@ -171,12 +170,14 @@ private class PhotoLibraryViewerTransitioningBrain{
     
     
     
-    func performAfterDismissalCleanUp(){
+    override func cleanUpAfterDismissal() {
         thumbnailInfo.snapshot.removeFromSuperview()
         dimmerView.removeFromSuperview()
         presented.view.layoutIfNeeded()
         presenter.view.isUserInteractionEnabled = true
     }
+    
+    
 }
 
 
@@ -214,49 +215,14 @@ class PhotoLibraryViewerTransitioningDelegate: NSObject, UIViewControllerTransit
 }
 
 
-private class PhotoLibraryTransitioningAnimator: NSObject, UIViewControllerAnimatedTransitioning{
+private class PhotoLibraryTransitioningAnimator: HKVCTransAnimationController<PhotoLibraryViewerTransitioningBrain>{
     
-    enum Config { case presentation, dismissal }
-    
-    private let brain: PhotoLibraryViewerTransitioningBrain
-    private let config: Config
-    
-    init(brain: PhotoLibraryViewerTransitioningBrain, config: Config){
-        self.config = config
-        self.brain = brain
+    override var duration: TimeInterval{
+        return 0.5
     }
     
-    private let duration: TimeInterval = 0.5
-    
-    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return duration
-    }
-    
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        
-        if config == .presentation{
-            brain.prepareForPresentation(using: transitionContext)
-            animate(action: brain.adjustViewsForPresentation) {
-                self.brain.performAfterPresentationCleanUp()
-                transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
-            }
-        } else {
-            brain.prepareForDismissal(fingerPositionInPresentedView: CGPoint.zero)
-            brain.prepareForEndingDismissalAnimation()
-            animate(action: brain.carryOutEndingDismissalAnimationAction) {
-                self.brain.performAfterDismissalCleanUp()
-                transitionContext.completeTransition(!transitionContext.transitionWasCancelled)
-            }
-        }
-    }
-    
-    
-    private func animate(action: @escaping () -> Void, completion: @escaping () -> Void){
-        UIView.animate(withDuration: duration, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.4, options: [.curveEaseIn], animations: {
-            action()
-        }) { _ in
-            completion()
-        }
+    override func getAnimator() -> (TimeInterval, @escaping () -> Void, @escaping (Bool) -> Void) -> Void {
+        return {UIView.animate(withDuration: $0, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.4, options: [.curveEaseIn], animations: $1, completion: $2)}
     }
 }
 
@@ -266,36 +232,34 @@ private class PhotoLibraryTransitioningAnimator: NSObject, UIViewControllerAnima
 
 
 
-private class PhotoLibraryViewerInteractionController: HKInteractionController{
+private class PhotoLibraryViewerInteractionController: HKVCTransInteractionController<PhotoLibraryViewerTransitioningBrain>{
     
     
-    private weak var brain: PhotoLibraryViewerTransitioningBrain!
+
+    private var presenter: PhotoLibraryViewerTransitioningPresenter{
+        return brain.presenter
+    }
+    private var presented: PhotoLibraryViewerTransitioningPresented{
+        return brain.presented
+    }
     
-    private let presenter: PhotoLibraryViewerTransitioningPresenter
-    private let presented: PhotoLibraryViewerTransitioningPresented
-    
-    init(brain: PhotoLibraryViewerTransitioningBrain){
-        self.brain = brain
-        self.presenter = brain.presenter
-        self.presented = brain.presented
-        super.init()
-        setUpGesture(for: presented.viewController)
+    override init(brain: PhotoLibraryViewerTransitioningBrain) {
+        super.init(brain: brain)
+        setUpGesture()
     }
     
     
     
     
     
-    private var shouldCompleteAnimation = false
-    var interactionInProgress = false
     
     private var gesture: UIPanGestureRecognizer!
     
     
-    private func setUpGesture(for vc: UIViewController){
+    private func setUpGesture(){
         
         let gesture = DirectionAwarePanGesture(target: self, action: #selector(respondToGesture(gesture:)))
-        vc.view.addGestureRecognizer(gesture)
+        presented.view.addGestureRecognizer(gesture)
         self.gesture = gesture
     }
     
@@ -328,10 +292,10 @@ private class PhotoLibraryViewerInteractionController: HKInteractionController{
         
         brain.prepareForEndingDismissalAnimation()
         UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.4, options: [.curveEaseIn], animations: {
-            self.brain.carryOutEndingDismissalAnimationAction()
+            self.brain.carryOutUnanimatedDismissalAction()
         }) { _ in
             super.completeTransition(true)
-            self.brain.performAfterDismissalCleanUp()
+            self.brain.cleanUpAfterDismissal()
         }
         self.completeInteraction()
     }

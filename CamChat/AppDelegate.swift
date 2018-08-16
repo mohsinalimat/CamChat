@@ -10,10 +10,9 @@ import CoreData
 import HelpKit
 
 
-
-
-
 private(set) var APP_INSETS = UIEdgeInsets.zero
+
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -28,7 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
         APP_INSETS = window!.safeAreaInsets
         
-        window?.rootViewController = Screen()
+        window?.rootViewController = CCAlertController(title: "Are you sure you want to log out?", description: nil, primaryButtonText: "Log Out", secondaryButtonText: nil)
         
         window?.gestureRecognizers?.remove(at: 0)
         window?.gestureRecognizers?.remove(at: 0)

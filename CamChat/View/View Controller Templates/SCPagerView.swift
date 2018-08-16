@@ -10,7 +10,9 @@ import UIKit
 import Foundation
 import HelpKit
 
-class SCPagerViewController: UIViewController, SCPagerDataSource{
+class SCPagerViewController: UIViewController, SCPagerDataSource, SCPagerDelegate{
+   
+    
     
     override var prefersStatusBarHidden: Bool{return true}
     
@@ -25,10 +27,15 @@ class SCPagerViewController: UIViewController, SCPagerDataSource{
         return newView
     }
     
+    func interactionGradientDidChange(to gradient: CGFloat) {
+        
+    }
+    
     var pagerView: SCPagerView!
     
     override func loadView() {
         let newView = SCPagerView(dataSource: self)
+        newView.delegate = self
         self.pagerView = newView
         newView.frame = UIScreen.main.bounds
         self.view = newView
@@ -39,6 +46,11 @@ class SCPagerViewController: UIViewController, SCPagerDataSource{
 protocol SCPagerDataSource: class {
     func pagerView(numberOfItemsIn pagerView: SCPagerView) -> Int
     func pagerView(_ pagerView: SCPagerView, viewForItemAt index: Int, cachedView: UIView?) -> UIView
+}
+
+protocol SCPagerDelegate: class{
+    /// gradient is given in terms of -1 to 0 to 1
+    func interactionGradientDidChange(to gradient: CGFloat)
 }
 
 
@@ -52,12 +64,12 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
     
     private func getView(for index: Int) -> UIView{
         let cachedView = cachedViews.first
-        let cell = dataSource!.pagerView(self, viewForItemAt: index, cachedView: cachedView)
+        let cell = dataSource!.pagerView(self, viewForItemAt: index, cachedView: nil)
         if cell === cachedView{cachedViews.remove(at: 0)}
         return cell
     }
     
-    
+    weak var delegate: SCPagerDelegate?
     
     init(dataSource: SCPagerDataSource){
         self.dataSource = dataSource
@@ -82,6 +94,8 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         print("I have been deinitted")
     }
     
+ 
+    
     
     
     private func setUpViews(){
@@ -96,7 +110,7 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         
         
         longView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 3).isActive = true
-        longView.pin(anchors: [.top: topAnchor, .bottom: bottomAnchor, .height: heightAnchor])
+        longView.pin(anchors: [.top: topAnchor, .bottom: bottomAnchor])
         longViewCenterXConstraint = longView.centerXAnchor.constraint(equalTo: centerXAnchor)
         longViewCenterXConstraint.isActive = true
         
@@ -185,10 +199,9 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
             
         default: break
         }
-        
-        
-        
     }
+    
+    
     
     var view: UIView!{
         return self
@@ -210,6 +223,8 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
             interactor.snapGradientTo(screen: .center, animated: false)
             return
         }
+        
+        delegate?.interactionGradientDidChange(to: gradient)
         
         let centerVal = centerViewTransformEquation.solve(for: gradient)
         let sideVals = sideViewsTransformEquation.solve(for: gradient)
@@ -289,7 +304,9 @@ fileprivate class SCPagerContainerView: UIView {
     
     func removeContainedView() -> UIView?{
         containedView?.removeFromSuperview()
-        return containedView
+        let x = containedView
+        containedView = nil
+        return x
     }
     
     func setContainedView(to view: UIView){

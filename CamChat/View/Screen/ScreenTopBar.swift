@@ -27,6 +27,7 @@ class ScreenTopBar: HKView{
     
     let topSearchBar: CCSearchBar = {
         let x = CCSearchBar()
+        x.applyShadow(width: 0.5)
         return x
     }()
     
@@ -37,9 +38,14 @@ class ScreenTopBar: HKView{
     }()
     
     
+    private let searchBarShadowAlphaEquation = AbsoluteValueEquation<Float>(xy(-1, 0), xy(0, 1), xy(1, 0), min: 0, max: 1)!
+    
+    
     func adaptTo(gradient: CGFloat, direction: ScrollingDirection){
         topSearchBar.changeGradientTo(gradient: gradient, direction: direction)
         buttonTopBar.changeIconPositionsAccordingTo(gradient: gradient, direction: direction)
+        
+        topSearchBar.layer.shadowOpacity = searchBarShadowAlphaEquation.solve(for: Float(gradient))
     }
     
 }

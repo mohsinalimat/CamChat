@@ -30,8 +30,6 @@ class CCSearchBar: UIView{
         addSubview(searchTextLabel)
         
         
-        
-        
         searchIcon.pin(anchors: [.left: leftAnchor, .centerY: centerYAnchor], constants: [.width: CCSearchConstants.searchIconSize.width, .height: CCSearchConstants.searchIconSize.height, .left: CCSearchConstants.searchIconLeftPadding])
         
         

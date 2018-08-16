@@ -52,12 +52,31 @@ class ChatTableView: SCTableView{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
       
-        let vc = ChatViewController()
+        let vc = ChatViewController(presenter: self)
         vc.tappedCell = tableView.cellForRow(at: indexPath)!
         
         DispatchQueue.main.async {
             
             self.present(vc, animated: true, completion: nil)
         }
+    }
+    
+    
+    
+}
+
+extension ChatTableView: ChatControllerTransitionAnimationParticipator{
+    
+    override var viewControllerForTransition: UIViewController{return parent!}
+    
+    
+    var topBarView: UIView {
+        return (parent! as! Screen).topBar_typed
+    }
+    
+    
+    
+    var viewToDim: UIView!{
+        return backgroundView
     }
 }

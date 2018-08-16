@@ -9,9 +9,7 @@
 import HelpKit
 
 
-class ChatViewController: UIViewController, ChatControllerProtocol{
-    
-    
+class ChatViewController: UIViewController{
     
   
     var tappedCell: UIView?{
@@ -19,9 +17,9 @@ class ChatViewController: UIViewController, ChatControllerProtocol{
         set{ chatTransitioningDelegate.tappedCell = newValue}
     }
 
-    init(){
+    init(presenter: HKVCTransParticipator){
         super.init(nibName: nil, bundle: nil)
-        self.chatTransitioningDelegate = ChatControllerTransitioningDelegate(chatVC: self)
+        self.chatTransitioningDelegate = ChatControllerTransitioningDelegate(presenter: presenter, presented: self)
         transitioningDelegate = chatTransitioningDelegate
     }
     
@@ -85,9 +83,7 @@ class ChatViewController: UIViewController, ChatControllerProtocol{
         return ChatTopBar(size: CGSize(width: UIScreen.main.bounds.width, height: topInset))
     }()
     
-    var topBarView: UIView{
-        return topBarView_typed
-    }
+    
     
     lazy var backgroundView: UIView = {
         let x = HKGradientView(colors: [BLUECOLOR, DARKER_BLUECOLOR])
@@ -95,9 +91,7 @@ class ChatViewController: UIViewController, ChatControllerProtocol{
         
         return x
     }()
-    var participatingView: UIView!{
-        return view
-    }
+   
     
     
     
@@ -126,6 +120,22 @@ class ChatViewController: UIViewController, ChatControllerProtocol{
     required init?(coder aDecoder: NSCoder) {
         fatalError("init coder has not been implemented")
     }
+    
+    
+}
+
+
+
+
+extension ChatViewController: ChatControllerProtocol{
+    
+    var topBarView: UIView{
+        return topBarView_typed
+    }
+    
+    
+    
+    
     
     
 }

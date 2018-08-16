@@ -14,8 +14,24 @@ class SendButton: BouncyButton{
         super.init()
         
         circleView.pinAllSides(addTo: contentView, pinTo: contentView)
-        imageView.pinAllSides(addTo: contentView, pinTo: contentView, insets: UIEdgeInsets(allInsets: 12))
+        imageViewPins = imageView.pinAllSides(addTo: contentView, pinTo: contentView)
         
+    }
+    
+    private var imageViewPins: Pins!
+    
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let val = (max(bounds.height, bounds.width) * 0.2)
+        
+        imageViewPins.left!.constant = val
+        imageViewPins.top!.constant = val
+        imageViewPins.right!.constant = -val
+        imageViewPins.bottom!.constant = -val
+        
+        
+        imageView.transform = CGAffineTransform(translationX: bounds.width * 0.05, y: 0)
     }
     
     

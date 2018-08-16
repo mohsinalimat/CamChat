@@ -51,8 +51,8 @@ class Login_MainVC: UIViewController{
         return x
     }()
     
-    private lazy var loginButton: SimpleInteractiveButton = {
-        let x = SimpleInteractiveButton()
+    private lazy var loginButton: SimpleLabelledButton = {
+        let x = SimpleLabelledButton()
         x.label.text = "LOG IN"
         x.backgroundColor = REDCOLOR
         x.addAction {
@@ -60,8 +60,8 @@ class Login_MainVC: UIViewController{
         }
         return x
     }()
-    private lazy var signUpButton: SimpleInteractiveButton = {
-        let x = SimpleInteractiveButton()
+    private lazy var signUpButton: SimpleLabelledButton = {
+        let x = SimpleLabelledButton()
         x.label.text = "SIGN UP"
         x.backgroundColor = BLUECOLOR
         x.addAction {

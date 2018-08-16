@@ -62,8 +62,8 @@ class LoginButtonView: HKView{
         button.label.attributedText = NSAttributedString(string: text, attributes: [.font: SCFonts.getFont(type: .demiBold, size: 17), .foregroundColor: UIColor.white])
     }
     
-    private lazy var button: SimpleInteractiveButton = {
-        let x = SimpleInteractiveButton()
+    private lazy var button: SimpleLabelledButton = {
+        let x = SimpleLabelledButton()
         x.backgroundColor = activeColor
         x.layer.masksToBounds = true
         x.addAction(respondToButtonPressed)

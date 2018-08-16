@@ -40,17 +40,30 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
     private let tableViewPadding: CGFloat = 15
     
     private func setUpViews(){
+        
         topBarLayoutGuide.pin(addTo: contentView, anchors: [.left: view.leftAnchor, .top: view.safeAreaLayoutGuide.topAnchor, .right: view.rightAnchor], constants: [.height: self.searchBarHeight])
         
-       
-        tableView.pin(addTo: contentView, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor, .top: topBarLayoutGuide.bottomAnchor], constants: [.left: tableViewPadding, .right: tableViewPadding])
-     
+        tableViewHolderView.pin(addTo: contentView, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor, .top: view.topAnchor], constants: [.left: tableViewPadding, .right: tableViewPadding])
+        
         searchIcon.pin(addTo: contentView, anchors: [.left: topBarLayoutGuide.leftAnchor, .centerY: topBarLayoutGuide.centerYAnchor],constants: [.left: CCSearchConstants.searchIconLeftPadding])
+        
         dissmiss_cancelButton.pin(addTo: contentView, anchors: [.right: topBarLayoutGuide.rightAnchor, .centerY: topBarLayoutGuide.centerYAnchor], constants: [.right: CCSearchConstants.searchIconLeftPadding])
+        
         searchTextField.pin(addTo: contentView, anchors: [.left: searchIcon.rightAnchor, .centerY: topBarLayoutGuide.centerYAnchor, .right: dissmiss_cancelButton.leftAnchor], constants: [.right: 15, .left: CCSearchConstants.searchIconRightPadding])
         
         
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        tableViewGradient.frame = tableViewHolderView.bounds
+        let middleEndPoint = NSNumber(value: Float((APP_INSETS.top + searchBarHeight - 10) / tableViewHolderView.bounds.height))
+        let lastEndpoint = NSNumber(value: Float((APP_INSETS.top + searchBarHeight + 10) / tableViewHolderView.bounds.height))
+        tableViewGradient.gradientLayer.locations = [0, middleEndPoint, lastEndpoint]
+    }
+    
+    
     
     override func viewWillAppear(_ animated: Bool) {
         if isBeingPresented{
@@ -112,7 +125,7 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
         let x = UITextField()
         x.keyboardAppearance = .dark
         x.tintColor = CCSearchConstants.searchTintColor
-        x.attributedPlaceholder = NSAttributedString(string: "Search", attributes: [NSAttributedString.Key.font: CCSearchConstants.searchLabelFont, .foregroundColor: UIColor.lightGray])
+        x.attributedPlaceholder = NSAttributedString(string: "Search", attributes: [NSAttributedString.Key.font: CCSearchConstants.searchLabelFont, .foregroundColor: UIColor(red: 0.7, green: 0.7, blue: 0.7, alpha: 1)])
         x.font = CCSearchConstants.searchLabelFont
         x.delegate = self
         x.textColor = CCSearchConstants.searchTintColor
@@ -127,11 +140,26 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
         return x
     }()
     
+    private lazy var tableViewHolderView: UIView = {
+        let x = UIView()
+        tableView.pinAllSides(addTo: x, pinTo: x)
+        x.mask = tableViewGradient
+        return x
+    }()
+    
     private lazy var tableView: CCSearchTableView = {
         let x = CCSearchTableView(owner: self)
         
         x.contentInset.bottom = self.tableViewPadding
+
+        x.contentInset.top = searchBarHeight - 5
         x.keyboardDismissMode = .onDrag
+        
+        return x
+    }()
+    
+    private lazy var tableViewGradient: HKGradientView = {
+        let x = HKGradientView(colors: [UIColor.black.withAlphaComponent(0), UIColor.black.withAlphaComponent(0.3), .black])
         return x
     }()
     

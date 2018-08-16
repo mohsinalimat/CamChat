@@ -13,8 +13,6 @@ class PhotoLibraryCollectionViewCell: UICollectionViewCell{
     
     override init(frame: CGRect) {
         super.init(frame: CGRect.zero)
-        
-        
         imageView.pinAllSides(addTo: self, pinTo: self)
     }
     
@@ -28,8 +26,6 @@ class PhotoLibraryCollectionViewCell: UICollectionViewCell{
     }()
     
     func pushViewIn(){
-    
-        
         UIView.animate(withDuration: 0.2, delay: 0, options: [.curveEaseOut], animations:  {
             self.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
         })
