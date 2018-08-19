@@ -137,7 +137,7 @@ private class PhotoLibraryViewerTransitioningBrain: HKVCTransBrain{
     func adjustViewsForDismissal(accordingTo translation: CGPoint){
         
         guard let fingerPosition = originalFingerPositionInPresentedViewBounds else {return}
-        let newFingerPoint = fingerPosition.translated(by: translation)
+        let newFingerPoint = fingerPosition.offset(by: translation)
         
         
         let scaleTranslation = presentedViewTranslationEquation.solve(for: translation.y)
@@ -175,6 +175,7 @@ private class PhotoLibraryViewerTransitioningBrain: HKVCTransBrain{
         dimmerView.removeFromSuperview()
         presented.view.layoutIfNeeded()
         presenter.view.isUserInteractionEnabled = true
+        super.cleanUpAfterDismissal()
     }
     
     

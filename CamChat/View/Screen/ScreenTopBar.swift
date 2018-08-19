@@ -9,7 +9,16 @@
 import HelpKit
 
 
+
+
 class ScreenTopBar: HKView{
+    typealias DelegateType = CCSearchBarDelegate & ScreenButtonsTopBarDelegate
+    private weak var delegate: DelegateType?
+    
+    init(delegate: DelegateType){
+        self.delegate = delegate
+        super.init()
+    }
     
     override func setUpView() {
         topSearchBar.pin(addTo: self, anchors: [.left: leftAnchor, .top: topAnchor, .bottom: bottomAnchor, .right: centerXAnchor])
@@ -25,16 +34,15 @@ class ScreenTopBar: HKView{
         return nil
     }
     
-    let topSearchBar: CCSearchBar = {
-        let x = CCSearchBar()
+    lazy var topSearchBar: CCSearchBar = {
+        let x = CCSearchBar(delegate: delegate!)
         x.applyShadow(width: 0.5)
         return x
     }()
     
-    lazy var buttonTopBar: ScreenButtonsTopBar = {
-        let x = ScreenButtonsTopBar()
+    private lazy var buttonTopBar: ScreenButtonsTopBar = {
+        let x = ScreenButtonsTopBar(delegate: delegate!)
         return x
-        
     }()
     
     
@@ -46,6 +54,10 @@ class ScreenTopBar: HKView{
         buttonTopBar.changeIconPositionsAccordingTo(gradient: gradient, direction: direction)
         
         topSearchBar.layer.shadowOpacity = searchBarShadowAlphaEquation.solve(for: Float(gradient))
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init coder has not being implemented")
     }
     
 }

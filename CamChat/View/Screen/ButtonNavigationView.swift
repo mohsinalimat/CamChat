@@ -17,12 +17,18 @@ func getGradientValue(minVal: CGFloat, maxVal: CGFloat, percentage: CGFloat) -> 
     
 }
 
+
+protocol ButtonNavigationViewDelegate: class{
+    func navigationButtonTapped(type: ButtonNavigationView.ButtonType)
+}
+
 class ButtonNavigationView: UIView{
-    
-    init(){
+    private weak var delegate: ButtonNavigationViewDelegate?
+    init(delegate: ButtonNavigationViewDelegate){
+        self.delegate = delegate
         super.init(frame: CGRect.zero)
 
-        
+        [photoButton, cameraButton, chatButton, settingsButton].forEach { $0.setAction(action: {[weak self] in self?.delegate?.navigationButtonTapped(type: $0)}) }
         
         addSubview(cameraButton)
         addSubview(photoButton)
@@ -36,15 +42,8 @@ class ButtonNavigationView: UIView{
         
         
         photoButton.pin(anchors: [.bottom: bottomAnchor, .centerX: rightAnchor], constants: [.width: beginningIconSize, .height: beginningIconSize, .bottom: bottomIconInset, .centerX: -beginningIconSideInset])
-        
-        
-        
+
         settingsButton.pin(anchors: [.top: cameraButton.bottomAnchor, .centerX: cameraButton.centerXAnchor], constants: [.width: 30, .height: 30, .top: 20])
-        
-
-        
-
-        
     }
     
     func setButtonBackingAlphas (to alpha: CGFloat){
@@ -79,10 +78,7 @@ class ButtonNavigationView: UIView{
     
     
     
-    func setButtonActions(to action: @escaping (ButtonType) -> Void){
-        
-        [photoButton, cameraButton, chatButton, settingsButton].forEach { $0.setAction(action: action) }
-    }
+    
     
 
     

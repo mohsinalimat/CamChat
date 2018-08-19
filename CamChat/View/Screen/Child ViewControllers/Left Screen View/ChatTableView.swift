@@ -67,7 +67,6 @@ class ChatTableView: SCTableView{
 
 extension ChatTableView: ChatControllerTransitionAnimationParticipator{
     
-    override var viewControllerForTransition: UIViewController{return parent!}
     
     
     var topBarView: UIView {
@@ -76,7 +75,7 @@ extension ChatTableView: ChatControllerTransitionAnimationParticipator{
     
     
     
-    var viewToDim: UIView!{
+    var viewToDim: UIView{
         return backgroundView
     }
 }

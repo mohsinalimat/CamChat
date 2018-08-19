@@ -10,12 +10,16 @@ import UIKit
 import HelpKit
 
 
-
+protocol CCSearchBarDelegate: class{
+    func searchBarTapped()
+}
 
 class CCSearchBar: UIView{
     
+    private weak var delegate: CCSearchBarDelegate?
     
-    init(){
+    init(delegate: CCSearchBarDelegate){
+        self.delegate = delegate
         super.init(frame: CGRect.zero)
         setUpViews()
         addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(respondToTap)))
@@ -43,10 +47,10 @@ class CCSearchBar: UIView{
     
     
     
-    var searchTappedAction = {}
+    
     
     @objc private func respondToTap(){
-        searchTappedAction()
+        delegate?.searchBarTapped()
     }
     
     private let searchLabelAlphaEquation = CGQuadEquation(xy(0.5, 0), xy(0, 1), xy(-0.5, 0), min: 0, max: 1)!

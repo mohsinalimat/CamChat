@@ -12,7 +12,7 @@ import HelpKit
 
 /// The ViewController presenting the Chat Controller may conform to this protocol so that it's topBar (if it has one) may be animated.
 protocol ChatControllerTransitionAnimationParticipator: HKVCTransParticipator{
-    var viewToDim: UIView! {get}
+    var viewToDim: UIView {get}
     var topBarView: UIView {get}
 }
 
@@ -140,12 +140,20 @@ class ChatControllerAnimationPositioningBrain: HKVCTransBrain{
     
     
     
-   
-    
+   /// This holds this instance in memory so that it responds to the keyboard dissmisal notification beore it deallocated.
+    private var myself:ChatControllerAnimationPositioningBrain!
+
     override func prepareForDismissal(){
         container.insertSubview(presenter.view, at: 0)
+        myself = self
         NotificationCenter.default.removeObserver(self)
         NotificationCenter.default.addObserver(self, selector: #selector(respondToKeyboardDismissal), name: UIResponder.keyboardDidHideNotification, object: nil)
+    }
+    
+    @objc private func respondToKeyboardDismissal(){
+        adjustKeyboardWindows{ $0.transform = CGAffineTransform.identity }
+        NotificationCenter.default.removeObserver(self)
+        myself = nil
     }
 
     
@@ -170,17 +178,14 @@ class ChatControllerAnimationPositioningBrain: HKVCTransBrain{
         }
         
     }
-    
-    @objc private func respondToKeyboardDismissal(){
-        adjustKeyboardWindows{$0.transform = CGAffineTransform.identity}
-        NotificationCenter.default.removeObserver(self)
-    }
+   
     
     override func cleanUpAfterDismissal() {
         tappedCell?.transform = CGAffineTransform.identity
         presentingViewDimmer.removeFromSuperview()
         presented.topBarView.removeFromSuperview()
         presenter.view.isUserInteractionEnabled = true
+        super.cleanUpAfterDismissal()
     }
     
     

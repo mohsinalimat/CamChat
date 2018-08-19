@@ -23,6 +23,10 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         
         setUpViews()
         
+        
+        
+        
+        
         // This is only to ensure they are initialized right now, since they are being lazily loaded. Page Scrolling Interactors are active by default.
         verticalScrollInteractor.activate()
         horizontalScrollInteractor.activate()
@@ -96,8 +100,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
    
     
     lazy var topBar_typed: ScreenTopBar = {
-        let x = ScreenTopBar()
-        x.topSearchBar.searchTappedAction = self.respondToSearchButtonTapped
+        let x = ScreenTopBar(delegate: self)
         return x
     }()
     
@@ -113,8 +116,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     
  
     lazy var navigationView: ButtonNavigationView = {
-        let x = ButtonNavigationView()
-        x.setButtonActions(to: self.respondToNavigationButtonTapped)
+        let x = ButtonNavigationView(delegate: self)
         return x
     }()
     

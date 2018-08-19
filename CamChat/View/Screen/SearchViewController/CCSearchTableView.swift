@@ -12,7 +12,7 @@ import HelpKit
 
 class CCSearchTableView: UITableView, UITableViewDataSource, UITableViewDelegate{
     private let cellID = "The Best cell ever"
-    let vcOwner: UIViewController
+    private weak var vcOwner: UIViewController!
     init(owner: UIViewController){
         self.vcOwner = owner
         super.init(frame: CGRect.zero, style: .plain)
@@ -56,7 +56,7 @@ class CCSearchTableView: UITableView, UITableViewDataSource, UITableViewDelegate
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         deselectRow(at: indexPath, animated: true)
-        vcOwner.present(ChatViewController(presenter: self), animated: true, completion: nil)
+        vcOwner.present(ChatViewController(presenter: vcOwner), animated: true, completion: nil)
         
     }
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -109,17 +109,7 @@ class CCSearchTableView: UITableView, UITableViewDataSource, UITableViewDelegate
     }
 }
 
-extension CCSearchTableView: HKVCTransParticipator{
-    
-    var viewControllerForTransition: UIViewController{
-        return vcOwner
-    }
-   
-    
-    
-    
-    
-}
+
 
 
 
@@ -138,12 +128,11 @@ private class CCSearchTableViewHeader: UIView{
         
         let sidePadding: CGFloat = -9
         labelBacking.pinAllSides(pinTo: label, insets: UIEdgeInsets(top: -6, left: sidePadding, bottom: -4, right: sidePadding))
+        isUserInteractionEnabled = false
         
         
     }
-    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-        return nil
-    }
+   
     override func layoutSubviews() {
         super.layoutSubviews()
         labelBacking.layer.cornerRadius = labelBacking.frame.height / 2

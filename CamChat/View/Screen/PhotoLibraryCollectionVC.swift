@@ -115,15 +115,12 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
 
 extension PhotoLibraryCollectionVC: PhotoLibraryViewerTransitioningPresenter{
     
-    override var viewControllerForTransition: UIViewController {return parent!}
     
     var viewForSnapshotToEnterForDismissal: UIView!{
         return self.view
     }
     
-    var viewControllerForPhotoLibraryTransition: UIViewController{
-        return parent!
-    }
+   
     
     func photoViewerPresentationDidBegin() {
         if let cell = cellToHideForPhotoViewerDismissal{

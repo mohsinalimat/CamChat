@@ -14,7 +14,6 @@ class SCPagerViewController: UIViewController, SCPagerDataSource, SCPagerDelegat
    
     
     
-    override var prefersStatusBarHidden: Bool{return true}
     
     
     func pagerView(numberOfItemsIn pagerView: SCPagerView) -> Int {
@@ -90,9 +89,7 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         } else {fatalError("You must have at least one item to display in an SCPagerView")}
     }
     
-    deinit {
-        print("I have been deinitted")
-    }
+    
     
  
     
@@ -109,8 +106,8 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         rightSegmentView.addSubview(rightView)
         
         
-        longView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 3).isActive = true
-        longView.pin(anchors: [.top: topAnchor, .bottom: bottomAnchor])
+        
+        longView.pin(anchors: [.top: topAnchor, .bottom: bottomAnchor, .width: widthAnchor], multipliers: [.width: 3])
         longViewCenterXConstraint = longView.centerXAnchor.constraint(equalTo: centerXAnchor)
         longViewCenterXConstraint.isActive = true
         
@@ -183,8 +180,6 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
             if currentItemIndex > 0{
                 leftView.setContainedView(to: getView(for: currentItemIndex - 1))
             }
-            
-            
         case .last:
             currentItemIndex += 1
             
@@ -195,8 +190,6 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
             if currentItemIndex < numberOfItems - 1{
                 rightView.setContainedView(to: getView(for: currentItemIndex + 1))
             }
-            
-            
         default: break
         }
     }
@@ -257,7 +250,7 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         return x
     }()
     
-    /// Use this method to add decorative views or buttons or whatever you wanna add to the holder views. Holder view transforms are not changed at all when swiping. They only hold the views whose transforms are changed. Their dimensions remain constant alwyas.
+    /// Use this method to add decorative views or buttons or whatever you wanna add to the holder views. Holder view transforms are not changed at all when swiping. They only hold the views whose transforms are changed. Their dimensions remain constant always.
     func configureHolderViews(using action: (UIView) -> Void){
         [leftSegmentView, centerSegmentView, rightSegmentView].forEach(action)
     }

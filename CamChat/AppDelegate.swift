@@ -27,7 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
         APP_INSETS = window!.safeAreaInsets
         
-        window?.rootViewController = CCAlertController(title: "Are you sure you want to log out?", description: nil, primaryButtonText: "Log Out", secondaryButtonText: nil)
+        window?.rootViewController = Screen()
         
         window?.gestureRecognizers?.remove(at: 0)
         window?.gestureRecognizers?.remove(at: 0)

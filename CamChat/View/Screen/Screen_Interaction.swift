@@ -33,27 +33,7 @@ extension Screen{
     
     
     
-    func respondToNavigationButtonTapped(type: ButtonNavigationView.ButtonType){
-        
-        
-        if verticalScrollInteractor.currentlyFullyVisibleScreen == .last && type != .cameraCapture{
-            shouldChangeNavViewSize = false
-            verticalScrollInteractor.snapGradientTo(screen: .center, animated: false)
-            shouldChangeNavViewSize = true
-        }
-        
-        switch type{
-        case .cameraCapture:
-            verticalScrollInteractor.snapGradientTo(screen: .center, animated: true)
-            horizontalScrollInteractor.snapGradientTo(screen: .center, animated: true)
-        case .chat:
-            horizontalScrollInteractor.snapGradientTo(screen: .first, animated: true)
-        case .photoLibrary:
-            horizontalScrollInteractor.snapGradientTo(screen: .last, animated: true)
-        case .settings:
-            verticalScrollInteractor.snapGradientTo(screen: .last, animated: true)
-        }
-    }
+
     
     
     func gradientDidSnap(fromScreen: PageScrollingInteractor.ScreenType, toScreen: PageScrollingInteractor.ScreenType, direction: ScrollingDirection, interactor: PageScrollingInteractor) {

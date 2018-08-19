@@ -9,10 +9,20 @@
 import UIKit
 import HelpKit
 
+
+protocol ScreenButtonsTopBarDelegate: class{
+    func newChatButtonTapped()
+    func flashButtonTapped(to isOn: Bool)
+    func cameraFlipButtonTapped()
+    func photoLibrarySelectButtonTapped()
+}
+
+
 class ScreenButtonsTopBar: UIView{
     
-    
-    init(){
+    private weak var delegate: ScreenButtonsTopBarDelegate?
+    init(delegate: ScreenButtonsTopBarDelegate){
+        self.delegate = delegate
         super.init(frame: CGRect.zero)
         addSubview(centerScreenIcons)
         addSubview(leftScreenIcon)
@@ -23,12 +33,20 @@ class ScreenButtonsTopBar: UIView{
             $0.pin(anchors: [.right: rightAnchor, .centerY: centerYAnchor], constants: [.right: 15])
         }
         
-        leftScreenIcon.transform = CGAffineTransform(translationX: -maxTransform, y: 0)
-        rightScreenIcon.transform = CGAffineTransform(translationX: maxTransform, y: 0)
+        leftScreenIcon.transform = CGAffineTransform(translationX: -maxLeftAndRightTransform, y: 0)
+        rightScreenIcon.transform = CGAffineTransform(translationX: maxLeftAndRightTransform, y: 0)
         leftScreenIcon.alpha = 0
         rightScreenIcon.alpha = 0
         
         setCustomActivationAreaForCenterIcons()
+        
+        leftScreenIcon.addAction({[weak self] in self?.delegate?.newChatButtonTapped()})
+        flashIcon.addAction { [weak self, weak flashIcon] in
+            guard let flashIcon = flashIcon else {return}
+            self?.delegate?.flashButtonTapped(to: flashIcon.currentImageType == .initial)
+        }
+        cameraFlipIcon.addAction({[weak self] in self?.delegate?.cameraFlipButtonTapped()})
+        rightScreenIcon.addAction({[weak self] in self?.delegate?.photoLibrarySelectButtonTapped()})
         
     }
     
@@ -48,7 +66,7 @@ class ScreenButtonsTopBar: UIView{
     }
     
     
-    private let maxTransform: CGFloat = 40
+    private let maxLeftAndRightTransform: CGFloat = 40
     
 
     
@@ -60,9 +78,9 @@ class ScreenButtonsTopBar: UIView{
     private let rightIconAlphaEquation = CGLinearEquation(xy(1, 1), xy(0.5, 0), min: 0, max: 1)!
     
     
-    private lazy var leftIconTransformEquation = CGLinearEquation(xy(-1, 0), xy(0, -maxTransform), min: -maxTransform, max: 0)!
-    private lazy var centerIconsTransformEquation = CGQuadEquation(xy(-1, maxTransform), xy(0, 0), xy(1, -maxTransform), min: -maxTransform, max: maxTransform)!
-    private lazy var rightIconTransformEquation = CGLinearEquation(xy(1, 0), xy(0, maxTransform), min: 0, max: maxTransform)!
+    private lazy var leftIconTransformEquation = CGLinearEquation(xy(-1, 0), xy(0, -maxLeftAndRightTransform), min: -maxLeftAndRightTransform, max: 0)!
+    private lazy var centerIconsTransformEquation = CGQuadEquation(xy(-1, maxLeftAndRightTransform), xy(0, 0), xy(1, -maxLeftAndRightTransform), min: -maxLeftAndRightTransform, max: maxLeftAndRightTransform)!
+    private lazy var rightIconTransformEquation = CGLinearEquation(xy(1, 0), xy(0, maxLeftAndRightTransform), min: 0, max: maxLeftAndRightTransform)!
     
     
     
@@ -91,7 +109,7 @@ class ScreenButtonsTopBar: UIView{
         
     }
     
-    private lazy var rightScreenIcon = self.getImageView(for: AssetImages.selectItemsIcon)
+    lazy var rightScreenIcon = self.getImageView(for: AssetImages.selectItemsIcon)
     private lazy var leftScreenIcon = self.getImageView(for: AssetImages.newChatIcon)
     
     

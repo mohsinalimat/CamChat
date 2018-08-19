@@ -50,8 +50,6 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
         dissmiss_cancelButton.pin(addTo: contentView, anchors: [.right: topBarLayoutGuide.rightAnchor, .centerY: topBarLayoutGuide.centerYAnchor], constants: [.right: CCSearchConstants.searchIconLeftPadding])
         
         searchTextField.pin(addTo: contentView, anchors: [.left: searchIcon.rightAnchor, .centerY: topBarLayoutGuide.centerYAnchor, .right: dissmiss_cancelButton.leftAnchor], constants: [.right: 15, .left: CCSearchConstants.searchIconRightPadding])
-        
-        
     }
     
     override func viewDidLayoutSubviews() {
@@ -85,12 +83,9 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
             
             UIView.animate(withDuration: 0.3) {
                 self.tableView.transform = CGAffineTransform(translationX: 0, y: 70)
-                
             }
         }
         super.viewWillAppear(animated)
-
-       
     }
    
     
@@ -149,12 +144,9 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
     
     private lazy var tableView: CCSearchTableView = {
         let x = CCSearchTableView(owner: self)
-        
         x.contentInset.bottom = self.tableViewPadding
-
         x.contentInset.top = searchBarHeight - 5
         x.keyboardDismissMode = .onDrag
-        
         return x
     }()
     
@@ -176,6 +168,3 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
         fatalError()
     }
 }
-
-
-

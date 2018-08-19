@@ -9,9 +9,10 @@
 import HelpKit
 
 
-class PhotoLibraryViewerVC: SCPagerViewController, PagerViewDelegate{
+class PhotoLibraryViewerVC: SCPagerViewController{
     
-    
+    override var prefersStatusBarHidden: Bool{return true}
+
     
     
     private let imageArray: [UIImage]
@@ -57,21 +58,15 @@ class PhotoLibraryViewerVC: SCPagerViewController, PagerViewDelegate{
     }
     
     
-    func sendButtonTapped() {
-        
-    }
     
-    func viewLongPressed() {
-        presentOptions()
-    }
+    
+    
     
     private func presentOptions(){
         self.present(PhotoOptionsVC(image: self.imageArray[self.currentItemIndex], presenter: self), animated: true, completion: nil)
     }
     
-    func threeDotButtonTapped() {
-        presentOptions()
-    }
+    
     
     
     
@@ -84,6 +79,18 @@ class PhotoLibraryViewerVC: SCPagerViewController, PagerViewDelegate{
     
     required init?(coder aDecoder: NSCoder) {
         fatalError()
+    }
+}
+
+extension PhotoLibraryViewerVC: PagerViewDelegate{
+    func sendButtonTapped() {
+        
+    }
+    func viewLongPressed() {
+        presentOptions()
+    }
+    func threeDotButtonTapped() {
+        presentOptions()
     }
 }
 

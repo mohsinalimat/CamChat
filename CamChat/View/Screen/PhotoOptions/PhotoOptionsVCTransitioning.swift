@@ -88,6 +88,7 @@ class PhotoOptionsVCTransitioningBrain: HKVCTransBrain{
     
     override func cleanUpAfterDismissal() {
         snapshotInfo.snapshot.removeFromSuperview()
+        super.cleanUpAfterDismissal()
     }
 }
 

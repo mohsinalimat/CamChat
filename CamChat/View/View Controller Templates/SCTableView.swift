@@ -11,10 +11,7 @@ import UIKit
 
 class SCCollectionView: SCScrollView, UICollectionViewDelegate, UICollectionViewDataSource {
     
-    
-    
-    
-    
+
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 0
