@@ -137,7 +137,7 @@ private class PhotoLibraryViewerTransitioningBrain: HKVCTransBrain{
     func adjustViewsForDismissal(accordingTo translation: CGPoint){
         
         guard let fingerPosition = originalFingerPositionInPresentedViewBounds else {return}
-        let newFingerPoint = fingerPosition.offset(by: translation)
+        let newFingerPoint = fingerPosition + translation
         
         
         let scaleTranslation = presentedViewTranslationEquation.solve(for: translation.y)

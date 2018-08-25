@@ -13,10 +13,10 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
     
 
     func collectionView(_ collectionView: UICollectionView, heightForItemAt indexPath: IndexPath) -> CGFloat {
-        
+        let defaultHeight: CGFloat = Variations.currentDevice(is: [.iPhone4, .iPhoneSE]) ? 250 : 300
         switch indexPath.item{
-        case 0, 2, 4, 6: return 300 - 30
-        default: return 300
+        case 0, 2, 4, 6: return defaultHeight - 30
+        default: return defaultHeight
         }
     }
     
@@ -75,14 +75,9 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
     private var cellToHideForPhotoViewerDismissal: UICollectionViewCell?
     
     
-    
-    
-    
-    
-    
-    
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath) as! PhotoLibraryCollectionViewCell
+        cell.vcOwner = self
         cell.imageView.image = imageArray[indexPath.item]
         cell.layer.masksToBounds = true
         cell.layer.cornerRadius = 10
@@ -108,6 +103,9 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
         return _collectionViewLayout
     }
 }
+
+
+
 
 
 

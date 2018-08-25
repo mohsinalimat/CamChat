@@ -16,7 +16,7 @@ class Login_LoginVC: LoginFormVCTemplate{
         
         buttonView.setButtonText(to: "Log In")
         buttonView.addAction {
-            self.present(Screen(), animated: true, completion: nil)
+            self.present(Screen.main, animated: true, completion: nil)
         }
     }
     

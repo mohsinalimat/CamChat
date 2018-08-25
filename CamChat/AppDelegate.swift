@@ -27,7 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
         APP_INSETS = window!.safeAreaInsets
         
-        window?.rootViewController = Screen()
+        window?.rootViewController = Screen.main
         
         window?.gestureRecognizers?.remove(at: 0)
         window?.gestureRecognizers?.remove(at: 0)

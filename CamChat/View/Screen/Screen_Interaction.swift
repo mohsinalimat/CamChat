@@ -71,14 +71,16 @@ extension Screen{
         case .horizontal:
             adjustHorizontalViewsToGradientChange(gradient: gradient)
             adjustTopGradientLayerViewTo_GradientChange(gradient: gradient)
+            adaptBackgroundColortoHorizontalGradientChange(gradient: gradient)
+            topBar_typed.adaptTo(gradient: gradient, direction: direction)
         case .vertical:
             adjustVerticalViewsToGradientChange(gradient: gradient)
         }
         
         
-        topBar_typed.adaptTo(gradient: gradient, direction: direction)
         adaptNavigationViewtoGradientChange(gradient: gradient, direction: direction)
-        adaptBackgroundColortoGradientChange(gradient: gradient, direction: direction)
+        
+        
     }
     
     
@@ -101,9 +103,7 @@ extension Screen{
     }
     
     private func adjustVerticalViewsToGradientChange(gradient: CGFloat){
-        let endingHeight = self.view.frame.height - topBarHeight - APP_INSETS.top
-        bottomScreenTopAnchor.constant = -(endingHeight * abs(gradient))
-        self.view.layoutIfNeeded()
+        bottomScreen.view.alpha = gradient
     }
     
     
@@ -111,18 +111,11 @@ extension Screen{
     
     
     
-    private func adaptBackgroundColortoGradientChange(gradient: CGFloat, direction: ScrollingDirection){
+    private func adaptBackgroundColortoHorizontalGradientChange(gradient: CGFloat){
         if !shouldChangeNavViewSize{return}
-        
-        let alpha = backgroundViewAlphaEquation.solve(for: gradient)
-        centerScreenCoverView.alpha = alpha
-        
-        if direction == .vertical{
-            self.centerScreenCoverView.backgroundColor = bottomScreenColor
-            return
-        }
-        
     
+        centerScreenCoverView.alpha = backgroundViewAlphaEquation.solve(for: gradient)
+        
         if gradient == 0{
             self.centerScreenCoverView.backgroundColor = .black
         } else if gradient < 0{
@@ -146,23 +139,18 @@ extension Screen{
         
         let shadowAlphas = navigationButtonsShadowAlphaEquation.solve(for: gradient)
         let gradientAlpha = bottomGradientViewAlpha_horizontal.solve(for: gradient)
-        let backingAlpha: CGFloat
-        let buttonColorVal: CGFloat
         
-        
-        switch direction{
-        case .horizontal:
-            backingAlpha = navigationViewBackingAlphaEquation_horizontal.solve(for: gradient)
-            buttonColorVal = navigationViewTintColorEquation_horizontal.solve(for: gradient)
-            bottomGradientView.alpha = gradientAlpha
-        case .vertical:
-            backingAlpha = navigationViewBackingAlphaEquation_vertical.solve(for: gradient)
-            buttonColorVal = navigationViewTintColorEquation_vertical.solve(for: gradient)
-        }
-        
-        navigationView.tintColor = UIColor(red: buttonColorVal, green: buttonColorVal, blue: buttonColorVal)
-        navigationView.setButtonBackingAlphas(to: backingAlpha)
         navigationView.setButtonShadowAlphas(to: shadowAlphas)
+        
+        if direction == .horizontal{
+            let backingAlpha = navigationViewBackingAlphaEquation.solve(for: gradient)
+            navigationView.setButtonBackingAlphas(to: backingAlpha)
+            let buttonColorVal = navigationViewTintColorEquation.solve(for: gradient)
+            navigationView.tintColor = UIColor(red: buttonColorVal, green: buttonColorVal, blue: buttonColorVal)
+            bottomGradientView.alpha = gradientAlpha
+
+            
+        }
     }
     
     

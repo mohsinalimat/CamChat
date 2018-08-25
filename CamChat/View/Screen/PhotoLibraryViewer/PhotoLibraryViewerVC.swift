@@ -25,7 +25,6 @@ class PhotoLibraryViewerVC: SCPagerViewController{
           self.libraryViewerTransitioningDelegate = PhotoLibraryViewerTransitioningDelegate(presenter: presenter, presented: self)
         self.transitioningDelegate = libraryViewerTransitioningDelegate
         pagerView.interactor.onlyAcceptInteractionInSpecifiedDirection = true
-        
     }
     
  
@@ -66,27 +65,26 @@ class PhotoLibraryViewerVC: SCPagerViewController{
         self.present(PhotoOptionsVC(image: self.imageArray[self.currentItemIndex], presenter: self), animated: true, completion: nil)
     }
     
-    
-    
-    
-    
     override func pagerView(numberOfItemsIn pagerView: SCPagerView) -> Int {
         return imageArray.count
     }
-    
-    
-    
     
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
 }
 
+
+
+
+
+
 extension PhotoLibraryViewerVC: PagerViewDelegate{
     func sendButtonTapped() {
         
     }
     func viewLongPressed() {
+        UIImpactFeedbackGenerator().impactOccurred()
         presentOptions()
     }
     func threeDotButtonTapped() {
@@ -119,7 +117,7 @@ private class PagerView: HKView{
     private lazy var longTapView: UIView = {
         let x = UIView()
         let gesture = UILongPressGestureRecognizer(target: self, action: #selector(respondToLongPress(gesture:)))
-        gesture.minimumPressDuration = 0.2
+        gesture.minimumPressDuration = 0.15
         x.addGestureRecognizer(gesture)
         return x
     }()
@@ -133,6 +131,7 @@ private class PagerView: HKView{
         let x = BouncyImageButton(image: AssetImages.threeDotMoreIcon.rotatedBy(.clockwise90)!.templateImage)
         x.addAction({ [weak self] in self?.delegate?.threeDotButtonTapped() })
         x.applyShadow(width: 5)
+        
         return x
     }()
     

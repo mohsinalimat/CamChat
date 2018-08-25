@@ -12,11 +12,15 @@ import HelpKit
 
 
 
-class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDelegate{
+class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDelegate, UIGestureRecognizerDelegate{
     
+    static var main = Screen()
     
+    private init(){super.init(nibName: nil, bundle: nil)}
     
- 
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init coder has not being implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,26 +29,16 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         
         
         
-        
+
         
         // This is only to ensure they are initialized right now, since they are being lazily loaded. Page Scrolling Interactors are active by default.
         verticalScrollInteractor.activate()
-        horizontalScrollInteractor.activate()
-        let line = UIView()
-        line.backgroundColor = .white
-        
+        horizontalScrollInteractor.activate()        
     }
     
 
     
-    
-    
-   
-    
 
-    
-    
-    
     lazy var leftScreen: SCScrollView = {
         let x = ChatTableView()
         self.addChild(x)
@@ -69,12 +63,15 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         x.delegate = self
         x.additionalSafeAreaInsets.bottom = subviewsBottomSafeAreaInset
         x.additionalSafeAreaInsets.top = topBarHeight
+        
         return x
     }()
     
      lazy var bottomScreen: UIViewController = {
         let x = SettingsViewController()
+        x.additionalSafeAreaInsets.bottom = subviewsBottomSafeAreaInset
         self.addChild(x)
+        x.view.alpha = 0
         return x
     }()
 
@@ -128,9 +125,12 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     
     lazy var verticalScrollInteractor: PageScrollingInteractor = {
         let x = PageScrollingInteractor(delegate: self, direction: .vertical)
+        x.multiplier = 1.4
         x.onlyAcceptInteractionInSpecifiedDirection = true
         return x
     }()
+    
+   
 
     
 
@@ -145,23 +145,18 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     var topBarHeightConstraint: NSLayoutConstraint!
     var topBarTopContraint: NSLayoutConstraint!
     
-    var bottomScreenTopAnchor: NSLayoutConstraint!
     var rightScreenLeftAnchor: NSLayoutConstraint!
     var leftScreenRightAnchor: NSLayoutConstraint!
     
     
     var leftScreenColor = BLUECOLOR
     var rightScreenColor = REDCOLOR
-    var bottomScreenColor = UIColor.orange
     
     
     
+    let navigationViewBackingAlphaEquation = CGLinearEquation(xy(-1, 1), xy(-0.8, 0), min: 0, max: 1)!
     
-    let navigationViewBackingAlphaEquation_horizontal = CGLinearEquation(xy(-1, 1), xy(-0.8, 0), min: 0, max: 1)!
-    let navigationViewBackingAlphaEquation_vertical = CGLinearEquation(xy(1, 1), xy(0.8, 0), min: 0, max: 1)!
-    
-    let navigationViewTintColorEquation_horizontal = CGLinearEquation(xy(-1, 190), xy(0, 255), min: 190, max: 255)!
-    let navigationViewTintColorEquation_vertical = CGLinearEquation(xy(0, 255), xy(1, 190), min: 190, max: 255)!
+    let navigationViewTintColorEquation = CGLinearEquation(xy(-1, 190), xy(0, 255), min: 190, max: 255)!
     
     let navigationButtonsShadowAlphaEquation = CGQuadEquation(xy(-1, 0), xy(0, 1), xy(1, 0), min: 0, max: 1)!
     let bottomGradientViewAlpha_horizontal = CGLinearEquation(xy(0, 0), xy(1, 1), min: 0, max: 1)!

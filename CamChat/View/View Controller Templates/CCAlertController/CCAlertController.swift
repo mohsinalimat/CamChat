@@ -9,6 +9,15 @@
 import HelpKit
 
 
+extension UIViewController{
+    @discardableResult func presentCCAlert(title: String, description: String? = nil, primaryButtonText: String, secondaryButtonText: String? = nil) -> CCAlertController{
+        let alert = CCAlertController(presenter: self, title: title, description: description, primaryButtonText: primaryButtonText, secondaryButtonText: secondaryButtonText)
+        present(alert, animated: true, completion: nil)
+        return alert
+    }
+}
+
+
 class CCAlertController: UIViewController{
     
     private var alertView: CCAlertControllerView{
@@ -42,7 +51,7 @@ class CCAlertController: UIViewController{
     
     
     
-    init(presenter: HKVCTransParticipator, title: String, description: String? = nil, primaryButtonText: String, secondaryButtonText: String? = nil){
+    fileprivate init(presenter: HKVCTransParticipator, title: String, description: String? = nil, primaryButtonText: String, secondaryButtonText: String? = nil){
         
         
         textInfo = (title, description, primaryButtonText, secondaryButtonText)

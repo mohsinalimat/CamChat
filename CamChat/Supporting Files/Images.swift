@@ -45,6 +45,13 @@ struct AssetImages{
     static var shareIcon = getIcon("shareIcon")
     static var trashIcon = getIcon("trashIcon")
     static var threeDotMoreIcon = getIcon("moreIcon")
+    static var snapCode = getPhoto("snapcode")
+    
+    static var accountUser = getIcon("accountUser")
+    static var notification = getIcon("notification")
+    static var logOut = getIcon("logOut")
+    static var storage = getIcon("storage")
+    
     
     
     static var examplePhotos = [

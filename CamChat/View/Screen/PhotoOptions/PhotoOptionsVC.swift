@@ -46,6 +46,25 @@ class PhotoOptionsVC: UIViewController{
         
     }
     
+    private func moveViewsOnScreen(){
+        self.labelStackView.transform = CGAffineTransform.identity
+        self.optionsMenu.transform = CGAffineTransform.identity
+    }
+    
+    private func moveViewsOffScreen(){
+        view.layoutIfNeeded()
+        
+        let labelsTranslation = -labelsLayoutGuide.layoutFrame.maxY
+        let optionsTranslation = view.bounds.height - optionsMenuLayoutGuide.layoutFrame.minY
+        
+        labelStackView.transform = CGAffineTransform(translationX: 0, y: labelsTranslation)
+        optionsMenu.transform = CGAffineTransform(translationX: 0, y: optionsTranslation)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        imageView.alpha = 1
+    }
     
     
     @objc private func respondToTap(gesture: UITapGestureRecognizer){
@@ -109,20 +128,7 @@ class PhotoOptionsVC: UIViewController{
 
 extension PhotoOptionsVC: PhotoOptionsVCPresented{
     
-    private func moveViewsOnScreen(){
-        self.labelStackView.transform = CGAffineTransform.identity
-        self.optionsMenu.transform = CGAffineTransform.identity
-    }
-    
-    private func moveViewsOffScreen(){
-        view.layoutIfNeeded()
-        
-        let labelsTranslation = -labelsLayoutGuide.layoutFrame.maxY
-        let optionsTranslation = view.bounds.height - optionsMenuLayoutGuide.layoutFrame.minY
-        
-        labelStackView.transform = CGAffineTransform(translationX: 0, y: labelsTranslation)
-        optionsMenu.transform = CGAffineTransform(translationX: 0, y: optionsTranslation)
-    }
+
     
     
     func prepareForObjectsPresentation() {
@@ -141,10 +147,7 @@ extension PhotoOptionsVC: PhotoOptionsVCPresented{
         moveViewsOffScreen()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        imageView.alpha = 1
-    }
+ 
     
     func getPhotoViewSnapshotInfo() -> (snapshot: UIView, endingFrame: CGRect, endingCornerRadius: CGFloat) {
         view.layoutIfNeeded()

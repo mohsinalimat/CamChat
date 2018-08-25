@@ -16,7 +16,6 @@ protocol ChatControllerTransitionAnimationParticipator: HKVCTransParticipator{
     var topBarView: UIView {get}
 }
 
-/// The Chat Controller conforms to this protocol.
 protocol ChatControllerProtocol: HKVCTransParticipator{
     var backgroundView: UIView {get}
     var topBarView: UIView {get}
@@ -140,7 +139,7 @@ class ChatControllerAnimationPositioningBrain: HKVCTransBrain{
     
     
     
-   /// This holds this instance in memory so that it responds to the keyboard dissmisal notification beore it deallocated.
+   /// This holds this instance in memory so that it responds to the keyboard dissmisal notification before it deallocated.
     private var myself:ChatControllerAnimationPositioningBrain!
 
     override func prepareForDismissal(){

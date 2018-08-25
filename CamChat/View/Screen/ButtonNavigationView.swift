@@ -11,11 +11,6 @@ import HelpKit
 fileprivate typealias ButtonType = ButtonNavigationView.ButtonType
 
 
-func getGradientValue(minVal: CGFloat, maxVal: CGFloat, percentage: CGFloat) -> CGFloat{
-    
-    return minVal + ((maxVal - minVal) * abs(percentage))
-    
-}
 
 
 protocol ButtonNavigationViewDelegate: class{

@@ -22,10 +22,10 @@ extension Screen{
         view.addSubview(centerScreenCoverView)
         view.addSubview(leftScreen.view)
         view.addSubview(rightScreen.view)
-        view.addSubview(bottomScreen.view)
         view.addSubview(topGradientView)
         view.addSubview(topBar_typed)
         view.addSubview(bottomGradientView)
+        view.addSubview(bottomScreen.view)
         view.addSubview(navigationView)
         
         
@@ -47,8 +47,7 @@ extension Screen{
         rightScreenLeftAnchor = rightScreenPins.left!
         
         
-        let bottomScreenPins = bottomScreen.view.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .top: view.bottomAnchor], constants: [.height: self.view.frame.height - topBarHeight - APP_INSETS.top])
-        bottomScreenTopAnchor = bottomScreenPins.top!
+        bottomScreen.view.pinAllSides(pinTo: view)
         
         
         

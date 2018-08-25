@@ -14,7 +14,7 @@ class Login_SignUp_Email: LoginFormVCTemplate{
         super.viewDidLoad()
         buttonView.setButtonText(to: "Continue")
         buttonView.addAction {
-            self.present(Screen(), animated: true, completion: nil)
+            self.present(Screen.main, animated: true, completion: nil)
         }
     }
     
