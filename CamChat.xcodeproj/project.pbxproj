@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		41B44AC0775625C522E2A591 /* Pods_CamChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85F770E7C208483F91509480 /* Pods_CamChat.framework */; };
 		6010B1C420F288FF00B94289 /* ButtonsTopBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6010B1C320F288FF00B94289 /* ButtonsTopBar.swift */; };
 		6011896B20FEDA3600C87C74 /* BouncyImageButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6011896A20FEDA3600C87C74 /* BouncyImageButton.swift */; };
 		601D0D34210DD656007C47C9 /* ChatTopBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 601D0D33210DD656007C47C9 /* ChatTopBar.swift */; };
@@ -57,6 +58,7 @@
 		60B506702104915600A9E94A /* Templates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B5066F2104915600A9E94A /* Templates.swift */; };
 		60B506732104A00700A9E94A /* ChatControllerTransitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B506722104A00700A9E94A /* ChatControllerTransitioning.swift */; };
 		60B99EA020EE3F4800660F9B /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B99E9F20EE3F4800660F9B /* SettingsVC.swift */; };
+		60BAD8592132C5CC00B0D205 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 60BAD8582132C5CC00B0D205 /* GoogleService-Info.plist */; };
 		60BAF21E21186E1000860E51 /* PhotoLibraryViewerVCTransitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60BAF21D21186E1000860E51 /* PhotoLibraryViewerVCTransitioning.swift */; };
 		60C23F0E2103BA1B00D78F77 /* ChatMessagesCollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60C23F0D2103BA1B00D78F77 /* ChatMessagesCollectionView.swift */; };
 		60CABF4320FD85D4008D5780 /* Login_SignUp_Password.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60CABF4220FD85D4008D5780 /* Login_SignUp_Password.swift */; };
@@ -114,6 +116,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1E3C6D283F8CDAE2806B48A1 /* Pods-CamChat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CamChat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CamChat/Pods-CamChat.debug.xcconfig"; sourceTree = "<group>"; };
 		6010B1C320F288FF00B94289 /* ButtonsTopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonsTopBar.swift; sourceTree = "<group>"; };
 		6011896A20FEDA3600C87C74 /* BouncyImageButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BouncyImageButton.swift; sourceTree = "<group>"; };
 		601D0D33210DD656007C47C9 /* ChatTopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTopBar.swift; sourceTree = "<group>"; };
@@ -166,6 +169,7 @@
 		60B5066F2104915600A9E94A /* Templates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Templates.swift; sourceTree = "<group>"; };
 		60B506722104A00700A9E94A /* ChatControllerTransitioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatControllerTransitioning.swift; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; wrapsLines = 1; };
 		60B99E9F20EE3F4800660F9B /* SettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
+		60BAD8582132C5CC00B0D205 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		60BAF21D21186E1000860E51 /* PhotoLibraryViewerVCTransitioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryViewerVCTransitioning.swift; sourceTree = "<group>"; };
 		60C23F0D2103BA1B00D78F77 /* ChatMessagesCollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessagesCollectionView.swift; sourceTree = "<group>"; };
 		60CABF4220FD85D4008D5780 /* Login_SignUp_Password.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Login_SignUp_Password.swift; sourceTree = "<group>"; };
@@ -182,6 +186,8 @@
 		60E528F22124D1090049E92B /* CCAlertControllerTransitioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCAlertControllerTransitioning.swift; sourceTree = "<group>"; };
 		60EB659420E5B8A0000FFB82 /* Login_MainVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Login_MainVC.swift; sourceTree = "<group>"; };
 		60F4CD0120E47B0000B06458 /* Screen_Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screen_Storage.swift; sourceTree = "<group>"; };
+		85F770E7C208483F91509480 /* Pods_CamChat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CamChat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA185CC5C7F5FC6654F523CC /* Pods-CamChat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CamChat.release.xcconfig"; path = "Pods/Target Support Files/Pods-CamChat/Pods-CamChat.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,6 +196,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				60470E6B20FA367700C947E6 /* HelpKit.framework in Frameworks */,
+				41B44AC0775625C522E2A591 /* Pods_CamChat.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -327,6 +334,8 @@
 				6044ED7020E44A9700098F22 /* CamChat */,
 				6044ED6F20E44A9700098F22 /* Products */,
 				60A8955420F5817500E4E644 /* MyPlayground.playground */,
+				754A139B0A5481F8ED499349 /* Pods */,
+				AECC994EA945A06737C7AD39 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -359,6 +368,7 @@
 				6096CCDC20F15FE30052EE16 /* Images.swift */,
 				6044ED7B20E44A9800098F22 /* Assets.xcassets */,
 				6044ED8020E44A9800098F22 /* Info.plist */,
+				60BAD8582132C5CC00B0D205 /* GoogleService-Info.plist */,
 				6044ED7D20E44A9800098F22 /* LaunchScreen.storyboard */,
 				6044ED7520E44A9700098F22 /* Main.storyboard */,
 				6044ED7820E44A9700098F22 /* CamChat.xcdatamodeld */,
@@ -464,6 +474,23 @@
 			path = CCAlertController;
 			sourceTree = "<group>";
 		};
+		754A139B0A5481F8ED499349 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				1E3C6D283F8CDAE2806B48A1 /* Pods-CamChat.debug.xcconfig */,
+				EA185CC5C7F5FC6654F523CC /* Pods-CamChat.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		AECC994EA945A06737C7AD39 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				85F770E7C208483F91509480 /* Pods_CamChat.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -471,10 +498,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6044ED8320E44A9800098F22 /* Build configuration list for PBXNativeTarget "CamChat" */;
 			buildPhases = (
+				AE6285596305F2D76B77DF03 /* [CP] Check Pods Manifest.lock */,
 				6044ED6A20E44A9700098F22 /* Sources */,
 				6044ED6B20E44A9700098F22 /* Frameworks */,
 				6044ED6C20E44A9700098F22 /* Resources */,
 				60470E6F20FA367700C947E6 /* Embed Frameworks */,
+				5A4AF1DE014933270E0926D9 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -548,12 +577,62 @@
 			buildActionMask = 2147483647;
 			files = (
 				6044ED7F20E44A9800098F22 /* LaunchScreen.storyboard in Resources */,
+				60BAD8592132C5CC00B0D205 /* GoogleService-Info.plist in Resources */,
 				6044ED7C20E44A9800098F22 /* Assets.xcassets in Resources */,
 				6044ED7720E44A9700098F22 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		5A4AF1DE014933270E0926D9 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-CamChat/Pods-CamChat-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CamChat/Pods-CamChat-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		AE6285596305F2D76B77DF03 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CamChat-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		6044ED6A20E44A9700098F22 /* Sources */ = {
@@ -770,6 +849,7 @@
 		};
 		6044ED8420E44A9800098F22 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1E3C6D283F8CDAE2806B48A1 /* Pods-CamChat.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -782,7 +862,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = PracticeProjects.CamChat;
+				PRODUCT_BUNDLE_IDENTIFIER = com.PatrickHanna.CamChat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
@@ -792,6 +872,7 @@
 		};
 		6044ED8520E44A9800098F22 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = EA185CC5C7F5FC6654F523CC /* Pods-CamChat.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -804,7 +885,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = PracticeProjects.CamChat;
+				PRODUCT_BUNDLE_IDENTIFIER = com.PatrickHanna.CamChat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;

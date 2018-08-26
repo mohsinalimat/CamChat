@@ -258,7 +258,6 @@ private class PhotoLibraryViewerInteractionController: HKVCTransInteractionContr
     
     
     private func setUpGesture(){
-        
         let gesture = DirectionAwarePanGesture(target: self, action: #selector(respondToGesture(gesture:)))
         presented.view.addGestureRecognizer(gesture)
         self.gesture = gesture
