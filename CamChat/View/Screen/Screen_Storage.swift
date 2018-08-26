@@ -16,7 +16,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     
     static var main = Screen()
     
-    private init(){super.init(nibName: nil, bundle: nil)}
+    private init() { super.init(nibName: nil, bundle: nil) }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init coder has not being implemented")
@@ -31,9 +31,9 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         
 
         
-        // This is only to ensure they are initialized right now, since they are being lazily loaded. Page Scrolling Interactors are active by default.
-        verticalScrollInteractor.activate()
-        horizontalScrollInteractor.activate()        
+        // This is only to ensure they are initialized right now, since they are being lazily loaded. Page Scrolling Interactors startAccepting touches by default.
+        verticalScrollInteractor.startAcceptingTouches()
+        horizontalScrollInteractor.startAcceptingTouches()        
     }
     
 
@@ -67,7 +67,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         return x
     }()
     
-     lazy var bottomScreen: UIViewController = {
+     lazy var bottomScreen: SettingsViewController = {
         let x = SettingsViewController()
         x.additionalSafeAreaInsets.bottom = subviewsBottomSafeAreaInset
         self.addChild(x)
@@ -126,9 +126,15 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     lazy var verticalScrollInteractor: PageScrollingInteractor = {
         let x = PageScrollingInteractor(delegate: self, direction: .vertical)
         x.multiplier = 1.4
+        x.gesture.delegate = self
         x.onlyAcceptInteractionInSpecifiedDirection = true
         return x
     }()
+    
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
     
    
 

@@ -40,6 +40,8 @@ class PhotoOptionsMiniTransitioningBrain: HKVCTransBrain{
         bluryView.pinAllSides(addTo: container, pinTo: container)
         container.addSubview(presented.view)
         presented.view.backgroundColor = .clear
+        Screen.main.horizontalScrollInteractor.snapGradientTo(screen: .last, animated: false)
+        Screen.main.horizontalScrollInteractor.stopAcceptingTouches()
     }
     
     override func carryOutUnanimatedPresentationAction() {
@@ -64,6 +66,8 @@ class PhotoOptionsMiniTransitioningBrain: HKVCTransBrain{
     override func cleanUpAfterDismissal() {
         bluryView.removeFromSuperview()
         super.cleanUpAfterDismissal()
+        Screen.main.horizontalScrollInteractor.startAcceptingTouches()
+
     }
     
 }

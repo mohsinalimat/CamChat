@@ -78,7 +78,7 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         setUpViews()
         
         //I'm just doing this because the interactor is being lazily loaded. The interactor is activated by default.
-        interactor.activate()
+        interactor.startAcceptingTouches()
         interactor.onlyAcceptInteractionInSpecifiedDirection = false
         
         if numberOfItems >= 1{

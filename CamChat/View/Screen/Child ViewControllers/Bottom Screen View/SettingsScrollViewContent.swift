@@ -41,20 +41,20 @@ class SettingsScrollContentView: UIView{
     
     
 
-    private lazy var snapCode: UIImageView = {
+    lazy var snapCode: UIImageView = {
         let x = UIImageView(image: AssetImages.snapCode, contentMode: .scaleAspectFill)
         x.setCornerRadius(to: 32)
         x.pin(constants: [.height: 150, .width: 150])
         return x
     }()
 
-    private lazy var topLabel: UILabel = {
+    lazy var topLabel: UILabel = {
         let x = UILabel(text: "Patrick Hanna", font: SCFonts.getFont(type: .demiBold, size: 24))
         x.textColor = .white
         return x
     }()
     
-    private lazy var bottomLabel: UILabel = {
+    lazy var bottomLabel: UILabel = {
         let x = UILabel(text: "patrickjh1998@hotmail.com", font: SCFonts.getFont(type: .medium, size: 16))
         x.textColor = UIColor.gray(percentage: 0.6).withAlphaComponent(0.7)
         return x
@@ -76,7 +76,7 @@ class SettingsScrollContentView: UIView{
     
     
     
-    private lazy var settingsblocksStackView: UIStackView = {
+    lazy var settingsblocksStackView: UIStackView = {
         let x = UIStackView()
         x.axis = .vertical
         x.alignment = .fill
@@ -92,7 +92,7 @@ class SettingsScrollContentView: UIView{
     
     
     
-    private lazy var logOutButton: LogOutSettingsButton = {
+    lazy var logOutButton: UIView = {
         let x = LogOutSettingsButton(info: logOutButtonInfo)
         x.pin(constants: [.height: 40, .width: 200])
         return x
@@ -122,8 +122,8 @@ private class SettingsButton: SimpleInteractiveButton {
         self.info = info
         super.init()
         setCornerRadius(to: 10)
-        backgroundColor = UIColor.gray(percentage: 0.3).withAlphaComponent(0.8)
-        if let action = info.action{ addAction(action) }
+        backgroundColor = UIColor.gray(percentage: 0.4).withAlphaComponent(0.6)
+        if let action = info.action { addAction(action) }
         setUpViews()
     }
     

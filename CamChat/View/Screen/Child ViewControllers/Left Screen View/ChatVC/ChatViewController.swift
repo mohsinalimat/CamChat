@@ -16,6 +16,9 @@ class ChatViewController: UIViewController{
         get{ return chatTransitioningDelegate.tappedCell }
         set{ chatTransitioningDelegate.tappedCell = newValue}
     }
+    
+    
+    
 
     init(presenter: HKVCTransParticipator){
         super.init(nibName: nil, bundle: nil)
@@ -132,10 +135,5 @@ extension ChatViewController: ChatControllerProtocol{
     var topBarView: UIView{
         return topBarView_typed
     }
-    
-    
-    
-    
-    
-    
+ 
 }

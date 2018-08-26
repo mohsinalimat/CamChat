@@ -33,29 +33,72 @@ extension Screen{
     
     
     
-
+    func gradientWillBeginChanging(interactor: PageScrollingInteractor, direction: ScrollingDirection) {
+        if direction == .horizontal{
+            if interactor.currentlyFullyVisibleScreen == .center {
+                leftScreen.viewWillAppear(true)
+                rightScreen.viewWillAppear(true)
+                centerScreen.viewWillDisappear(true)
+            }
+            if interactor.currentlyFullyVisibleScreen == .first{
+                leftScreen.viewWillDisappear(true)
+                centerScreen.viewWillAppear(true)
+            }
+            if interactor.currentlyFullyVisibleScreen == .last{
+                rightScreen.viewWillDisappear(true)
+                centerScreen.viewWillAppear(true)
+            }
+            
+        }
+        if direction == .vertical{
+            if interactor.currentlyFullyVisibleScreen == .center{
+                centerScreen.viewWillDisappear(true)
+                bottomScreen.viewWillAppear(true)
+            }
+            if interactor.currentlyFullyVisibleScreen == .last{
+                bottomScreen.viewWillDisappear(true)
+                centerScreen.viewWillAppear(true)
+            }
+        }
+    }
     
     
     func gradientDidSnap(fromScreen: PageScrollingInteractor.ScreenType, toScreen: PageScrollingInteractor.ScreenType, direction: ScrollingDirection, interactor: PageScrollingInteractor) {
         if toScreen == .center{
             
-            horizontalScrollInteractor.activate()
-            verticalScrollInteractor.activate()
+            horizontalScrollInteractor.startAcceptingTouches()
+            verticalScrollInteractor.startAcceptingTouches()
             horizontalScrollInteractor.onlyAcceptInteractionInSpecifiedDirection = true
             verticalScrollInteractor.onlyAcceptInteractionInSpecifiedDirection = true
             
         } else if interactor == horizontalScrollInteractor{
             
-            verticalScrollInteractor.deactivate()
-            horizontalScrollInteractor.activate()
+            verticalScrollInteractor.stopAcceptingTouches()
+            horizontalScrollInteractor.startAcceptingTouches()
             horizontalScrollInteractor.onlyAcceptInteractionInSpecifiedDirection = false
             
         } else if interactor == verticalScrollInteractor{
             
-            horizontalScrollInteractor.deactivate()
-            verticalScrollInteractor.activate()
+            horizontalScrollInteractor.stopAcceptingTouches()
+            verticalScrollInteractor.startAcceptingTouches()
             verticalScrollInteractor.onlyAcceptInteractionInSpecifiedDirection = false
             
+        }
+        
+        if toScreen == fromScreen{return}
+        
+        
+        let verticalDict = [PageScrollingInteractor.ScreenType.center: centerScreen, .last: bottomScreen]
+        let horizontalDict = [PageScrollingInteractor.ScreenType.first: leftScreen, .center: centerScreen, .last: rightScreen]
+        
+        if direction == .horizontal{
+            horizontalDict[fromScreen]!.viewDidDisappear(true)
+            horizontalDict[toScreen]!.viewDidAppear(true)
+        }
+        
+        if direction == .vertical{
+            verticalDict[fromScreen]!.viewDidDisappear(true)
+            verticalDict[toScreen]!.viewDidAppear(true)
         }
     }
     
@@ -75,12 +118,9 @@ extension Screen{
             topBar_typed.adaptTo(gradient: gradient, direction: direction)
         case .vertical:
             adjustVerticalViewsToGradientChange(gradient: gradient)
+            bottomScreen.gradientDidChange(to: gradient)
         }
-        
-        
         adaptNavigationViewtoGradientChange(gradient: gradient, direction: direction)
-        
-        
     }
     
     

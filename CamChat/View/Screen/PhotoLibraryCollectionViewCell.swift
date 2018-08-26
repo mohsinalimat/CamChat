@@ -19,11 +19,13 @@ class PhotoLibraryCollectionViewCell: UICollectionViewCell{
         imageView.pinAllSides(addTo: self, pinTo: self)
         let gesture = UILongPressGestureRecognizer(target: self, action: #selector(respondToGesture(gesture:)))
         addGestureRecognizer(gesture)
-        gesture.minimumPressDuration = 0.25
+        gesture.minimumPressDuration = 0.325
         gesture.delaysTouchesBegan = false
         gesture.delaysTouchesEnded = false
         gesture.cancelsTouchesInView = true
     }
+    
+    
     
     
     @objc private func respondToGesture(gesture: UILongPressGestureRecognizer){

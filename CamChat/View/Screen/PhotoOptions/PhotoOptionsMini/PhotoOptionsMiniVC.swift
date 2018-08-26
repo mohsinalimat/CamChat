@@ -62,6 +62,9 @@ class PhotoOptionsMiniVC: UIViewController {
 
     }
     
+
+  
+    
     
     
     @objc private func respondToTap(gesture: UITapGestureRecognizer){
