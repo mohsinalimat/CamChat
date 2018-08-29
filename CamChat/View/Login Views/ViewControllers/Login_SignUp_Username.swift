@@ -9,14 +9,23 @@
 import Foundation
 import UIKit
 
-class Login_SignUp_UserName: LoginFormVCTemplate{
+class Login_SignUp_UserName: SignUpFormVCTemplate{
     
     override func viewDidLoad() {
         super.viewDidLoad()
         buttonView.setButtonText(to: "Continue")
-
-        buttonView.addAction {
-            self.present(Login_SignUp_Password(), animated: false, completion: nil)
+        
+        
+    }
+    
+    override var nextScreenType: SignUpFormVCTemplate.Type{
+        return Login_SignUp_Password.self
+    }
+    
+    override func respondToButtonViewTapped() {
+        self.handleErrorWithOopsAlert {
+            try self.infoObject.setUsername(to: self.inputFormView.topTextField.textField.text!)
+            super.respondToButtonViewTapped()
         }
     }
     

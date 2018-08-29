@@ -8,13 +8,25 @@
 
 import UIKit
 
-class Login_SignUp_Email: LoginFormVCTemplate{
+class Login_SignUp_Email: SignUpFormVCTemplate{
     
     override func viewDidLoad() {
         super.viewDidLoad()
         buttonView.setButtonText(to: "Continue")
-        buttonView.addAction {
-            self.present(Screen.main, animated: true, completion: nil)
+        
+     
+    }
+    
+    override func respondToButtonViewTapped() {
+        self.handleErrorWithOopsAlert {
+            try self.infoObject.setEmail(to: self.inputFormView.topTextField.textField.text!)
+            Firebase.signUpAndSignIn(with: self.infoObject, errorHandler: { (error) in
+                if let error = error {
+                    self.presentOopsAlert(description: error.localizedDescription)
+                } else {
+                    self.present(Screen.main, animated: true, completion: nil)
+                }
+            })
         }
     }
     

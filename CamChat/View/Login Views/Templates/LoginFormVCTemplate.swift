@@ -10,39 +10,79 @@ import UIKit
 import HelpKit
 
 
+class SignUpFormVCTemplate: LoginFormVCTemplate{
+    var infoObject: UserSignUpProgressionInfo
+    
+    private lazy var nextScreen = nextScreenType.init(presenter: self, info: infoObject)
+    
+    var nextScreenType: SignUpFormVCTemplate.Type{
+        return SignUpFormVCTemplate.self
+    }
+    
+    required init(presenter: HKVCTransParticipator, info: UserSignUpProgressionInfo){
+        
+        self.infoObject = info
+        super.init(presenter: presenter)
+        buttonView.addAction({[unowned self] in self.respondToButtonViewTapped()})
+    }
+    
+    
+    /// It is the job of subclasses to set the info object with the info they've collected from the user and/or update Firestore all BEFORE they call super. It is also the responsibility of the very last signup screen to NOT call super and PRESENT THE MAIN INTERFACE instead.
+    func respondToButtonViewTapped(){
+        self.present(self.nextScreen)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init coder has not being implemented")
+    }
+}
 
-/// TODO: increase the hit area of the back button
+
+
+
+
+
+
+
+
+
+
 class LoginFormVCTemplate: UIViewController, LoginInputFormViewDelegate{
     
+    
+    private var customTransitioningDelegate: LoginVCTransitioningDelegate!
+    
+    init(presenter: HKVCTransParticipator){
+        super.init(nibName: nil, bundle: nil)
+        self.customTransitioningDelegate = LoginVCTransitioningDelegate(presenter: presenter, presented: self)
+        transitioningDelegate = customTransitioningDelegate
+        
+    }
     
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpViews()
+        view.setCornerRadius(to: 10)
 
         view.backgroundColor = .red
         
         inputFormView.invalidateIntrinsicContentSize()
         view.layoutIfNeeded()
-        inputFormView.delegate = self
-        inputFormView.topTextField.textField.becomeFirstResponder()
         
+        NotificationCenter.default.addObserver(self, selector: #selector(respondToKeyboardFrameChange(notification:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
+    
+    
     override func viewWillAppear(_ animated: Bool) {
-        NotificationCenter.default.addObserver(self, selector: #selector(respondToKeyboardFrameChange(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(respondToKeyboardFrameChange(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(respondToApplicationWillEnterForegroundNotification), name: UIApplication.willEnterForegroundNotification, object: nil)
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-       
         activateTopTextFieldIfNeeded()
+        super.viewWillAppear(animated)
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        NotificationCenter.default.removeObserver(self)
-    }
+  
+    
+    
 
     
     func textFieldDidReturn(textField: LoginTextFieldView) {
@@ -60,7 +100,7 @@ class LoginFormVCTemplate: UIViewController, LoginInputFormViewDelegate{
         switch inputFormView.formType{
         case .oneTextField:
             if let text = topText{
-                if !text.removeWhiteSpaces().isEmpty{
+                if !text.withTrimmedWhiteSpaces().isEmpty{
                     buttonView.enable()
                     return
                 }
@@ -69,7 +109,7 @@ class LoginFormVCTemplate: UIViewController, LoginInputFormViewDelegate{
             
         case .twoTextFields:
             if let topText = topText, let bottomText = bottomText{
-                if !topText.removeWhiteSpaces().isEmpty && !bottomText.removeWhiteSpaces().isEmpty{
+                if !topText.withTrimmedWhiteSpaces().isEmpty && !bottomText.withTrimmedWhiteSpaces().isEmpty{
                     buttonView.enable()
                     return
                 }
@@ -78,9 +118,7 @@ class LoginFormVCTemplate: UIViewController, LoginInputFormViewDelegate{
         }
     }
     
-    @objc private func respondToApplicationWillEnterForegroundNotification(){
-        activateTopTextFieldIfNeeded()
-    }
+    
     
     private func activateTopTextFieldIfNeeded(){
         if !inputFormView.topTextField.textField.isFirstResponder && !inputFormView.topTextField.textField.isFirstResponder{
@@ -99,10 +137,12 @@ class LoginFormVCTemplate: UIViewController, LoginInputFormViewDelegate{
         view.layoutIfNeeded()
         UIView.animate(withDuration: animationTime) {
             
-            let originalInsets = self.view.safeAreaInsets.bottom - self.additionalSafeAreaInsets.bottom
+            let keyboardHeightOnScreen = max(self.view.bounds.height - keyboardFrame.minY, 0)
             
-            self.additionalSafeAreaInsets.bottom = keyboardFrame.height - originalInsets
+            self.additionalSafeAreaInsets.bottom = max(keyboardHeightOnScreen - APP_INSETS.bottom, 0)
+            self.view.layoutIfNeeded()
             self.scrollView.contentSize = self.view.safeAreaLayoutGuide.layoutFrame.size
+            
             self.scrollView.contentSize.height -= self.buttonView.intrinsicContentSize.height
             self.view.layoutIfNeeded()
         }
@@ -115,7 +155,6 @@ class LoginFormVCTemplate: UIViewController, LoginInputFormViewDelegate{
             self.scrollView.contentSize.height = desiredScrollingSpace
             self.view.layoutIfNeeded()
         }
-        
     }
     
     
@@ -127,7 +166,7 @@ class LoginFormVCTemplate: UIViewController, LoginInputFormViewDelegate{
         scrollView.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .top: view.topAnchor, .bottom: view.bottomAnchor])
         
         buttonView.pin(anchors: [.left: view.leftAnchor, .bottom: view.safeAreaLayoutGuide.bottomAnchor, .right: view.rightAnchor])
-        backButton.pin(anchors: [.left: view.leftAnchor, .top: view.safeAreaLayoutGuide.topAnchor], constants: [.left: 15, .top: 18])
+        backButton.pin(anchors: [.left: view.leftAnchor, .top: view.topAnchor], constants: [.left: 15, .top: 18 + Variations.notchHeight])
         
         inputFormView.pin(anchors: [.centerX: scrollView.contentLayoutGuide.centerXAnchor, .centerY: scrollView.contentLayoutGuide.centerYAnchor])
         view.layoutIfNeeded()
@@ -141,6 +180,8 @@ class LoginFormVCTemplate: UIViewController, LoginInputFormViewDelegate{
     lazy var inputFormView: LoginInputFormView = {
         let x = LoginInputFormView(formType: preferredInputFormViewType)
         configureInputFormView(form: x)
+        x.delegate = self
+
         return x
     }()
     
@@ -168,21 +209,26 @@ class LoginFormVCTemplate: UIViewController, LoginInputFormViewDelegate{
         return x
     }()
     
-    lazy var backButton: UIImageView = {
-        let x = UIImageView(image: AssetImages.arrowChevron)
-        x.transform = CGAffineTransform(rotationAngle: .pi)
-        x.contentMode = .scaleAspectFit
+
+    
+    lazy var backButton: UIView = {
+        let x = BouncyImageButton(image: AssetImages.arrowChevron.rotatedBy(._180)!.templateImage)
         x.tintColor = BLUECOLOR
         x.pin(constants: [.height: 23, .width: 23])
-        x.isUserInteractionEnabled = true
-        let gesture = UITapGestureRecognizer(target: self, action: #selector(respondToBackButtonPressed(gesture:)))
-        x.addGestureRecognizer(gesture)
+        x.addAction { [unowned self] in self.respondToBackButtonTapped()}
         return x
     }()
     
-    @objc func respondToBackButtonPressed(gesture: UITapGestureRecognizer){
-        self.dismiss(animated: false, completion: nil)
+ 
+    
+    func respondToBackButtonTapped(){
+        inputFormView.topTextField.textField.resignFirstResponder()
+        inputFormView.bottomTextField.textField.resignFirstResponder()
+        self.dismiss(animated: true)
+        
     }
+    
+    
     
     
     
@@ -190,5 +236,9 @@ class LoginFormVCTemplate: UIViewController, LoginInputFormViewDelegate{
         return true
     }
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init coder has not being implemented")
+    }
     
+
 }

@@ -18,8 +18,6 @@ enum SCFontType: String{
 
 class SCFonts{
     
-    
-    
     private static var fontTypeString = "AvenirNext"
     
     static func getFont(type: SCFontType, size: CGFloat) -> UIFont{

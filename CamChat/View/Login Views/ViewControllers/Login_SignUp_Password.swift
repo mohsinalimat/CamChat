@@ -9,14 +9,24 @@
 import Foundation
 import UIKit
 
-class Login_SignUp_Password: LoginFormVCTemplate{
+class Login_SignUp_Password: SignUpFormVCTemplate{
     
     override func viewDidLoad() {
         super.viewDidLoad()
         buttonView.setButtonText(to: "Continue")
+    
         
-        buttonView.addAction {
-            self.present(Login_SignUp_Email(), animated: false, completion: nil)
+    
+    }
+    
+    override var nextScreenType: SignUpFormVCTemplate.Type{
+        return Login_SignUp_Email.self
+    }
+    
+    override func respondToButtonViewTapped() {
+        self.handleErrorWithOopsAlert {
+            try self.infoObject.setPassword(to: self.inputFormView.topTextField.textField.text!)
+            super.respondToButtonViewTapped()
         }
     }
     
@@ -32,7 +42,7 @@ class Login_SignUp_Password: LoginFormVCTemplate{
         form.topTextField.textField.textContentType = .password
         form.topTextField.textField.keyboardType = .asciiCapable
         form.titleLabel.text = "Choose a password"
-        form.topDescriptionLabel.text = "Your password should be at least 8 characters."
+        form.topDescriptionLabel.text = "Your password should be at least \(UserSignUpProgressionInfo.minimumPasswordLength) characters."
     }
     
 }

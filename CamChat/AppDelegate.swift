@@ -22,15 +22,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     
     func applicationDidFinishLaunching(_ application: UIApplication) {
-        
+        Firebase.configure()
+
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.makeKeyAndVisible()
         APP_INSETS = window!.safeAreaInsets
         
-        window?.rootViewController = Screen.main
+        if User.currentUser.isNil{
+            window?.rootViewController = Login_MainVC()
+        } else {
+            window?.rootViewController = Screen.main
+        }
+        
         
         window?.gestureRecognizers?.remove(at: 0)
         window?.gestureRecognizers?.remove(at: 0)
+        
+        
     
     }
     

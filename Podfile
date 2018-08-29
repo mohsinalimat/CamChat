@@ -8,5 +8,7 @@ target 'CamChat' do
   # Pods for CamChat
 
 pod 'Firebase/Core'
+pod 'Firebase/Firestore'
+pod 'Firebase/Auth'
 
 end

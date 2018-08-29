@@ -9,7 +9,7 @@
 import UIKit
 import HelpKit
 
-protocol LoginInputFormViewDelegate: class{
+protocol LoginInputFormViewDelegate: class {
     func textFieldTextDidChange(textField: LoginTextFieldView, text: String?)
     func textFieldDidReturn(textField: LoginTextFieldView)
 }

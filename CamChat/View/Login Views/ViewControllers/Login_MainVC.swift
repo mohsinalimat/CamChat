@@ -15,9 +15,12 @@ class Login_MainVC: UIViewController{
     
     private let buttonHeight: CGFloat = 80
     
+    
+ 
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .yellow
+        
         
         
         signUpButton.pin(addTo: view, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor], constants: [.height: buttonHeight])
@@ -35,9 +38,9 @@ class Login_MainVC: UIViewController{
         return true
     }
     
-    override func setNeedsUpdateOfHomeIndicatorAutoHidden() {
-        super.setNeedsUpdateOfHomeIndicatorAutoHidden()
-    }
+    override var prefersHomeIndicatorAutoHidden: Bool{return true}
+    
+    
     
     private lazy var ghostImage: UIImageView = {
         let x = UIImageView(image: AssetImages.snapchatGhost)
@@ -51,29 +54,31 @@ class Login_MainVC: UIViewController{
         return x
     }()
     
+    private lazy var loginScreen = Login_LoginVC(presenter: self)
+    private lazy var signUpScreen = Login_SignUp_Name.init(presenter: self, info: UserSignUpProgressionInfo())
+    
     private lazy var loginButton: SimpleLabelledButton = {
         let x = SimpleLabelledButton()
         x.label.text = "LOG IN"
         x.backgroundColor = REDCOLOR
-        x.addAction {
-            self.present(Login_LoginVC(), animated: false, completion: nil)
+        x.addAction { [unowned self] in
+            
+            self.present(self.loginScreen, animated: true, completion: nil)
         }
         return x
     }()
+    
+    
+    
     private lazy var signUpButton: SimpleLabelledButton = {
         let x = SimpleLabelledButton()
         x.label.text = "SIGN UP"
         x.backgroundColor = BLUECOLOR
-        x.addAction {
-            self.present(Login_SignUp_Name(), animated: false, completion: nil)
+        x.addAction { [unowned self] in
+            self.present(self.signUpScreen, animated: true, completion: nil)
         }
         return x
     }()
-    
-    
-    
-    
-    
 }
 
 

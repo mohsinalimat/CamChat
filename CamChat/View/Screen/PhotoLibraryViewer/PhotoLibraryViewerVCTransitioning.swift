@@ -294,8 +294,8 @@ private class PhotoLibraryViewerInteractionController: HKVCTransInteractionContr
         UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.4, options: [.curveEaseIn], animations: {
             self.brain.carryOutUnanimatedDismissalAction()
         }) { _ in
-            super.completeTransition(true)
             self.brain.cleanUpAfterDismissal()
+            super.completeTransition(true)
         }
         self.completeInteraction()
     }

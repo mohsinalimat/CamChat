@@ -8,17 +8,27 @@
 
 import HelpKit
 
-class Login_SignUp_Name: LoginFormVCTemplate{
+class Login_SignUp_Name: SignUpFormVCTemplate{
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
         buttonView.setButtonText(to: "Sign Up & Accept")
-        buttonView.addAction {
-            self.present(Login_SignUp_UserName(), animated: false, completion: nil)
+        
+        
+    }
+    
+    override var nextScreenType: SignUpFormVCTemplate.Type {
+        return Login_SignUp_UserName.self
+    }
+    
+    override func respondToButtonViewTapped() {
+        self.handleErrorWithOopsAlert {
+            try self.infoObject.setFirstName(to: self.inputFormView.topTextField.textField.text!)
+            try self.infoObject.setLastName(to: self.inputFormView.bottomTextField.textField.text!)
+            super.respondToButtonViewTapped()
         }
-        
-        
     }
     
     private let bottomDescription = "By tapping Sign Up & Accept, you acknowledge that you have read the Privacy Policy and agree to the Terms of Service."
@@ -36,13 +46,13 @@ class Login_SignUp_Name: LoginFormVCTemplate{
         form.bottomDescriptionLabel.text = bottomDescription
     }
     
-    @objc override func respondToBackButtonPressed(gesture: UITapGestureRecognizer) {
-        
+    override func respondToBackButtonTapped() {
         inputFormView.topTextField.textField.resignFirstResponder()
         inputFormView.bottomTextField.textField.resignFirstResponder()
-        
-        super.respondToBackButtonPressed(gesture: gesture)
+        super.respondToBackButtonTapped()
     }
+    
+    
     
     override var preferredInputFormViewType: LoginInputFormView.LoginFormType{
         return .twoTextFields

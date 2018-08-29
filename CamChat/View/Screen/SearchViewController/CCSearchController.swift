@@ -95,7 +95,7 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
     
     @objc private func respondToTextFieldTextDidChange(){
         if let text = searchTextField.text{
-            if text.removeWhiteSpaces().isEmpty {
+            if text.withTrimmedWhiteSpaces().isEmpty {
                 dissmiss_cancelButton.showDismissButton()
             } else {
                 dissmiss_cancelButton.showCancelButton()

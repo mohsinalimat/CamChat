@@ -28,12 +28,7 @@ class CCAlertControllerTransitioningBrain: HKVCTransBrain{
         return x
     }()
     
-    private lazy var statusBarDimmerView: UIView = {
-        let x = UIView()
-        x.backgroundColor = UIColor.black.withAlphaComponent(minDimmerViewAlpha)
-        x.alpha = 0
-        return x
-    }()
+   
     
     private var offScreenTransform: CGAffineTransform{
         let translation = container.bounds.height.half + presented.view.intrinsicContentSize.height.half + 50
@@ -42,27 +37,23 @@ class CCAlertControllerTransitioningBrain: HKVCTransBrain{
     
     override func prepareForPresentation(using context: UIViewControllerContextTransitioning) {
         super.prepareForPresentation(using: context)
-        dimmerView.pin(addTo: container, anchors: [.left: container.leftAnchor, .right: container.rightAnchor, .bottom: container.bottomAnchor, .top: container.safeAreaLayoutGuide.topAnchor])
-        statusBar.addSubview(statusBarDimmerView)
-        statusBarDimmerView.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: APP_INSETS.top)
+        dimmerView.frame = container.bounds
+        container.addSubview(dimmerView)
         presented.view.transform = offScreenTransform
         presented.view.pin(addTo: container, anchors: [.centerX: container.safeAreaLayoutGuide.centerXAnchor, .centerY: container.safeAreaLayoutGuide.centerYAnchor])
-        
     }
     
     override func carryOutUnanimatedPresentationAction() {
         dimmerView.alpha = 1
-        statusBarDimmerView.alpha = 1
         presented.view.transform = CGAffineTransform.identity
     }
     
     override func carryOutUnanimatedDismissalAction() {
         presented.view.transform = offScreenTransform
         dimmerView.alpha = 0
-        statusBarDimmerView.alpha = 0
     }
+    
     override func cleanUpAfterDismissal() {
-        statusBarDimmerView.removeFromSuperview()
         dimmerView.removeFromSuperview()
         super.cleanUpAfterDismissal()
     }

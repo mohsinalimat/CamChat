@@ -15,8 +15,16 @@ class Login_LoginVC: LoginFormVCTemplate{
         super.viewDidLoad()
         
         buttonView.setButtonText(to: "Log In")
-        buttonView.addAction {
-            self.present(Screen.main, animated: true, completion: nil)
+        buttonView.addAction { [unowned self] in
+            
+            let email = self.inputFormView.topTextField.textField.text!
+            let password = self.inputFormView.bottomTextField.textField.text!
+            let loginInfo = LoginInfo(email: email, password: password)
+            
+            Firebase.logIn(loginInfo: loginInfo, completion: { (user, error) in
+                if let error = error{self.presentOopsAlert(description: error.localizedDescription)}
+                else {self.present(Screen.main, animated: true, completion: nil)}
+            })
         }
     }
     
@@ -41,15 +49,11 @@ class Login_LoginVC: LoginFormVCTemplate{
         form.bottomTextField.textField.isSecureTextEntry = true
         form.bottomTextField.textField.textContentType = .password
     }
-
-    @objc override func respondToBackButtonPressed(gesture: UITapGestureRecognizer) {
-        
+    override func respondToBackButtonTapped() {
         inputFormView.topTextField.textField.resignFirstResponder()
         inputFormView.bottomTextField.textField.resignFirstResponder()
-        super.respondToBackButtonPressed(gesture: gesture)
+        super.respondToBackButtonTapped()
     }
-    
-    
     
     
     

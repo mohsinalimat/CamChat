@@ -28,10 +28,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         setUpViews()
         
         
-        
-
-        
-        // This is only to ensure they are initialized right now, since they are being lazily loaded. Page Scrolling Interactors startAccepting touches by default.
+        // This is only to ensure they are initialized right now, since they are being lazily loaded. Page Scrolling Interactors start accepting touches by default.
         verticalScrollInteractor.startAcceptingTouches()
         horizontalScrollInteractor.startAcceptingTouches()        
     }

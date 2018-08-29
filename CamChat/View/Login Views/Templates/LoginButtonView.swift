@@ -71,6 +71,7 @@ class LoginButtonView: HKView{
     }()
     
     func carryOutAction(){
+        if isEnabled.isFalse{return}
         respondToButtonPressed()
     }
     

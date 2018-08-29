@@ -49,9 +49,19 @@ class CCAlertController: UIViewController{
     }
     
     
+    private let presenter: HKVCTransParticipator
     
+    
+    override var prefersStatusBarHidden: Bool{
+        return presenter.viewController.prefersStatusBarHidden
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle{
+        return presenter.viewController.preferredStatusBarStyle
+    }
     
     fileprivate init(presenter: HKVCTransParticipator, title: String, description: String? = nil, primaryButtonText: String, secondaryButtonText: String? = nil){
+        self.presenter = presenter
         
         
         textInfo = (title, description, primaryButtonText, secondaryButtonText)
