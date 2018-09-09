@@ -145,8 +145,8 @@ private class PhotoLibraryViewerTransitioningBrain: HKVCTransBrain{
         presented.view.transform = transform
         thumbnailInfo.snapshot.transform = transform
         
-        presented.view.move(pointInBounds: fingerPosition, toPointInSuperViewsFrame: newFingerPoint)
-        thumbnailInfo.snapshot.move(pointInBounds: fingerPosition, toPointInSuperViewsFrame: newFingerPoint)
+        presented.view.move(pointInBounds: fingerPosition, toPointInSuperViewsBounds: newFingerPoint)
+        thumbnailInfo.snapshot.move(pointInBounds: fingerPosition, toPointInSuperViewsBounds: newFingerPoint)
         dimmerView.alpha = dimmerAlphaEquation.solve(for: translation.y)
     }
     
