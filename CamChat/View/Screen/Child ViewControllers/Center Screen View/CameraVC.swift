@@ -18,6 +18,7 @@ class CameraVC: UIViewController{
 
         
     }
+
     
     
     
@@ -27,6 +28,39 @@ class CameraVC: UIViewController{
     var captureDevice: AVCaptureDevice!
     
     
+    private weak var stopCaptureSessionTimer: Timer!
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        stopCaptureSessionTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: false, block: {[weak self, weak captureSession] (timer) in
+            
+            guard let self = self, let captureSession = captureSession else {return}
+            
+            DispatchQueue.global(qos: .background).async {
+                if captureSession.isRunning{
+                    captureSession.stopRunning()
+                }
+            }
+            timer.invalidate()
+            self.stopCaptureSessionTimer = nil
+        })
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if let timer = stopCaptureSessionTimer{timer.invalidate(); stopCaptureSessionTimer = nil}
+        DispatchQueue.global(qos: .background).async { [weak captureSession] in
+            
+            guard let captureSession = captureSession else {return}
+            
+            if captureSession.isRunning.isFalse{
+                captureSession.startRunning()
+            }
+        }
+    }
+    
+  
     
     
     
@@ -43,8 +77,6 @@ class CameraVC: UIViewController{
             beginSession()
             
         }
-        
-        
     }
     
     func beginSession () {

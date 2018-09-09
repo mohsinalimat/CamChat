@@ -23,7 +23,7 @@ class ButtonNavigationView: UIView{
         self.delegate = delegate
         super.init(frame: CGRect.zero)
 
-        [photoButton, cameraButton, chatButton, settingsButton].forEach { $0.setAction(action: {[weak self] in self?.delegate?.navigationButtonTapped(type: $0)}) }
+        [photoButton, cameraButton, chatButton, settingsButton].forEach { $0.setAction(action: {[weak delegate = self.delegate] in delegate?.navigationButtonTapped(type: $0)}) }
         
         addSubview(cameraButton)
         addSubview(photoButton)
@@ -320,7 +320,7 @@ fileprivate class SCNavigationButton: BouncyImageButton{
     
 
     func setAction(action: @escaping (ButtonType) -> Void){
-        addAction { action(self.type) }
+        addAction {[unowned self] in action(self.type) }
     }
  
 

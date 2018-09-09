@@ -40,6 +40,6 @@ class Login_SignUp_UserName: SignUpFormVCTemplate{
         form.topTextField.setDescriptionText(to: "Username")
         form.topTextField.textField.autocapitalizationType = .none
         form.titleLabel.text = "Pick a username"
-        form.topDescriptionLabel.text = "Your username is how friends add you on Camchat."
+        form.topDescriptionLabel.text = "Your username is how friends add you on CamChat."
     }
 }

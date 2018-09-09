@@ -18,6 +18,8 @@ class ScreenTopBar: HKView{
     init(delegate: DelegateType){
         self.delegate = delegate
         super.init()
+        
+        
     }
     
     override func setUpView() {

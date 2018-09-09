@@ -12,12 +12,16 @@ import HelpKit
 class ChatTopBar: HKView{
     
     private let size: CGSize
-    
-    init(size: CGSize){
+    private let user: User
+    init(size: CGSize, user: User){
         self.size = size
+        self.user = user
         super.init(frame: CGRect.zero)
+        self.topLabel.text = user.fullName
         
     }
+    
+    
     
     override var intrinsicContentSize: CGSize{
         return size

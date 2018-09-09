@@ -8,19 +8,26 @@
 
 import HelpKit
 
+typealias SignUpProgressionOuput = UserSignUpProgressionInfo.OutputType
+
 class UserSignUpProgressionInfo {
     init(){}
     
-    private(set) var firstName: String?
-    private(set) var lastName: String?
-    private(set) var password: String?
-    private(set) var userName: String?
-    private(set) var email: String?
+    private var firstName: String?
+    private var lastName: String?
+    private var password: String?
+    private var userName: String?
+    private var email: String?
+    private var profileImage: UIImage?
+    
+    func setProfileImage(to image: UIImage){
+        profileImage = image
+    }
     
     static var minimumPasswordLength = 8
     
     func setFirstName(to text: String) throws {
-        let trimmedText = text.withTrimmedWhiteSpaces()
+        let trimmedText = text.withTrimmedWhiteSpaces().capitalizingFirstLetter()
         let testResult = testName(text: trimmedText)
         if testResult.isValid.isFalse{
             let error = HKError(description: testResult.errorMessage ?? "An unknown error occured.")
@@ -32,7 +39,8 @@ class UserSignUpProgressionInfo {
     }
     
     func setLastName(to text: String) throws {
-        let trimmedText = text.withTrimmedWhiteSpaces()
+        let trimmedText = text.withTrimmedWhiteSpaces().capitalizingFirstLetter()
+    
         let testResult = testName(text: trimmedText)
         if testResult.isValid.isFalse{throw HKError(description: testResult.errorMessage ?? "An unknown error occured.")}
         self.lastName = trimmedText
@@ -68,18 +76,29 @@ class UserSignUpProgressionInfo {
     }
     
     
+    typealias OutputType = (firstName: String, lastName: String, username: String, email: String, password: String, profilePicture: UIImage)
     
     
-    /// returns true if all values are set, and false if any value is nil
-    var progressionIsComplete: Bool{
-        let array = [firstName, lastName, password, userName, email]
-        return array.filterOutNils().count == array.count
+    var output: SignUpProgressionOuput?{
+        if let firstname = firstName, let lastname = lastName, let password = password, let username = userName, let email = email, let image = profileImage{
+            return (firstname, lastname, username, email, password, image)
+        } else { return nil }
     }
+    
+    
 }
 
 struct LoginInfo{
     let email: String
     let password: String
+
+    init(email: String, password: String) throws {
+        if email.isValidEmail.isFalse{
+            throw HKError(description: "The email address provided is not valid.")
+        }
+        self.email = email
+        self.password = password
+    }
 }
 
 

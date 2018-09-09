@@ -11,33 +11,38 @@ import HelpKit
 
 
 class ChatKeyboardShortcutView: HKView{
-    
-    
-    
+    private let user: User
+    init(user: User){
+        self.user = user
+        super.init()
+    }
+
     override func setUpView() {
-        backgroundColor = .red
+        backgroundColor = .white
         
-        textView.pinAllSides(addTo: self, pinTo: self)
-        topLine.pin(addTo: self, anchors: [.left: leftAnchor, .right: rightAnchor, .top: topAnchor])
+        addSubview(textView)
+        addSubview(sendButton)
+        addSubview(topLine)
+        
+        
+        topLine.pin(anchors: [.left: leftAnchor, .right: rightAnchor, .top: topAnchor])
+        
+        let buttonInsets: CGFloat = 6
+        let buttonHeight = textView.contentSize.height - buttonInsets.doubled
+        sendButton.pin(anchors: [.right: rightAnchor, .bottom: bottomAnchor], constants: [.right: buttonInsets, .height: buttonHeight, .width: 50, .bottom: buttonInsets])
+        
+        textView.pin(anchors: [.left: leftAnchor, .top: topAnchor, .bottom: bottomAnchor, .right: sendButton.leftAnchor], constants: [.right: buttonInsets])
+        
         
         NotificationCenter.default.addObserver(self, selector: #selector(respondToTextDidChange), name: UITextView.textDidChangeNotification, object: self.textView)
         
-        setUpTextViewHint()
-    }
-    
-    private lazy var placeholderLabel = UILabel()
-    
-    private func setUpTextViewHint(){
         
-        placeholderLabel.text = "Send a Chat"
-        placeholderLabel.font = textView.font
-        placeholderLabel.sizeToFit()
-        textView.addSubview(placeholderLabel)
-        placeholderLabel.frame.origin = CGPoint(x: textView.textContainerInset.left + 5, y: textView.textContainerInset.top)
-        placeholderLabel.textColor = UIColor.lightGray
-        placeholderLabel.isHidden = !textView.text.isEmpty
         
     }
+    
+
+    
+   
     
     
     private let preferredMaximumHeight: CGFloat = 140
@@ -51,14 +56,28 @@ class ChatKeyboardShortcutView: HKView{
         return CGSize(width: UIView.noIntrinsicMetric, height: preferredHeight)
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        sendButton.setCornerRadius(to: sendButton.frame.height.half)
+    }
     
-    lazy var textView: UITextView = {
-        let x = UITextView()
-        x.returnKeyType = .send
-        x.font = SCFonts.getFont(type: .medium, size: 17.5)
-        x.tintColor = REDCOLOR
-        x.textContainerInset.left = 4
-        x.textContainerInset.right = 6
+    private lazy var sendButton: SimpleLabelledButton = {
+        let x = SimpleLabelledButton()
+        x.label.text = "Send"
+        x.label.font = SCFonts.getFont(type: .demiBold, size: 13)
+        x.backgroundColor = BLUECOLOR
+        x.label.textColor = .white
+        x.addAction({[unowned textView, unowned self] in
+            let message = TempMessage(text: textView.text.withTrimmedWhiteSpaces(), dateSent: Date(), uniqueID: NSUUID().uuidString, senderID: Firebase.currentUser!.uid, receiverID: self.user.uniqueID)
+            Firebase.send(message: message)
+            
+        })
+        return x
+    }()
+    
+    private lazy var textView: ChatKeyboardShortutTextView = {
+        let x = ChatKeyboardShortutTextView()
+        
         return x
     }()
     
@@ -76,7 +95,6 @@ class ChatKeyboardShortcutView: HKView{
     
     @objc func respondToTextDidChange(){
         
-        placeholderLabel.isHidden = !textView.text.isEmpty
         
         guard let previousSize = previousTextViewSize else {
             previousTextViewSize = textView.contentSize
@@ -91,6 +109,71 @@ class ChatKeyboardShortcutView: HKView{
             
         }
         previousTextViewSize = textView.contentSize
+    }
+    
+    
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init coder has not being implemented")
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+private class ChatKeyboardShortutTextView: UITextView{
+    
+    init(){
+        super.init(frame: CGRect.zero, textContainer: nil)
+        returnKeyType = .send
+        font = SCFonts.getFont(type: .medium, size: 17.5)
+        tintColor = REDCOLOR
+        textContainerInset.left = 4
+        textContainerInset.right = 6
+        setUpTextViewHint()
+        NotificationCenter.default.addObserver(self, selector: #selector(respondToTextDidChange), name: UITextView.textDidChangeNotification, object: self)
+        
+    }
+    
+    @objc private func respondToTextDidChange(){
+        placeholderLabel.isHidden = !text.isEmpty
+
+    }
+    
+    
+    private lazy var placeholderLabel = UILabel()
+    
+    private func setUpTextViewHint(){
+        
+        placeholderLabel.text = "Send a Chat"
+        placeholderLabel.font = font
+        placeholderLabel.sizeToFit()
+        addSubview(placeholderLabel)
+        placeholderLabel.frame.origin = CGPoint(x: textContainerInset.left + 5, y: textContainerInset.top)
+        placeholderLabel.textColor = UIColor.lightGray
+        placeholderLabel.isHidden = !text.isEmpty
+        
+        
+        
+    }
+    
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init coder has not being implemented")
     }
 }
 

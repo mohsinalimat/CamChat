@@ -17,33 +17,22 @@ extension Screen: CCSearchBarDelegate{
 }
 
 extension Screen: ScreenButtonsTopBarDelegate{
-    
-    private func presentAlert(){
-        
-        let alert = presentCCAlert(title: "Clear All Cache?", description: "All of your caches will be cleared, and Snapchat will restart. Your Memories backup won't be deleted!", primaryButtonText: "Clear", secondaryButtonText: "cancel")
-        
-        alert.addSecondaryButtonAction({[weak alert] in alert?.dismiss(animated: true)})
-    }
-    
+
     func newChatButtonTapped() {
-        presentAlert()
-        
+
     }
     
     func flashButtonTapped(to isOn: Bool) {
-        presentAlert()
+
     }
     
     func cameraFlipButtonTapped() {
-        presentAlert()
+
     }
     
     func photoLibrarySelectButtonTapped() {
-        presentAlert()
+
     }
-    
-    
-    
 }
 
 

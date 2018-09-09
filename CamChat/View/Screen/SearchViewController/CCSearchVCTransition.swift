@@ -9,6 +9,37 @@
 import HelpKit
 
 
+class CCSearchVCBrain: HKVCTransBrain{
+    
+    var presented: HKVCTransParticipator{return _presented}
+    var presenter: HKVCTransParticipator{return _presenter}
+    
+    override func prepareForPresentation(using context: UIViewControllerContextTransitioning) {
+        super.prepareForPresentation(using: context)
+        
+    }
+    
+    override func carryOutUnanimatedPresentationAction() {
+        super.carryOutUnanimatedPresentationAction()
+    }
+    
+    override func cleanUpAfterPresentation() {
+        super.cleanUpAfterPresentation()
+    }
+    
+    override func prepareForDismissal() {
+        super.prepareForDismissal()
+    }
+    
+    override func carryOutUnanimatedDismissalAction() {
+        super.carryOutUnanimatedDismissalAction()
+    }
+    
+    override func cleanUpAfterDismissal() {
+        super.cleanUpAfterDismissal()
+    }
+}
+
 
 class CCSearchVCTransition: NSObject, UIViewControllerTransitioningDelegate{
     init(searchController: UIViewController){
@@ -40,7 +71,6 @@ private class CCSearchVCTransitionAnimator: NSObject, UIViewControllerAnimatedTr
     
     
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        
         let fromView = transitionContext.view(forKey: .from)
         let toView = transitionContext.view(forKey: .to)
         if config == .presentation{

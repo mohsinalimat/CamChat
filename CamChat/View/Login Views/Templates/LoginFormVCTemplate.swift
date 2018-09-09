@@ -27,6 +27,8 @@ class SignUpFormVCTemplate: LoginFormVCTemplate{
     }
     
     
+    
+    
     /// It is the job of subclasses to set the info object with the info they've collected from the user and/or update Firestore all BEFORE they call super. It is also the responsibility of the very last signup screen to NOT call super and PRESENT THE MAIN INTERFACE instead.
     func respondToButtonViewTapped(){
         self.present(self.nextScreen)
@@ -115,6 +117,8 @@ class LoginFormVCTemplate: UIViewController, LoginInputFormViewDelegate{
                 }
             }
             buttonView.disable()
+            
+        default: break
         }
     }
     
@@ -135,26 +139,33 @@ class LoginFormVCTemplate: UIViewController, LoginInputFormViewDelegate{
         let keyboardFrame = notification.userInfo!["UIKeyboardFrameEndUserInfoKey"] as! CGRect
         let animationTime = notification.userInfo!["UIKeyboardAnimationDurationUserInfoKey"] as! TimeInterval
         view.layoutIfNeeded()
-        UIView.animate(withDuration: animationTime) {
+        UIView.animate(withDuration: animationTime > 0 ? animationTime : 0.2) {
             
             let keyboardHeightOnScreen = max(self.view.bounds.height - keyboardFrame.minY, 0)
-            
             self.additionalSafeAreaInsets.bottom = max(keyboardHeightOnScreen - APP_INSETS.bottom, 0)
-            self.view.layoutIfNeeded()
-            self.scrollView.contentSize = self.view.safeAreaLayoutGuide.layoutFrame.size
             
-            self.scrollView.contentSize.height -= self.buttonView.intrinsicContentSize.height
+            
+            self.adaptScrollViewContentSizeToContentIfNeeded()
+
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    private func adaptScrollViewContentSizeToContentIfNeeded(){
+        self.scrollView.contentSize = self.view.safeAreaLayoutGuide.layoutFrame.size
+        self.scrollView.contentSize.height -= self.buttonView.intrinsicContentSize.height
+        
+        let desiredScrollingSpace = self.inputFormView.intrinsicContentSize.height + 20
+        if scrollView.contentSize.height < desiredScrollingSpace{
+            self.scrollView.contentSize.height = desiredScrollingSpace
+            
             self.view.layoutIfNeeded()
         }
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        let desiredScrollingSpace = self.inputFormView.intrinsicContentSize.height + 20
-        if scrollView.contentSize.height < desiredScrollingSpace{
-            self.scrollView.contentSize.height = desiredScrollingSpace
-            self.view.layoutIfNeeded()
-        }
+        adaptScrollViewContentSizeToContentIfNeeded()
     }
     
     
@@ -169,6 +180,10 @@ class LoginFormVCTemplate: UIViewController, LoginInputFormViewDelegate{
         backButton.pin(anchors: [.left: view.leftAnchor, .top: view.topAnchor], constants: [.left: 15, .top: 18 + Variations.notchHeight])
         
         inputFormView.pin(anchors: [.centerX: scrollView.contentLayoutGuide.centerXAnchor, .centerY: scrollView.contentLayoutGuide.centerYAnchor])
+        
+        
+        bottomSeamHider.pin(addTo: view, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor], constants: [.height: APP_INSETS.bottom])
+        
         view.layoutIfNeeded()
 
     }
@@ -195,6 +210,7 @@ class LoginFormVCTemplate: UIViewController, LoginInputFormViewDelegate{
     
     lazy var scrollView: HKScrollView = {
         let x = HKScrollView()
+        x.delaysContentTouches = false
         x.backgroundColor = .white
         x.alwaysBounceVertical = true
         x.contentSize = self.view.safeAreaLayoutGuide.layoutFrame.size
@@ -229,6 +245,14 @@ class LoginFormVCTemplate: UIViewController, LoginInputFormViewDelegate{
     }
     
     
+    ///Because at this point I just wanna be done with these login screens🙄.
+    private lazy var bottomSeamHider: UIView = {
+        let x = UIView()
+        x.backgroundColor = .white
+        return x
+    }()
+    
+    
     
     
     
@@ -242,3 +266,6 @@ class LoginFormVCTemplate: UIViewController, LoginInputFormViewDelegate{
     
 
 }
+
+
+

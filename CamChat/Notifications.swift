@@ -10,4 +10,3 @@ import HelpKit
 
 
 
-let CurrentUserChangedNotification = HKNotification<Void>()

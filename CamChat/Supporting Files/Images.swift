@@ -52,7 +52,7 @@ struct AssetImages{
     static var logOut = getIcon("logOut")
     static var storage = getIcon("storage")
     
-    
+    static var profilePicturePlaceholder = getIcon("profilePicturePlaceholder")
     
     static var examplePhotos = [
         getPhoto("iphoneImage0"),

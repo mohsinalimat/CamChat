@@ -35,10 +35,10 @@ class PhotoOptionsMiniVC: UIViewController {
     
     override var prefersStatusBarHidden: Bool{return true}
     
- 
-
     private weak var presenter: PhotoOptionsMiniPresenter!
+
     private let snapshotInfo: (snapshot: UIView, cornerRadius: CGFloat, currentFrame: CGRect, currentTransform: CGAffineTransform, endingFrame: CGRect)
+    
     private var snapshot: UIView{
         return snapshotInfo.snapshot
     }
@@ -63,7 +63,7 @@ class PhotoOptionsMiniVC: UIViewController {
     }
     
 
-  
+    
     
     
     

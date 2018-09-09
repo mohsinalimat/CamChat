@@ -10,7 +10,13 @@ import HelpKit
 
 
 
-class SettingsViewController: UIViewController, UIGestureRecognizerDelegate, UIScrollViewDelegate{
+
+class SettingsViewController: UIViewController, UIGestureRecognizerDelegate{
+    private weak var screen: Screen?
+    init(screen: Screen){
+        self.screen = screen
+        super.init(nibName: nil, bundle: nil)
+    }
     
     
     private let transformEquation = CGLinearEquation(xy(0, 70), xy(1, 0))!
@@ -20,12 +26,14 @@ class SettingsViewController: UIViewController, UIGestureRecognizerDelegate, UIS
         contentObjectsHolderView.transform = CGAffineTransform(translationX: 0, y: transform)
     }
     
-
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         scrollView.scrollToTop()
     }
+    
+
+    
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,6 +41,8 @@ class SettingsViewController: UIViewController, UIGestureRecognizerDelegate, UIS
         setUpViews()
         
     }
+    
+ 
     
     
     
@@ -58,58 +68,7 @@ class SettingsViewController: UIViewController, UIGestureRecognizerDelegate, UIS
     
     private var shouldCheckForDisablingScroll: (shouldCheck: Bool, previousContentOffset: CGPoint?) = (false, nil)
     
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        if scrollView.contentOffset.y <= -scrollView.adjustedContentInset.top{
-            shouldCheckForDisablingScroll = (true, scrollView.contentOffset)
-        } else {
-            shouldCheckForDisablingScroll = (false, nil)
-        }
-    }
-
-    
-
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-
-        adjustMaskForScrollViewScrolled(scrollView)
-        checkScrollViewForDisabling(scrollView)
-
-    }
-    
-    private func checkScrollViewForDisabling(_ scrollView: UIScrollView){
-        if shouldCheckForDisablingScroll.shouldCheck{
-            if scrollView.contentOffset.y < shouldCheckForDisablingScroll.previousContentOffset!.y{
-                
-                scrollView.isScrollEnabled = false
-                Screen.main.verticalScrollInteractor.startAcceptingTouches()
-                
-                return
-            }
-        }
-        shouldCheckForDisablingScroll = (false, nil)
-        Screen.main.verticalScrollInteractor.stopAcceptingTouches()
-        scrollView.isScrollEnabled = true
-    }
-    
-    
-    private func adjustMaskForScrollViewScrolled(_ scrollView: UIScrollView){
-        let equation = CGLinearEquation(xy(-scrollView.adjustedContentInset.top, 1), xy(-scrollView.adjustedContentInset.top + 50, 0), min: 0, max: 1)!
-        let num = equation[scrollView.contentOffset.y]
-        topMaskGradientView?.gradientLayer.colors?[0] = UIColor.black.withAlphaComponent(num).cgColor
-    }
-    
-    
-    @objc private func respondToGesture(gesture: UIPanGestureRecognizer){
-        if gesture.state == .ended{
-            scrollView.isScrollEnabled = true
-            shouldCheckForDisablingScroll = (false, nil)
-        }
-    }
-    
-    
-    
-    
-    
-    
+   
     
     
     private var topMaskGradientView: HKGradientView?
@@ -168,7 +127,7 @@ class SettingsViewController: UIViewController, UIGestureRecognizerDelegate, UIS
         let x = BouncyImageButton(image: AssetImages.xIcon)
         x.applyShadow(width: 5)
         x.pin(constants: [.height: 30, .width: 30])
-        x.addAction({[unowned screen = Screen.main] in screen.verticalScrollInteractor.snapGradientTo(screen: .center, animated: true)})
+        x.addAction({[weak screen = screen] in screen?.verticalScrollInteractor.snapGradientTo(screen: .center, animated: true)})
         return x
     }()
     
@@ -183,6 +142,87 @@ class SettingsViewController: UIViewController, UIGestureRecognizerDelegate, UIS
         return x
     }()
 
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init coder has not being implemented")
+    }
+    
+}
+
+
+
+// MARK: - SCROLLING
+
+
+
+extension SettingsViewController: UIScrollViewDelegate{
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        scrollView.isScrollEnabled = true
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        scrollView.isScrollEnabled = false
+    }
+    
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        if scrollView.contentOffset.y <= -scrollView.adjustedContentInset.top{
+            shouldCheckForDisablingScroll = (true, scrollView.contentOffset)
+        } else {
+            shouldCheckForDisablingScroll = (false, nil)
+        }
+    }
+    
+    
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        adjustMaskForScrollViewScrolled(scrollView)
+        checkScrollViewForDisabling(scrollView)
+    }
+    
+    private func checkScrollViewForDisabling(_ scrollView: UIScrollView){
+        if shouldCheckForDisablingScroll.shouldCheck{
+            
+            defer{ shouldCheckForDisablingScroll = (false, nil) }
+            
+            if scrollView.contentOffset.y < shouldCheckForDisablingScroll.previousContentOffset!.y{
+                
+                scrollView.isScrollEnabled = false
+                screen!.verticalScrollInteractor.startAcceptingTouches()
+                
+                return
+            }
+        }
+        if screen!.verticalScrollInteractor.currentGradientPercentage == 1{
+            screen!.verticalScrollInteractor.stopAcceptingTouches()
+            scrollView.isScrollEnabled = true
+        }
+    }
+    
+    
+    private func adjustMaskForScrollViewScrolled(_ scrollView: UIScrollView){
+        let equation = CGLinearEquation(xy(-scrollView.adjustedContentInset.top, 1), xy(-scrollView.adjustedContentInset.top + 50, 0), min: 0, max: 1)!
+        let num = equation[scrollView.contentOffset.y]
+        topMaskGradientView?.gradientLayer.colors?[0] = UIColor.black.withAlphaComponent(num).cgColor
+    }
+    
+    
+    @objc private func respondToGesture(gesture: UIPanGestureRecognizer){
+        if gesture.state == .ended{
+            print("received gesture ended function call")
+            scrollView.isScrollEnabled = true
+            shouldCheckForDisablingScroll = (false, nil)
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
 }
 
 

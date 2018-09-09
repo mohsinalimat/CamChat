@@ -13,20 +13,39 @@ class Login_LoginVC: LoginFormVCTemplate{
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+   
         buttonView.setButtonText(to: "Log In")
-        buttonView.addAction { [unowned self] in
+        buttonView.addAction { [unowned self] in self.handleButtonViewTapped()}
+    }
+    
+    private func handleButtonViewTapped(){
+        let email = self.inputFormView.topTextField.textField.text!
+        let password = self.inputFormView.bottomTextField.textField.text!
+        
+        self.handleErrorWithOopsAlert {
+            let loginInfo = try LoginInfo(email: email, password: password)
             
-            let email = self.inputFormView.topTextField.textField.text!
-            let password = self.inputFormView.bottomTextField.textField.text!
-            let loginInfo = LoginInfo(email: email, password: password)
+            UIApplication.shared.beginIgnoringInteractionEvents()
+            self.buttonView.startShowingLoadingIndicator()
             
-            Firebase.logIn(loginInfo: loginInfo, completion: { (user, error) in
-                if let error = error{self.presentOopsAlert(description: error.localizedDescription)}
-                else {self.present(Screen.main, animated: true, completion: nil)}
+            DataCoordinator.logIn(info: loginInfo, completion: { (callback) in
+                
+                UIApplication.shared.endIgnoringInteractionEvents()
+                self.buttonView.stopShowingLoadingIndicator()
+                
+                switch callback{
+                case .success:
+                    self.inputFormView.topTextField.textField.resignFirstResponder()
+                    self.inputFormView.bottomTextField.textField.resignFirstResponder()
+                    InterfaceManager.shared.transitionToMainInterface()
+                case .failure(let error):
+                    self.presentOopsAlert(description: error.localizedDescription)
+                }
             })
         }
     }
+    
+    
     
     override var preferredInputFormViewType: LoginInputFormView.LoginFormType{
         return .twoTextFields
@@ -35,7 +54,7 @@ class Login_LoginVC: LoginFormVCTemplate{
 
     
     override func configureInputFormView(form: LoginInputFormView) {
-        form.topTextField.setDescriptionText(to: "email or username")
+        form.topTextField.setDescriptionText(to: "email")
         form.bottomTextField.setDescriptionText(to: "password")
         form.titleLabel.text = "Log In"
         form.bottomDescriptionLabel.text = "Forgot password?"

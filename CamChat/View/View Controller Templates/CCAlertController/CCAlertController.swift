@@ -167,7 +167,7 @@ private class CCAlertControllerView: UIView {
         return desiredViewWidth - (titleLabelInsets * 2)
     }
     
-    private let lineTopAndBottomInsets: CGFloat = 10
+    private let lineTopAndBottomInsets: CGFloat = 5
     private let lineHeight: CGFloat = 1
     
     private let secondaryButtonTopAndBottomInsets: CGFloat = 7

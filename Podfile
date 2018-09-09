@@ -6,9 +6,21 @@ target 'CamChat' do
   use_frameworks!
 
   # Pods for CamChat
+  
+  
+  
+  
+  
+  pod 'Firebase/Core'
+  pod 'Firebase/Firestore'
+  pod 'Firebase/Auth'
+  pod 'Firebase/Storage'
+  pod 'NVActivityIndicatorView'
+  
 
-pod 'Firebase/Core'
-pod 'Firebase/Firestore'
-pod 'Firebase/Auth'
-
+  target 'CamChatTests' do
+      inherit! :search_paths
+      pod 'Firebase'
+  end
+  
 end

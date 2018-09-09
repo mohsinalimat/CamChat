@@ -18,9 +18,10 @@ class ChatViewController: UIViewController{
     }
     
     
-    
+    private let user: User
 
-    init(presenter: HKVCTransParticipator){
+    init(presenter: HKVCTransParticipator, user: User){
+        self.user = user
         super.init(nibName: nil, bundle: nil)
         self.chatTransitioningDelegate = ChatControllerTransitioningDelegate(presenter: presenter, presented: self)
         transitioningDelegate = chatTransitioningDelegate
@@ -78,12 +79,12 @@ class ChatViewController: UIViewController{
     }
     
     private lazy var collectionView: ChatMessagesCollectionView = {
-        return ChatMessagesCollectionView()
+        return ChatMessagesCollectionView(user: user)
     }()
     
     
     lazy var topBarView_typed: ChatTopBar = {
-        return ChatTopBar(size: CGSize(width: UIScreen.main.bounds.width, height: topInset))
+        return ChatTopBar(size: CGSize(width: UIScreen.main.bounds.width, height: topInset), user: user)
     }()
     
     
@@ -101,7 +102,7 @@ class ChatViewController: UIViewController{
     
     
     private lazy var accessoryView: ChatKeyboardShortcutView = {
-        return ChatKeyboardShortcutView()
+        return ChatKeyboardShortcutView(user: self.user)
     }()
     
     private lazy var accesoryViewWrapper = InputAccessoryViewWrapper(for: accessoryView, width: view.frame.width)

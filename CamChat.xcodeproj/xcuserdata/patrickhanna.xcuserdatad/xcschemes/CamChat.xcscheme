@@ -38,6 +38,16 @@
                ReferencedContainer = "container:../HelpKit/HelpKit.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "609394032138145B00C62671"
+               BuildableName = "CamChatTests.xctest"
+               BlueprintName = "CamChatTests"
+               ReferencedContainer = "container:CamChat.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference

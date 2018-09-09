@@ -13,6 +13,7 @@ class PhotoLibraryCollectionViewCell: UICollectionViewCell{
     
     
     weak var vcOwner: UIViewController?
+    weak var screen: Screen?
     
     override init(frame: CGRect) {
         super.init(frame: CGRect.zero)
@@ -30,7 +31,9 @@ class PhotoLibraryCollectionViewCell: UICollectionViewCell{
     
     @objc private func respondToGesture(gesture: UILongPressGestureRecognizer){
         if gesture.state != .began { return }
-        vcOwner!.present(PhotoOptionsMiniVC(presenter: self), animated: true)
+        vcOwner!.present(PhotoOptionsMiniVC(presenter: self))
+        screen!.horizontalScrollInteractor.snapGradientTo(screen: .last, animated: false)
+        screen!.horizontalScrollInteractor.gesture.cancelCurrentTouch()
     }
   
     
@@ -79,7 +82,8 @@ class PhotoLibraryCollectionViewCell: UICollectionViewCell{
 
 
 extension PhotoLibraryCollectionViewCell: PhotoOptionsMiniPresenter{
-    var viewControllerForTransition: UIViewController {
+    
+    var viewControllerForTransition: UIViewController{
         return vcOwner!.topMostLevelParent
     }
     

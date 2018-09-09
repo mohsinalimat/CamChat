@@ -18,13 +18,24 @@ class Login_SignUp_Email: SignUpFormVCTemplate{
     }
     
     override func respondToButtonViewTapped() {
-        self.handleErrorWithOopsAlert {
+        
+        self.handleErrorWithOopsAlert { [unowned self, unowned buttonView, unowned inputFormView] in
             try self.infoObject.setEmail(to: self.inputFormView.topTextField.textField.text!)
-            Firebase.signUpAndSignIn(with: self.infoObject, errorHandler: { (error) in
-                if let error = error {
+            
+            
+            UIApplication.shared.beginIgnoringInteractionEvents()
+            buttonView.startShowingLoadingIndicator()
+            
+            DataCoordinator.signUpAndLogIn(signUpProgressionInfo: self.infoObject.output!, completion: { (callback) in
+                UIApplication.shared.endIgnoringInteractionEvents()
+                buttonView.stopShowingLoadingIndicator()
+                
+                switch callback{
+                case .success:
+                    inputFormView.topTextField.textField.resignFirstResponder()
+                    InterfaceManager.shared.transitionToMainInterface()
+                case .failure(let error):
                     self.presentOopsAlert(description: error.localizedDescription)
-                } else {
-                    self.present(Screen.main, animated: true, completion: nil)
                 }
             })
         }

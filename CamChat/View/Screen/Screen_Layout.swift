@@ -50,7 +50,6 @@ extension Screen{
         bottomScreen.view.pinAllSides(pinTo: view)
         
         
-        
         bottomGradientView.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .top: navigationView.topAnchor, .bottom: view.bottomAnchor])
         
         
@@ -62,14 +61,14 @@ extension Screen{
         
         topBarBottomLine.pin(anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: topBar_typed.bottomAnchor], constants: [.height: 0.5])
         
-
+        balanceViewControllerAppearanceCalls()
         
     }
     
     
-   
-    
+    private func balanceViewControllerAppearanceCalls(){
+        [leftScreen, rightScreen, bottomScreen].forEach{
+            $0.viewWillDisappear(true); $0.viewDidDisappear(true)
+        }
+    }
 }
-
-
-

@@ -42,28 +42,37 @@ class SettingsScrollContentView: UIView{
     
 
     lazy var snapCode: UIImageView = {
-        let x = UIImageView(image: AssetImages.snapCode, contentMode: .scaleAspectFill)
+        let x = UIImageView(image: DataCoordinator.currentUser!.profilePicture, contentMode: .scaleAspectFill)
         x.setCornerRadius(to: 32)
         x.pin(constants: [.height: 150, .width: 150])
         return x
     }()
 
     lazy var topLabel: UILabel = {
-        let x = UILabel(text: "Patrick Hanna", font: SCFonts.getFont(type: .demiBold, size: 24))
+        let x = UILabel(text: DataCoordinator.currentUser!.fullName, font: SCFonts.getFont(type: .demiBold, size: 24))
         x.textColor = .white
         return x
     }()
     
     lazy var bottomLabel: UILabel = {
-        let x = UILabel(text: "patrickjh1998@hotmail.com", font: SCFonts.getFont(type: .medium, size: 16))
+        let x = UILabel(text: DataCoordinator.currentUser!.email, font: SCFonts.getFont(type: .medium, size: 16))
         x.textColor = UIColor.gray(percentage: 0.6).withAlphaComponent(0.7)
         return x
     }()
     
     private lazy var logOutButtonInfo = SettingsBlockInfo(text: "Log Out", image: AssetImages.logOut, action: { [unowned vcOwner] in
         let alert = vcOwner.presentCCAlert(title: "Are you sure you want to log out?", primaryButtonText: "Log Out", secondaryButtonText: "Cancel")
-        
-        alert.addSecondaryButtonAction({alert.dismiss(animated: true)})
+        alert.addPrimaryButtonAction({ [unowned alert] in
+            do{
+                try DataCoordinator.logOut()
+                InterfaceManager.shared.transitionToLoginInterface()
+            } catch {
+                alert.dismiss(animated: true, completion: {
+                    vcOwner.presentOopsAlert(description: error.localizedDescription)
+                })
+            }
+        })
+        alert.addSecondaryButtonAction({[unowned alert] in alert.dismiss(animated: true)})
         
     })
     

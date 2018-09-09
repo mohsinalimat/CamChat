@@ -38,7 +38,6 @@ class Login_SignUp_Password: SignUpFormVCTemplate{
 
     override func configureInputFormView(form: LoginInputFormView) {
         form.topTextField.setDescriptionText(to: "Password")
-        
         form.topTextField.textField.textContentType = .password
         form.topTextField.textField.keyboardType = .asciiCapable
         form.titleLabel.text = "Choose a password"

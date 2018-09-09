@@ -11,7 +11,16 @@ import UIKit
 
 class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
     
-
+    private weak var screen: Screen?
+    
+    
+    init(screen: Screen){
+        self.screen = screen
+        super.init()
+    }
+    
+    
+    
     func collectionView(_ collectionView: UICollectionView, heightForItemAt indexPath: IndexPath) -> CGFloat {
         let defaultHeight: CGFloat = Variations.currentDevice(is: [.iPhone4, .iPhoneSE]) ? 250 : 300
         switch indexPath.item{
@@ -78,6 +87,7 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath) as! PhotoLibraryCollectionViewCell
         cell.vcOwner = self
+        cell.screen = screen
         cell.imageView.image = imageArray[indexPath.item]
         cell.layer.masksToBounds = true
         cell.layer.cornerRadius = 10
@@ -101,6 +111,10 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
     
     override var collectionViewLayout: UICollectionViewLayout{
         return _collectionViewLayout
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 
@@ -153,6 +167,9 @@ extension PhotoLibraryCollectionVC: PhotoLibraryViewerTransitioningPresenter{
         
         return (cell.snapshotView(afterScreenUpdates: true)!, view.convert(cell.frame, from: collectionView), cell.layer.cornerRadius)
     }
+    
+   
+    
 }
 
 

@@ -117,7 +117,7 @@ class SCScrollView: UIViewController, UIScrollViewDelegate {
 
     }
     
-    /// Override this method in subclasses so that tableView and collectionViewCells will be registered at the appropriate times to avoid crashing. NEVER CALL THIS FUNCTION DIRECTLY.
+    /// Override this method in subclasses so that tableView and collectionView cells will be registered at the appropriate times to avoid crashing. NEVER CALL THIS FUNCTION DIRECTLY.
     func registerCells(){
         
     }

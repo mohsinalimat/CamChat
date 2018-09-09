@@ -7,20 +7,30 @@
 //
 
 import HelpKit
+import CoreData
 
 
 
-class ChatMessagesCollectionView: UICollectionView, UIGestureRecognizerDelegate{
+class ChatMessagesCollectionView: UICollectionView{
     
-    init() {
-        super.init(frame: CGRect.zero, collectionViewLayout: UICollectionViewLayout())
+    
+    private var viewModel: CoreDataListViewVM<ChatMessagesCollectionView>!
+    private let user: User
+    init(user: User) {
+        self.user = user
+        let layout = UICollectionViewFlowLayout()
+        layout.itemSize = CGSize(width: UIScreen.main.bounds.width, height: 30)
+        super.init(frame: CGRect.zero, collectionViewLayout: layout)
+        
         alwaysBounceVertical = true
         backgroundColor = .white
         keyboardDismissMode = .interactive
-        layer.cornerRadius = 10
+        setCornerRadius(to: 10)
         layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
-        layer.masksToBounds = true
-        panGestureRecognizer.delegate = self
+        
+        viewModel = CoreDataListViewVM(delegate: self)
+        
+        
     }
 
     
@@ -28,4 +38,33 @@ class ChatMessagesCollectionView: UICollectionView, UIGestureRecognizerDelegate{
     required init?(coder aDecoder: NSCoder) {
         fatalError("init coder has not been implemented")
     }
+}
+
+
+extension ChatMessagesCollectionView: CoreDataListViewVMDelegate{
+    var fetchRequest: NSFetchRequest<Message> {
+        let fetch = Message.typedFetchRequest()
+        
+        fetch.predicate = NSPredicate(format: "(\(#keyPath(Message.sender.uniqueID)) == %@) OR \(#keyPath(Message.receiver.uniqueID)) == %@", user.uniqueID, user.uniqueID)
+        fetch.sortDescriptors = [NSSortDescriptor(key: #keyPath(Message.dateSent), ascending: true)]
+        return fetch
+    }
+    
+    
+    
+    
+    var listView: UICollectionView{
+        return self
+    }
+    
+    func configureCell(_ cell: ChatMessagesCollectionViewCell, at indexPath: IndexPath, for object: Message) {
+    
+        cell.setWith(message: object)
+    }
+    
+    
+    
+    
+    
+    
 }

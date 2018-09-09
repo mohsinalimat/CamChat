@@ -14,19 +14,19 @@ import HelpKit
 
 class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDelegate, UIGestureRecognizerDelegate{
     
-    static var main = Screen()
     
-    private init() { super.init(nibName: nil, bundle: nil) }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init coder has not being implemented")
+    
+    init(){
+        super.init(nibName: nil, bundle: nil)
     }
+  
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         setUpViews()
-        
+        view.clipsToBounds = true
         
         // This is only to ensure they are initialized right now, since they are being lazily loaded. Page Scrolling Interactors start accepting touches by default.
         verticalScrollInteractor.startAcceptingTouches()
@@ -37,7 +37,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     
 
     lazy var leftScreen: SCScrollView = {
-        let x = ChatTableView()
+        let x = ConversationsTableVC()
         self.addChild(x)
         x.delegate = self
         x.additionalSafeAreaInsets.bottom = subviewsBottomSafeAreaInset
@@ -55,7 +55,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     }()
     
     lazy var rightScreen: SCScrollView = {
-        let x = PhotoLibraryCollectionVC()
+        let x = PhotoLibraryCollectionVC(screen: self)
         self.addChild(x)
         x.delegate = self
         x.additionalSafeAreaInsets.bottom = subviewsBottomSafeAreaInset
@@ -65,7 +65,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     }()
     
      lazy var bottomScreen: SettingsViewController = {
-        let x = SettingsViewController()
+        let x = SettingsViewController(screen: self)
         x.additionalSafeAreaInsets.bottom = subviewsBottomSafeAreaInset
         self.addChild(x)
         x.view.alpha = 0
@@ -157,6 +157,10 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     
     
     
+    
+    
+    
+    
     let navigationViewBackingAlphaEquation = CGLinearEquation(xy(-1, 1), xy(-0.8, 0), min: 0, max: 1)!
     
     let navigationViewTintColorEquation = CGLinearEquation(xy(-1, 190), xy(0, 255), min: 190, max: 255)!
@@ -171,9 +175,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     
     
     
-    
-    
-    
+
     
     
     
@@ -183,4 +185,12 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     override var preferredStatusBarStyle: UIStatusBarStyle{
         return .lightContent
     }
+    
+    
+    
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init coder has not being implemented")
+    }
+
 }

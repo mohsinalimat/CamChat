@@ -8,7 +8,7 @@
 
 import HelpKit
 
-protocol PhotoLibraryLayoutDelegate{
+protocol PhotoLibraryLayoutDelegate: class{
     func collectionView(_ collectionView: UICollectionView, heightForItemAt indexPath: IndexPath) -> CGFloat
 }
 
@@ -18,7 +18,7 @@ class PhotoLibraryLayout: UICollectionViewLayout{
     private var contentHeight: CGFloat = 0
     
     var numberOfColumns = 2
-    var delegate: PhotoLibraryLayoutDelegate!
+    weak var delegate: PhotoLibraryLayoutDelegate!
     private var width: CGFloat{
         collectionView?.layoutIfNeeded()
         return collectionView!.frame.width

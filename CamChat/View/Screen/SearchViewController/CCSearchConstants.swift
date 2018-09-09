@@ -9,6 +9,11 @@
 import HelpKit
 
 class CCSearchConstants{
+    
+    
+    
+    
+    
     static let searchIconSize = CGSize(width: 25, height: 25)
     static let searchIconLeftPadding: CGFloat = 15
     static let searchIconRightPadding: CGFloat = 10

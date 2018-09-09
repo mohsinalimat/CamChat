@@ -10,14 +10,20 @@ import HelpKit
 
 
 
-class CCSearchTableView: UITableView, UITableViewDataSource, UITableViewDelegate{
-    private let cellID = "The Best cell ever"
+class CCSearchTableView: UITableView, UITableViewDelegate, SearchControllerVMDelegate{
+    
+    
+    
+    
+    
+    
     private weak var vcOwner: UIViewController!
     init(owner: UIViewController){
         self.vcOwner = owner
         super.init(frame: CGRect.zero, style: .plain)
+        self.viewModel = SearchControllerVM(tableView: self, delegate: self)
         tableFooterView = UIView()
-        dataSource = self
+        
         delegate = self
         separatorStyle = .none
         backgroundColor = .clear
@@ -26,7 +32,6 @@ class CCSearchTableView: UITableView, UITableViewDataSource, UITableViewDelegate
         
         showsVerticalScrollIndicator = false
         showsHorizontalScrollIndicator = false
-        register(CCSearchTableViewCell.self, forCellReuseIdentifier: cellID)
         
         
         
@@ -34,21 +39,21 @@ class CCSearchTableView: UITableView, UITableViewDataSource, UITableViewDelegate
         
     }
     
-   
+    private var viewModel: SearchControllerVM<CCSearchTableView>!
     
-   
+   typealias CellType = CCSearchTableViewCell
+    
+    
     
     
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        if section == 1{
-            return CCSearchTableViewHeader(text: "My Friends")
-        } else if section == 0{
-            return CCSearchTableViewHeader(text: "Strangers")
-        }
-        return nil
-        
+
+        if let title = tableView.dataSource?.tableView?(self, titleForHeaderInSection: section){
+            return CCSearchTableViewHeader(text: title)
+        } else {return nil}
     }
+    
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 50
     }
@@ -56,22 +61,31 @@ class CCSearchTableView: UITableView, UITableViewDataSource, UITableViewDelegate
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         deselectRow(at: indexPath, animated: true)
-        vcOwner.present(ChatViewController(presenter: vcOwner), animated: true, completion: nil)
+        let object = viewModel.objects[indexPath.row]
         
-    }
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        if let user = User.getObjectWith(uniqueID: object.uniqueID){
+            self.vcOwner.present(ChatViewController(presenter: vcOwner, user: user))
+        } else {
+            viewModel.objects[indexPath.row].persist{ (callback) in
+                
+                switch callback{
+                case .success(let user): self.vcOwner.present(ChatViewController(presenter: self.vcOwner, user: user), animated: true, completion: nil)
+                case .failure(let error): print(error)
+                }
+            }
+        }
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return section == 0 ? 2 : 10
-
-    }
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = dequeueReusableCell(withIdentifier: cellID, for: indexPath) as! CCSearchTableViewCell
+    
+    func configureCell(_ cell: CCSearchTableView.CellType, for indexPath: IndexPath, with object: TempUser) {
+        
         configureTopLine_And_Corners(for: cell, indexPath: indexPath)
-        return cell
+        cell.setWithUser(user: object)
+        
     }
+    
+    
+    
     
     private let preferredCornerRadius: CGFloat = 10
 

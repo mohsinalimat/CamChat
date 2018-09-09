@@ -268,7 +268,6 @@ private class ChatControllerInteractionController: HKVCTransInteractionControlle
     override init(brain: ChatControllerAnimationPositioningBrain) {
         super.init(brain: brain)
         setUpGesture(for: presented.viewController)
-
     }
     
    

@@ -10,7 +10,7 @@ import UIKit
 
 
 
-class ChatCell: UITableViewCell{
+class ConversationCell: UITableViewCell{
     
     private let padding: CGFloat = 10
     
@@ -26,6 +26,12 @@ class ChatCell: UITableViewCell{
         labelStackView.pin(anchors: [.left: customImageView.rightAnchor, .right: rightAnchor, .centerY: centerYAnchor], constants: [.left: padding, .right: padding])
     }
     
+    func setWith(user: User){
+        customImageView.image = user.profilePicture
+        topLabel.text = user.fullName
+        bottomLabel.text = user.email
+    }
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         customImageView.layer.cornerRadius = customImageView.frame.width / 2
@@ -33,7 +39,7 @@ class ChatCell: UITableViewCell{
     
     
     private lazy var customImageView: UIImageView = {
-        let x = UIImageView(image: AssetImages.me)
+        let x = UIImageView()
         x.contentMode = .scaleAspectFill
         x.clipsToBounds = true
         return x

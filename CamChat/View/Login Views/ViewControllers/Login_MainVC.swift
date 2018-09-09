@@ -21,7 +21,7 @@ class Login_MainVC: UIViewController{
         super.viewDidLoad()
         self.view.backgroundColor = .yellow
         
-        
+  
         
         signUpButton.pin(addTo: view, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor], constants: [.height: buttonHeight])
         
@@ -34,11 +34,9 @@ class Login_MainVC: UIViewController{
     }
     
     
-    override var prefersStatusBarHidden: Bool{
-        return true
-    }
+    override var prefersStatusBarHidden: Bool{ return true }
     
-    override var prefersHomeIndicatorAutoHidden: Bool{return true}
+    override var prefersHomeIndicatorAutoHidden: Bool { return true}
     
     
     
@@ -61,10 +59,7 @@ class Login_MainVC: UIViewController{
         let x = SimpleLabelledButton()
         x.label.text = "LOG IN"
         x.backgroundColor = REDCOLOR
-        x.addAction { [unowned self] in
-            
-            self.present(self.loginScreen, animated: true, completion: nil)
-        }
+        x.addAction { [unowned self] in self.present(self.loginScreen) }
         return x
     }()
     
@@ -74,9 +69,7 @@ class Login_MainVC: UIViewController{
         let x = SimpleLabelledButton()
         x.label.text = "SIGN UP"
         x.backgroundColor = BLUECOLOR
-        x.addAction { [unowned self] in
-            self.present(self.signUpScreen, animated: true, completion: nil)
-        }
+        x.addAction { [unowned self] in self.present(self.signUpScreen) }
         return x
     }()
 }

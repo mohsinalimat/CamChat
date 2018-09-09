@@ -20,7 +20,7 @@ class Login_SignUp_Name: SignUpFormVCTemplate{
     }
     
     override var nextScreenType: SignUpFormVCTemplate.Type {
-        return Login_SignUp_UserName.self
+        return Login_SignUp_ProfilePicture.self
     }
     
     override func respondToButtonViewTapped() {
@@ -39,8 +39,9 @@ class Login_SignUp_Name: SignUpFormVCTemplate{
         form.topDescriptionLabel.text = bottomDescription
         form.topTextField.setDescriptionText(to: "First Name")
         form.bottomTextField.setDescriptionText(to: "Last Name")
-        form.topTextField.textField.textContentType = .name
-        form.bottomTextField.textField.autocapitalizationType = .words
+        form.topTextField.textField.textContentType = .givenName
+        form.bottomTextField.textField.textContentType = .familyName
+        form.topTextField.textField.autocapitalizationType = .words
         form.bottomTextField.textField.autocapitalizationType = .words
         form.titleLabel.text = "What's your name?"
         form.bottomDescriptionLabel.text = bottomDescription

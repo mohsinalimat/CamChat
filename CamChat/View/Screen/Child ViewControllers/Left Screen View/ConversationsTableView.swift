@@ -7,14 +7,13 @@
 //
 
 import UIKit
+import CoreData
 
-
-class ChatTableView: SCTableView{
-    let cellID = "cell reuse identifier"
+class ConversationsTableVC: SCTableView{
     
- 
+   
   
-    
+    private var viewModel: CoreDataListViewVM<ConversationsTableVC>!
     
     
     override func viewDidLoad() {
@@ -22,18 +21,14 @@ class ChatTableView: SCTableView{
         super.viewDidLoad()
         tableView.rowHeight = 70
         tableView.separatorStyle = .none
-        
-        
-        
-        
+    
     }
     
     override func registerCells() {
-        tableView.register(ChatCell.self, forCellReuseIdentifier: cellID)
+       viewModel = CoreDataListViewVM(delegate: self)
     }
     
-    
-    
+
     override var topLabelText: String{
         return "Chats"
     }
@@ -43,18 +38,12 @@ class ChatTableView: SCTableView{
     }
     
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return tableView.dequeueReusableCell(withIdentifier: cellID, for: indexPath)
-    }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 30
-    }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
       
-        let vc = ChatViewController(presenter: self)
+        let vc = ChatViewController(presenter: self, user: viewModel.objects[indexPath.row])
         vc.tappedCell = tableView.cellForRow(at: indexPath)!
         
         DispatchQueue.main.async {
@@ -67,7 +56,32 @@ class ChatTableView: SCTableView{
     
 }
 
-extension ChatTableView: ChatControllerTransitionAnimationParticipator{
+
+
+extension ConversationsTableVC: CoreDataListViewVMDelegate{
+    
+    var fetchRequest: NSFetchRequest<User>{
+        let x = User.typedFetchRequest()
+        x.predicate = NSPredicate(format: "\(#keyPath(User.uniqueID)) != %@", DataCoordinator.currentUser!.uniqueID)
+        x.sortDescriptors = [NSSortDescriptor(key: #keyPath(User.firstName), ascending: true)]
+        return x
+    }
+    
+    func configureCell(_ cell: ConversationCell, at indexPath: IndexPath, for object: User) {
+        cell.setWith(user: object)
+    }
+    
+    var listView: UITableView{
+        return tableView
+    }
+    
+}
+
+
+
+
+
+extension ConversationsTableVC: ChatControllerTransitionAnimationParticipator{
     
     
     

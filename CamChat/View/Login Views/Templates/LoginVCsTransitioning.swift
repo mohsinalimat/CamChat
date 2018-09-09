@@ -81,7 +81,6 @@ class LoginVCAnimationController: HKVCTransAnimationController<LoginVCTransition
     override var duration: TimeInterval{return 0.5}
     
     override func getAnimator() -> (TimeInterval, @escaping () -> Void, @escaping (Bool) -> Void) -> Void {
-        return { UIView.animate(withDuration: $0, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.4, options: [.curveEaseIn], animations: $1, completion: $2)}
+        return { UIView.animate(withDuration: $0, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.4, options: [.curveEaseIn, .allowUserInteraction], animations: $1, completion: $2)}
     }
-    
 }

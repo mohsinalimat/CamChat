@@ -25,7 +25,10 @@ class CCSearchTableViewCell: UITableViewCell{
         
         let imageViewPadding: CGFloat = 10
         
-        customImageView.pin(addTo: self, anchors: [.left: leftAnchor, .top: topAnchor, .bottom: bottomAnchor, .width: customImageView.heightAnchor], constants: [.left: imageViewPadding, .top: imageViewPadding, .bottom: imageViewPadding])
+        placeHolderImageView.pin(addTo: self, anchors: [.left: leftAnchor, .top: topAnchor, .bottom: bottomAnchor, .width: placeHolderImageView.heightAnchor], constants: [.left: imageViewPadding, .top: imageViewPadding, .bottom: imageViewPadding])
+        
+        customImageView.pinAllSides(addTo: self, pinTo: placeHolderImageView, insets: UIEdgeInsets(allInsets: -1))
+        
         labelStackView.pin(addTo: self, anchors: [.left: customImageView.rightAnchor, .centerY: centerYAnchor], constants: [.left: imageViewPadding])
         
     }
@@ -36,6 +39,33 @@ class CCSearchTableViewCell: UITableViewCell{
     func hideLine(){
         bottomLine.alpha = 0
     }
+    
+    private weak var currentUser: TempUser?
+    
+    func setWithUser(user: TempUser){
+        self.customImageView.alpha = 0
+        self.currentUser = user
+        topLabel.text = user.fullName
+        bottomLabel.text = user.email
+        if let picture = user.profilePicture{
+            self.customImageView.alpha = 1
+            self.customImageView.image = picture
+        }
+        user.setProfileImage { (callback) in
+            switch callback{
+            case .success(let args):
+                if user !== self.currentUser{return}
+                self.customImageView.image = args.image
+                UIView.animate(withDuration: args.wasDownloaded ? 0.3 : 0, animations: {
+                    self.customImageView.alpha = 1
+                })
+            case .failure(let error):
+                print(error)
+            }
+        }
+    }
+    
+    
     
     
     private lazy var bottomLine: UIView = {
@@ -51,7 +81,17 @@ class CCSearchTableViewCell: UITableViewCell{
     }
     
     private lazy var customImageView: UIImageView = {
-        let x = UIImageView(image: AssetImages.me)
+        let x = UIImageView()
+        x.contentMode = .scaleAspectFill
+        x.layer.masksToBounds = true
+        x.alpha = 0
+        return x
+    }()
+    
+    private lazy var placeHolderImageView: UIImageView = {
+        let x = UIImageView(image: AssetImages.profilePicturePlaceholder)
+        x.backgroundColor = .clear
+        x.tintColor = .white
         x.contentMode = .scaleAspectFill
         x.layer.masksToBounds = true
         return x

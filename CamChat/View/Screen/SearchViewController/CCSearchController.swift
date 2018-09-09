@@ -156,14 +156,6 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
     }()
     
 
-    
-    
-    
-    
-    
-    
-    
-    
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
