@@ -17,9 +17,8 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     
     
     
-    init(){
-        super.init(nibName: nil, bundle: nil)
-    }
+    
+    init(){ super.init(nibName: nil, bundle: nil) }
   
     
     override func viewDidLoad() {
@@ -33,7 +32,8 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         horizontalScrollInteractor.startAcceptingTouches()        
     }
     
-
+    
+    
     
 
     lazy var leftScreen: SCScrollView = {
@@ -42,7 +42,6 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         x.delegate = self
         x.additionalSafeAreaInsets.bottom = subviewsBottomSafeAreaInset
         x.additionalSafeAreaInsets.top = topBarHeight
-        
         return x
     }()
     
@@ -60,7 +59,6 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         x.delegate = self
         x.additionalSafeAreaInsets.bottom = subviewsBottomSafeAreaInset
         x.additionalSafeAreaInsets.top = topBarHeight
-        
         return x
     }()
     

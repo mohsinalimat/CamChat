@@ -24,13 +24,32 @@ class ConversationCell: UITableViewCell{
         customImageView.pin(anchors: [.left: leftAnchor, .top: topAnchor, .bottom: bottomAnchor, .width: customImageView.heightAnchor], constants: [.top: padding, .left: padding, .bottom: padding])
 
         labelStackView.pin(anchors: [.left: customImageView.rightAnchor, .right: rightAnchor, .centerY: centerYAnchor], constants: [.left: padding, .right: padding])
+        
+        Timer.scheduledTimer(withTimeInterval: 60, repeats: true) {[weak self] (timer) in
+            guard let self = self else {timer.invalidate(); return}
+            if let user = self.user{
+                let bottomText = ConversationCellVM().getSubtitleInfoFor(user: user).bottomText
+                self.bottomLabel.text = bottomText
+            }
+        }
     }
     
+    private var user: User?
+    
+    
+    
     func setWith(user: User){
+        self.user = user
         customImageView.image = user.profilePicture
-        topLabel.text = user.fullName
-        bottomLabel.text = user.email
+        
+        let subtitleInfo = ConversationCellVM().getSubtitleInfoFor(user: user)
+        
+        topLabel.text = subtitleInfo.topText
+        bottomLabel.text = subtitleInfo.bottomText
+        self.bottomIconView.image = subtitleInfo.icon
     }
+    
+    
     
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -46,14 +65,30 @@ class ConversationCell: UITableViewCell{
     }()
     
     private lazy var labelStackView: UIStackView = {
-        let x = UIStackView(arrangedSubviews: [topLabel, bottomLabel])
+        let x = UIStackView(arrangedSubviews: [topLabel, bottomRowHolder])
         x.axis = .vertical
+        x.spacing = 3
+        return x
+    }()
+    
+    private lazy var bottomRowHolder: UIView = {
+        let x = UIView()
+        bottomIconView.pin(addTo: x, anchors: [.left: x.leftAnchor, .centerY: x.centerYAnchor])
+        bottomLabel.pin(addTo: x, anchors: [.left: bottomIconView.rightAnchor, .centerY: bottomIconView.centerYAnchor], constants: [.left: 6])
+        x.pin(anchors: [.height: bottomIconView.heightAnchor, .right: bottomLabel.rightAnchor])
         return x
     }()
     
     private lazy var topLabel: UILabel = {
         let x = UILabel()
-        x.text = "Patrick"
+        
+        return x
+    }()
+    
+    private lazy var bottomIconView: UIImageView = {
+        let x = UIImageView(contentMode: .scaleAspectFit)
+        x.tintColor = BLUECOLOR
+        x.pin(constants: [.height: 15, .width: 15])
         return x
     }()
 
@@ -61,11 +96,24 @@ class ConversationCell: UITableViewCell{
         let x = UILabel()
         x.textColor = UIColor.lightGray
         x.font = UIFont.systemFont(ofSize: 13)
-        x.text = "Received ∙ 2d"
         return x
     }()
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init coder has not been implemented")
     }
+}
+
+
+
+
+extension ConversationCell: CoreDataListViewUpdateAwareCell{
+    
+    func updateCellInfo() {
+        if let user = self.user{
+            self.setWith(user: user)
+        }
+        
+    }
+    
 }

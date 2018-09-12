@@ -22,17 +22,17 @@ class Login_SignUp_Email: SignUpFormVCTemplate{
         self.handleErrorWithOopsAlert { [unowned self, unowned buttonView, unowned inputFormView] in
             try self.infoObject.setEmail(to: self.inputFormView.topTextField.textField.text!)
             
-            
+            inputFormView.dismissKeyboard()
             UIApplication.shared.beginIgnoringInteractionEvents()
             buttonView.startShowingLoadingIndicator()
             
             DataCoordinator.signUpAndLogIn(signUpProgressionInfo: self.infoObject.output!, completion: { (callback) in
+                
                 UIApplication.shared.endIgnoringInteractionEvents()
                 buttonView.stopShowingLoadingIndicator()
                 
                 switch callback{
                 case .success:
-                    inputFormView.topTextField.textField.resignFirstResponder()
                     InterfaceManager.shared.transitionToMainInterface()
                 case .failure(let error):
                     self.presentOopsAlert(description: error.localizedDescription)

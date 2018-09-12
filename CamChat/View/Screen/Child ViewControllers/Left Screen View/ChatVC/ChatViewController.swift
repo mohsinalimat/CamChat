@@ -8,23 +8,43 @@
 
 import HelpKit
 
+protocol ChatViewControllerTappedCellProvider{
+    func cellFor(user: User) -> UITableViewCell?
+}
+
 
 class ChatViewController: UIViewController{
     
   
-    var tappedCell: UIView?{
+    private var tappedCell: UIView?{
         get{ return chatTransitioningDelegate.tappedCell }
         set{ chatTransitioningDelegate.tappedCell = newValue}
     }
     
     
     private let user: User
+    private var tappedCellProvider: ChatViewControllerTappedCellProvider?
 
+    
+    convenience init(presenter: HKVCTransParticipator, tappedCellProvider: ChatViewControllerTappedCellProvider, user: User){
+        self.init(presenter: presenter, user: user)
+        self.tappedCellProvider = tappedCellProvider
+    }
+    
     init(presenter: HKVCTransParticipator, user: User){
         self.user = user
         super.init(nibName: nil, bundle: nil)
         self.chatTransitioningDelegate = ChatControllerTransitioningDelegate(presenter: presenter, presented: self)
         transitioningDelegate = chatTransitioningDelegate
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(respondToTextViewDidBeginEditing), name: UITextView.textDidBeginEditingNotification, object: self.accessoryView.textView)
+        
+    }
+
+    
+    
+    @objc private func respondToTextViewDidBeginEditing(){
+        collectionView.scrollToBottom()
     }
     
    
@@ -45,6 +65,12 @@ class ChatViewController: UIViewController{
         
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(respondToKeyboardWillChangeFrame(notification:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+    }
+    
     
 
     override func loadView() {
@@ -52,7 +78,7 @@ class ChatViewController: UIViewController{
         view.frame = UIScreen.main.bounds
         view.backgroundColor = .clear
         view.didMoveToSuperviewAction = { [weak self] in self?.becomeFirstResponder() }
-        view.hitTestAction = {[weak self] in self?.hitTestView(point: $0, event: $1) }
+        view.hitTestAction = { [weak self] in self?.hitTestView(point: $0, event: $1) }
         self.view = view
         
     }
@@ -65,7 +91,35 @@ class ChatViewController: UIViewController{
         return nil
     }
     
+    @objc private func respondToKeyboardWillChangeFrame(notification: Notification){
+
+        
+        let newKeyboardFrame = notification.userInfo!["UIKeyboardFrameEndUserInfoKey"] as! CGRect
+        
+        let keyboardHeightOnScreen = max(self.view.bounds.height - newKeyboardFrame.minY, 0)
+        
+        
+        UIView.performWithoutAnimation {
+            view.layoutIfNeeded()
+
+            additionalSafeAreaInsets.bottom = max(keyboardHeightOnScreen - APP_INSETS.bottom, 0)
+            view.layoutIfNeeded()
+            
+            
+        }
+        
+        
+    }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        UIView.performWithoutAnimation {
+            if isBeingPresented{
+                collectionView.scrollToBottom(animated: false)
+            }
+        }
+
+    }
     
    
     
@@ -129,7 +183,21 @@ class ChatViewController: UIViewController{
 }
 
 
-
+extension ChatViewController: HKVCTransEventAwareParticipator{
+    func prepareForPresentation() {
+        tappedCell = tappedCellProvider?.cellFor(user: user)
+    }
+    
+    
+    
+    func prepareForDismissal() {
+        tappedCell = tappedCellProvider?.cellFor(user: user)
+    }
+    
+    func cleanUpAfterDismissal() {
+        user.deleteIfNotNeeded()
+    }
+}
 
 extension ChatViewController: ChatControllerProtocol{
     

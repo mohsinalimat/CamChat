@@ -7,12 +7,13 @@
 //
 
 import HelpKit
+import CoreData
 
 
 class TempUser {
     
     
-    private static var cache = HKCache<String, UIImage>(objectLimit: 40)
+    private static var imageCache = HKCache<String, UIImage>(objectLimit: 40)
     
     
     init(firstName: String, lastName: String, username: String, email: String, profilePicture: UIImage? = nil, uniqueID: String){
@@ -25,7 +26,7 @@ class TempUser {
         
         if let image = profilePicture{
             self.profilePicture = image
-            TempUser.cache.set(value: image, forKey: uniqueID)
+            TempUser.imageCache.set(value: image, forKey: uniqueID)
         }
         
     }
@@ -43,7 +44,7 @@ class TempUser {
     
     
     func setProfileImage(_ completion: ((HKCompletionResult<(image: UIImage, wasDownloaded: Bool)>) -> Void)?){
-        if let image = profilePicture ?? TempUser.cache.valueFor(key: uniqueID) {
+        if let image = profilePicture ?? TempUser.imageCache.valueFor(key: uniqueID) {
             completion?(.success((image, false)))
         } else {
             
@@ -52,7 +53,7 @@ class TempUser {
                 switch callback{
                 case .success(let image):
                     self.profilePicture = image
-                    TempUser.cache.set(value: image, forKey: self.uniqueID)
+                    TempUser.imageCache.set(value: image, forKey: self.uniqueID)
                     completion?(.success((image, true)))
                     
                 case .failure(let error): completion?(.failure(error))
@@ -62,16 +63,38 @@ class TempUser {
         
     }
     
+    private static var currentPersistQueries = [String: [(User) -> Void]]()
+    
+    
     
     /// Attempts to save the receiver as a Core Data object.
     func persist(_ completion: ((HKCompletionResult<User>) -> Void)?){
+        
+        if User.hasStoredObjectWith(uniqueID: uniqueID){
+            completion?(.success(User.getObjectWith(uniqueID: uniqueID)!))
+        }
+        
+        
+        // Ensures that if 2 callers are trying to persist a User at the same time, only one User object is created and the two completion handlers are called using that one User object.
+        if var queries = TempUser.currentPersistQueries[uniqueID]{
+            queries.append({completion?(.success($0))})
+            TempUser.currentPersistQueries[uniqueID] = queries
+            return
+        } else {
+            TempUser.currentPersistQueries[uniqueID] = [{completion?(.success($0))}]
+        }
+        
+        
+        
         
         setProfileImage { (callBack) in
 
             switch callBack{
             case .success(let args):
+                
                 let user = User.createNew(lastName: self.lastName, firstName: self.firstName, username: self.username, email: self.email, profilePicture: args.image, uniqueID: self.uniqueID)
-                completion?(.success(user))
+                TempUser.currentPersistQueries[self.uniqueID]!.forEach{$0(user)}
+                TempUser.currentPersistQueries[self.uniqueID] = nil
             case .failure(let error):
                 completion?(.failure(error))
             }

@@ -28,6 +28,14 @@ class LoginInputFormView: UIView, UITextFieldDelegate{
         NotificationCenter.default.addObserver(self, selector: #selector(textFieldDidChange_field2), name: UITextField.textDidChangeNotification, object: self.bottomTextField.textField)
     }
     
+    func dismissKeyboard(){
+        topTextField.textField.resignFirstResponder()
+        bottomTextField.textField.resignFirstResponder()
+    }
+    func presentKeyboard(){
+        topTextField.textField.resignFirstResponder()
+    }
+    
     
     @objc private func textFieldDidChange_field1(){
         delegate?.textFieldTextDidChange(textField: topTextField, text: topTextField.textField.text)

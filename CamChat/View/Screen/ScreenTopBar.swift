@@ -12,6 +12,11 @@ import HelpKit
 
 
 class ScreenTopBar: HKView{
+    
+    
+    
+
+    
     typealias DelegateType = CCSearchBarDelegate & ScreenButtonsTopBarDelegate
     private weak var delegate: DelegateType?
     
@@ -63,8 +68,3 @@ class ScreenTopBar: HKView{
     }
     
 }
-
-
-
-
-

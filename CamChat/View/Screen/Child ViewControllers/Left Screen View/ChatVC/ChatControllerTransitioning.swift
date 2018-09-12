@@ -14,6 +14,7 @@ import HelpKit
 protocol ChatControllerTransitionAnimationParticipator: HKVCTransParticipator{
     var viewToDim: UIView {get}
     var topBarView: UIView {get}
+    
 }
 
 protocol ChatControllerProtocol: HKVCTransParticipator{
@@ -27,16 +28,16 @@ protocol ChatControllerProtocol: HKVCTransParticipator{
 
 class ChatControllerAnimationPositioningBrain: HKVCTransBrain{
     
-    var presenter_typed: ChatControllerTransitionAnimationParticipator?{
+    var presenter_typed: ChatControllerTransitionAnimationParticipator? {
         return presenter as? ChatControllerTransitionAnimationParticipator
     }
     
     
-    var presenter: HKVCTransParticipator{
+    var presenter: HKVCTransParticipator {
         return _presenter
     }
     
-    var presented: ChatControllerProtocol{
+    var presented: ChatControllerProtocol {
         return _presented as! ChatControllerProtocol
     }
     
@@ -46,8 +47,8 @@ class ChatControllerAnimationPositioningBrain: HKVCTransBrain{
     
     required init(presenter: HKVCTransParticipator, presented: HKVCTransParticipator) {
         super.init(presenter: presenter, presented: presented)
-        adjustKeyboardWindows{$0.transform = CGAffineTransform.identity}
-
+        adjustKeyboardWindows{ $0.transform = CGAffineTransform.identity }
+        
     }
     
     
@@ -77,7 +78,6 @@ class ChatControllerAnimationPositioningBrain: HKVCTransBrain{
     /// This function must be called before any other function so that all of this class's vars may be initialized.
     override func prepareForPresentation(using transitionContext: UIViewControllerContextTransitioning){
         super.prepareForPresentation(using: transitionContext)
-        
         presenter.view.isUserInteractionEnabled = false
         container.addSubview(presented.backgroundView)
         container.addSubview(presented.view)
@@ -126,6 +126,7 @@ class ChatControllerAnimationPositioningBrain: HKVCTransBrain{
     
     
     override func carryOutUnanimatedPresentationAction() {
+        super.carryOutUnanimatedPresentationAction()
         presented.view.transform = CGAffineTransform.identity
         presented.topBarView.transform = CGAffineTransform(translationX: chatBackgroundViewAlphaEquation.solve(for: 0), y: 0)
         presenter_typed?.topBarView.alpha = presentingTopBarAlphaEquation.solve(for: 0)
@@ -136,13 +137,20 @@ class ChatControllerAnimationPositioningBrain: HKVCTransBrain{
         }
     }
     
+    override func cleanUpAfterPresentation() {
+        if let tappedCell = tappedCell{
+            tappedCell.transform = CGAffineTransform.identity
+        }
+    }
     
     
     
-   /// This holds this instance in memory so that it responds to the keyboard dissmisal notification before it deallocated.
+    
+   /// This holds this instance in memory so that it responds to the keyboard dissmisal notification before it is deallocated.
     private var myself:ChatControllerAnimationPositioningBrain!
 
     override func prepareForDismissal(){
+        super.prepareForDismissal()
         container.insertSubview(presenter.view, at: 0)
         myself = self
         NotificationCenter.default.removeObserver(self)
@@ -159,6 +167,7 @@ class ChatControllerAnimationPositioningBrain: HKVCTransBrain{
     /// This basically performs the unanimated dismissal action.
     
     override func carryOutUnanimatedDismissalAction() {
+        super.carryOutUnanimatedDismissalAction()
         adjustViewPositionsForDismissal(accordingTo: 1)
     }
     
@@ -173,7 +182,7 @@ class ChatControllerAnimationPositioningBrain: HKVCTransBrain{
         
         
         if let tappedCell = tappedCell, let equation = tappedCellTransformEquation{
-            tappedCell.transform = CGAffineTransform(translationX: equation.solve(for: percentage), y: 0)
+            tappedCell.transform = CGAffineTransform(translationX: equation[percentage], y: 0)
         }
         
     }

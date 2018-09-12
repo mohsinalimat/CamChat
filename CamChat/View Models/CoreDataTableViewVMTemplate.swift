@@ -13,9 +13,21 @@ protocol CoreDataListViewVMDelegate: class {
     associatedtype CellType: UIView
     associatedtype ListViewType: CelledListView
     associatedtype ObjectType: NSManagedObject
+
     var listView: ListViewType {get}
     var fetchRequest: NSFetchRequest<ObjectType> { get }
     func configureCell(_ cell: CellType, at indexPath: IndexPath, for object:  ObjectType)
+    func coreDataUpdatesOcurred(updates: [NSFetchedResultsChangeType])
+}
+
+
+extension CoreDataListViewVMDelegate{
+    func coreDataUpdatesOcurred(updates: [NSFetchedResultsChangeType]){}
+}
+
+/// Neither UITableView nor UICollectionView updates the cell content when the cells are being moved. Cells that conform to this Protocol will be notified manually when updates are needed.
+protocol CoreDataListViewUpdateAwareCell{
+    func updateCellInfo()
 }
 
 class CoreDataListViewVM<Delegate: CoreDataListViewVMDelegate>: NSObject, NSFetchedResultsControllerDelegate, UITableViewDataSource, UICollectionViewDataSource {
@@ -41,9 +53,9 @@ class CoreDataListViewVM<Delegate: CoreDataListViewVMDelegate>: NSObject, NSFetc
         
         
         self.delegate = delegate
-    
+        
         super.init()
-    
+        
         if let listView = listView as? UICollectionView{
             listView.dataSource = self
         } else if let listView = listView as? UITableView{
@@ -61,7 +73,6 @@ class CoreDataListViewVM<Delegate: CoreDataListViewVMDelegate>: NSObject, NSFetc
         
         
         handleErrorWithPrintStatement { try controller.performFetch() }
-        
         listView?.reloadData()
         controller.delegate = self
     }
@@ -74,7 +85,7 @@ class CoreDataListViewVM<Delegate: CoreDataListViewVMDelegate>: NSObject, NSFetc
     
     
     
-    private var listViewUpdates = [() -> Void]()
+    private var listViewUpdates = [(NSFetchedResultsChangeType, (() -> Void))]()
     
     
     
@@ -84,25 +95,29 @@ class CoreDataListViewVM<Delegate: CoreDataListViewVMDelegate>: NSObject, NSFetc
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         
-        listViewUpdates.append {
-            
-            
+        
+        
+        let action = {
             let listView = self.listView
             
             switch type{
             case .delete:
                 listView?.deleteCell(at: indexPath!)
             case .insert:
-
                 listView?.insertCell(at: newIndexPath!)
             case .move:
+                if let cell = listView?.cellForItem(at: indexPath!) as? CoreDataListViewUpdateAwareCell{
+                    cell.updateCellInfo()
+                }
                 listView?.moveCell(from: indexPath!, to: newIndexPath!)
             case .update:
-
                 listView?.reloadCell(at: indexPath!)
                 
             }
+            
         }
+        
+        listViewUpdates.append((type, action))
         
     }
     
@@ -110,8 +125,11 @@ class CoreDataListViewVM<Delegate: CoreDataListViewVMDelegate>: NSObject, NSFetc
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         let updates = self.listViewUpdates
         listView?.performBatchUpdates({
-            updates.forEach{$0()}
-        }, completion: nil)
+            updates.forEach{$0.1()}
+        }, completion: {(success) in
+            self.delegate?.coreDataUpdatesOcurred(updates: updates.map{$0.0})
+        })
+
         self.listViewUpdates = []
     }
     

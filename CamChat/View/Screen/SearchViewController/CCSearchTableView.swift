@@ -32,11 +32,7 @@ class CCSearchTableView: UITableView, UITableViewDelegate, SearchControllerVMDel
         
         showsVerticalScrollIndicator = false
         showsHorizontalScrollIndicator = false
-        
-        
-        
-        
-        
+
     }
     
     private var viewModel: SearchControllerVM<CCSearchTableView>!
@@ -66,10 +62,11 @@ class CCSearchTableView: UITableView, UITableViewDelegate, SearchControllerVMDel
         if let user = User.getObjectWith(uniqueID: object.uniqueID){
             self.vcOwner.present(ChatViewController(presenter: vcOwner, user: user))
         } else {
-            viewModel.objects[indexPath.row].persist{ (callback) in
+            viewModel.objects[indexPath.row].persist(){ (callback) in
                 
                 switch callback{
-                case .success(let user): self.vcOwner.present(ChatViewController(presenter: self.vcOwner, user: user), animated: true, completion: nil)
+                case .success(let user):
+                    self.vcOwner.present(ChatViewController(presenter: self.vcOwner, user: user), animated: true, completion: nil)
                 case .failure(let error): print(error)
                 }
             }

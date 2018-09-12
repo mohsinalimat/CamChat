@@ -6,7 +6,7 @@
 //
 //
 
-import Foundation
+import HelpKit
 import CoreData
 
 
@@ -28,7 +28,12 @@ public class Message: NSManagedObject, ManagedObjectProtocol{
         x.sender = sender
         x.receiver = receiver
         
+        sender.notifyOfMessageCreation(message: x)
+        receiver.notifyOfMessageCreation(message: x)
+        
         CoreData.saveChanges()
+
+
         return x
     }
     
@@ -39,7 +44,15 @@ public class Message: NSManagedObject, ManagedObjectProtocol{
     @NSManaged private(set) var sender: User
     @NSManaged private(set) var receiver: User
     
-
+    
+    
+    var currentUserIsReceiver: Bool{
+        return receiver === DataCoordinator.currentUser
+    }
+    
+    var currentUserIsSender: Bool{
+        return sender === DataCoordinator.currentUser
+    }
 }
 
 

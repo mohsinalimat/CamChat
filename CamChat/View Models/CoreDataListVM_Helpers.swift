@@ -26,7 +26,7 @@ protocol CelledListView: class {
     func reloadCell(at index: IndexPath)
     func reloadData()
     func performBatchUpdates(_ updates: (() -> Void)?, completion: ((Bool) -> Void)?)
-    
+    func cellForItem(at index: IndexPath) -> CellBaseType?
     
 }
 
@@ -34,6 +34,9 @@ extension UITableView: CelledListView{
     
     typealias CellBaseType = UITableViewCell
     
+    func cellForItem(at index: IndexPath) -> UITableViewCell? {
+        return cellForRow(at: index)
+    }
     
     func insertCell(at index: IndexPath) {
         insertRows(at: [index], with: .fade)
@@ -50,12 +53,18 @@ extension UITableView: CelledListView{
     func reloadCell(at index: IndexPath) {
         reloadRows(at: [index], with: .fade)
     }
+    
+    
 }
 
 extension UICollectionView: CelledListView{
     
     
+    
+    
     typealias CellBaseType = UICollectionViewCell
+    
+    
     
     func register(_ cellClass: AnyClass?, forCellReuseIdentifier identifier: String) {
         register(cellClass, forCellWithReuseIdentifier: identifier)

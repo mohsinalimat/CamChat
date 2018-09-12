@@ -42,12 +42,9 @@ class ConversationsTableVC: SCTableView{
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-      
-        let vc = ChatViewController(presenter: self, user: viewModel.objects[indexPath.row])
-        vc.tappedCell = tableView.cellForRow(at: indexPath)!
-        
+        let vc = ChatViewController(presenter: self, tappedCellProvider: self, user: viewModel.objects[indexPath.row])
+
         DispatchQueue.main.async {
-            
             self.present(vc, animated: true, completion: nil)
         }
     }
@@ -56,14 +53,22 @@ class ConversationsTableVC: SCTableView{
     
 }
 
-
+extension ConversationsTableVC: ChatViewControllerTappedCellProvider{
+    func cellFor(user: User) -> UITableViewCell? {
+        if let index = viewModel.objects.firstIndex(of: user), let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)){
+            return cell
+        } else {return nil}
+    }
+    
+    
+}
 
 extension ConversationsTableVC: CoreDataListViewVMDelegate{
     
     var fetchRequest: NSFetchRequest<User>{
         let x = User.typedFetchRequest()
-        x.predicate = NSPredicate(format: "\(#keyPath(User.uniqueID)) != %@", DataCoordinator.currentUser!.uniqueID)
-        x.sortDescriptors = [NSSortDescriptor(key: #keyPath(User.firstName), ascending: true)]
+        x.predicate = NSPredicate(format: "\(#keyPath(User.uniqueID)) != %@ AND \(#keyPath(User.mostRecentMessage)) != nil", DataCoordinator.currentUser!.uniqueID)
+        x.sortDescriptors = [NSSortDescriptor(key: #keyPath(User.mostRecentMessage.dateSent), ascending: false)]
         return x
     }
     

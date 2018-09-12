@@ -17,6 +17,12 @@ protocol ManagedObjectProtocol {
 
 extension ManagedObjectProtocol where Self: NSManagedObject{
     
+    
+    func delete(){
+        CoreData.context.delete(self)
+        CoreData.saveChanges()
+    }
+    
     static func deleteAllObjects(){
         handleErrorWithPrintStatement {
             let request = NSBatchDeleteRequest(fetchRequest: fetchRequest())
@@ -72,7 +78,7 @@ class CoreData{
     
     
     
-    static private var persistentContainer: NSPersistentContainer = {
+    static var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "CamChat")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
@@ -93,6 +99,7 @@ class CoreData{
                 try context.save()
             } catch {
                 let nserror = error as NSError
+                print(nserror.userInfo)
                 fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }

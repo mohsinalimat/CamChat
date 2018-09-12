@@ -61,7 +61,11 @@ class SettingsScrollContentView: UIView{
     }()
     
     private lazy var logOutButtonInfo = SettingsBlockInfo(text: "Log Out", image: AssetImages.logOut, action: { [unowned vcOwner] in
+        
+        
         let alert = vcOwner.presentCCAlert(title: "Are you sure you want to log out?", primaryButtonText: "Log Out", secondaryButtonText: "Cancel")
+        
+        
         alert.addPrimaryButtonAction({ [unowned alert] in
             do{
                 try DataCoordinator.logOut()

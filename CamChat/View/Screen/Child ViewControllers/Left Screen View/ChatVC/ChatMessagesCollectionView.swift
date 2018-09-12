@@ -13,13 +13,12 @@ import CoreData
 
 class ChatMessagesCollectionView: UICollectionView{
     
-    
-    private var viewModel: CoreDataListViewVM<ChatMessagesCollectionView>!
+    private var viewModel: ChatCollectionViewVM?
     private let user: User
     init(user: User) {
         self.user = user
         let layout = UICollectionViewFlowLayout()
-        layout.itemSize = CGSize(width: UIScreen.main.bounds.width, height: 30)
+        layout.estimatedItemSize = CGSize(width: UIScreen.main.bounds.width, height: 100)
         super.init(frame: CGRect.zero, collectionViewLayout: layout)
         
         alwaysBounceVertical = true
@@ -27,10 +26,9 @@ class ChatMessagesCollectionView: UICollectionView{
         keyboardDismissMode = .interactive
         setCornerRadius(to: 10)
         layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
-        
-        viewModel = CoreDataListViewVM(delegate: self)
-        
-        
+        contentInset.top = ChatMessagesCollectionViewCell.leftInset
+        contentInset.bottom = ChatMessagesCollectionViewCell.leftInset
+        self.viewModel = ChatCollectionViewVM(collectionView: self, user: user, delegate: self)
     }
 
     
@@ -40,31 +38,31 @@ class ChatMessagesCollectionView: UICollectionView{
     }
 }
 
-
-extension ChatMessagesCollectionView: CoreDataListViewVMDelegate{
-    var fetchRequest: NSFetchRequest<Message> {
-        let fetch = Message.typedFetchRequest()
+extension ChatMessagesCollectionView: ChatCollectionViewVMInsertionDelegate{
+    
+    func shouldMake(insertions: [InsertionResult]) {
         
-        fetch.predicate = NSPredicate(format: "(\(#keyPath(Message.sender.uniqueID)) == %@) OR \(#keyPath(Message.receiver.uniqueID)) == %@", user.uniqueID, user.uniqueID)
-        fetch.sortDescriptors = [NSSortDescriptor(key: #keyPath(Message.dateSent), ascending: true)]
-        return fetch
+        let action = {
+            if insertions.contains(.reload){self.reloadData(); return}
+            for insertion in insertions{
+                switch insertion{
+                case .block(blockIndex: let index): self.insertItems(at: [index])
+                    
+                case .message(newBlock: let block, newMessage: let newMessage, newMessagesIndex: let newMessageIndex, blockIndex: let blockIndex):
+                    if let cell = self.cellForItem(at: blockIndex) as? ChatMessagesCollectionViewCell{
+                        cell.setWithBlock(newBlock: block, insertingNewMessage: newMessage, atIndex: newMessageIndex)
+                    } else {
+                        self.insertItems(at: [blockIndex])
+                    }
+                default: break
+                    
+                }
+            }
+        }
+        
+        performBatchUpdates(action, completion: nil)
     }
-    
-    
-    
-    
-    var listView: UICollectionView{
-        return self
-    }
-    
-    func configureCell(_ cell: ChatMessagesCollectionViewCell, at indexPath: IndexPath, for object: Message) {
-    
-        cell.setWith(message: object)
-    }
-    
-    
-    
-    
-    
-    
 }
+
+
+

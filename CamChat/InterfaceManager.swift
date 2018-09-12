@@ -46,7 +46,7 @@ class InterfaceManager{
      Call this function when the app is first launched to present the app's user interface on screen.
      */
     func launchInterface(){
-        let window = DataCoordinator.currentUser.isNil ? initializeLoginWindow() : initializeMainScreenWindow()
+        let window = DataCoordinator.userIsLoggedIn ? initializeMainScreenWindow() : initializeLoginWindow()
         window.makeKeyAndVisible()
     }
     

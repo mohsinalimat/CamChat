@@ -25,6 +25,8 @@ class Login_LoginVC: LoginFormVCTemplate{
         self.handleErrorWithOopsAlert {
             let loginInfo = try LoginInfo(email: email, password: password)
             
+            self.inputFormView.dismissKeyboard()
+            
             UIApplication.shared.beginIgnoringInteractionEvents()
             self.buttonView.startShowingLoadingIndicator()
             
@@ -35,8 +37,6 @@ class Login_LoginVC: LoginFormVCTemplate{
                 
                 switch callback{
                 case .success:
-                    self.inputFormView.topTextField.textField.resignFirstResponder()
-                    self.inputFormView.bottomTextField.textField.resignFirstResponder()
                     InterfaceManager.shared.transitionToMainInterface()
                 case .failure(let error):
                     self.presentOopsAlert(description: error.localizedDescription)
@@ -69,8 +69,7 @@ class Login_LoginVC: LoginFormVCTemplate{
         form.bottomTextField.textField.textContentType = .password
     }
     override func respondToBackButtonTapped() {
-        inputFormView.topTextField.textField.resignFirstResponder()
-        inputFormView.bottomTextField.textField.resignFirstResponder()
+        inputFormView.dismissKeyboard()
         super.respondToBackButtonTapped()
     }
     

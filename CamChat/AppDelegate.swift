@@ -19,14 +19,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationDidFinishLaunching(_ application: UIApplication) {
         Firebase.configure()
-        InterfaceManager.shared.launchInterface()
         
+        
+        InterfaceManager.shared.launchInterface()
         DataCoordinator.configure()
         
         
         
-        
-        CoreData.saveChanges()
         
     }
     

@@ -48,9 +48,7 @@ class FirebaseManager{
     private init() { FirebaseApp.configure() }
     fileprivate static var shared = FirebaseManager()
     
-    var currentUser: Firebase.User?{
-        return Auth.auth().currentUser
-    }
+    
     
     private var firestore: Firestore{
         return Firestore.firestore()
@@ -155,26 +153,29 @@ class FirebaseManager{
     
     
     func getUserProfilePicture(userID: String, completion: @escaping (HKCompletionResult<UIImage>) -> Void){
-        profilePicturesFolder.child(userID).getData(maxSize: Int64.max) { (data, error) in
-            if let data = data, let image = UIImage(data: data){
-                completion(.success(image))
-            } else {
-                completion(.failure(error ?? HKError.unknownError))
-                
+        DispatchQueue.main.async {
+            self.profilePicturesFolder.child(userID).getData(maxSize: Int64.max) { (data, error) in
+                if let data = data, let image = UIImage(data: data){
+                    completion(.success(image))
+                } else {
+                    completion(.failure(error ?? HKError.unknownError))
+                    
+                }
             }
         }
+        
     }
     
     
     
     
     func getAllUsers(completion: @escaping(HKCompletionResult<[TempUser]>) -> Void){
-        guard let currentUser = currentUser else {fatalError("There must be a current user for this function to work!")}
+        guard let currentUser = DataCoordinator.currentUser else {fatalError("There must be a current user for this function to work!")}
         usersCollection.order(by: UserKeys.firstName).getDocuments(completion: { (snapshot, error) in
             if let snapshot = snapshot{
                 
                 let users = snapshot.documents.map{self.parseUserDocumentInfo(from: $0.data())!}
-                let results = users.filter({$0.uniqueID != currentUser.uid})
+                let results = users.filter({$0.uniqueID != currentUser.uniqueID})
                 
                 completion(.success(results))
             } else {completion(.failure(error ?? HKError.unknownError))}
@@ -185,7 +186,7 @@ class FirebaseManager{
     
     
     func send(message: TempMessage){
-        precondition(self.currentUser.isNotNil, "There must be a current user for this function to work!")
+        guard let currentUser = DataCoordinator.currentUser else {return}
         
         let dict: [String: Any] = [
             MessageKeys.uniqueID: message.uniqueID,
@@ -204,7 +205,7 @@ class FirebaseManager{
         
         // Updating the current user's personal messages Collection
         
-        let currentUserMessageDoc = self.messagesCollectionForUserWith(userID: currentUser!.uid).document(message.uniqueID)
+        let currentUserMessageDoc = self.messagesCollectionForUserWith(userID: currentUser.uniqueID).document(message.uniqueID)
         let currentUserData = [
             UserKeys.messageID: message.uniqueID,
             UserKeys.chatPartnerID: message.chatPartnerID!
@@ -216,7 +217,7 @@ class FirebaseManager{
         let chatPartnerMessageDoc = messagesCollectionForUserWith(userID: message.chatPartnerID!).document(message.uniqueID)
         let chatPartnerData = [
             UserKeys.messageID: message.uniqueID,
-            UserKeys.chatPartnerID: currentUser!.uid
+            UserKeys.chatPartnerID: DataCoordinator.currentUser!.uniqueID
         ]
         writeBatch.setData(chatPartnerData, forDocument: chatPartnerMessageDoc)
         writeBatch.commit()
@@ -232,7 +233,6 @@ class FirebaseManager{
         
         return messagesCollectionForUserWith(userID: userID).addSnapshotListener {[weak self] (snapshot, error) in
             guard let self = self else { return }
-            
             if let snapshot = snapshot{
                 var messages = [TempMessage](){
                     didSet{
@@ -240,6 +240,7 @@ class FirebaseManager{
                         { action(.success(messages)) }
                     }
                 }
+                
                 
                 for change in snapshot.documentChanges{
                     let messageID = change.document.data()[UserKeys.messageID] as! String
@@ -251,6 +252,8 @@ class FirebaseManager{
                     })
                 }
             } else { action(.failure(error ?? HKError.unknownError ))}
+            
+            
         }
     }
     
@@ -259,20 +262,22 @@ class FirebaseManager{
     private func getMessageFor(messageID: String, completion: @escaping (HKCompletionResult<TempMessage>) -> Void){
         
         messagesCollection.document(messageID).getDocument { (snapshot, error) in
-            if let snapshot = snapshot{
-                let dict = snapshot.data()!
-                
-                let receiver = dict[MessageKeys.receiverID] as! String
-                let sender = dict[MessageKeys.senderID] as! String
-                let uniqueID = dict[MessageKeys.uniqueID] as! String
-                let date = (dict[MessageKeys.dateSent] as! Timestamp).dateValue()
-                let text = dict[MessageKeys.text] as! String
-                
-                let message = TempMessage(text: text, dateSent: date, uniqueID: uniqueID, senderID: sender, receiverID: receiver)
-                
-                completion(.success(message))
-            } else { completion(.failure(error ?? HKError.unknownError)) }
-        }
+                if let snapshot = snapshot{
+                    let dict = snapshot.data()!
+                    
+                    let receiver = dict[MessageKeys.receiverID] as! String
+                    let sender = dict[MessageKeys.senderID] as! String
+                    let uniqueID = dict[MessageKeys.uniqueID] as! String
+                    let date = (dict[MessageKeys.dateSent] as! Timestamp).dateValue()
+                    let text = dict[MessageKeys.text] as! String
+                    
+                    let message = TempMessage(text: text, dateSent: date, uniqueID: uniqueID, senderID: sender, receiverID: receiver)
+                    
+                    completion(.success(message))
+                } else { completion(.failure(error ?? HKError.unknownError)) }
+            }
+            
+        
         
     }
     

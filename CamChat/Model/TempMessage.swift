@@ -7,6 +7,7 @@
 //
 
 import HelpKit
+import CoreData
 
 
 struct TempMessage{
@@ -18,8 +19,9 @@ struct TempMessage{
     var receiverID: String
     
     var chatPartnerID: String?{
-        if senderID == Firebase.currentUser?.uid{return receiverID}
-        if receiverID == Firebase.currentUser?.uid{return senderID}
+        guard let currentUserID = DataCoordinator.currentUser?.uniqueID else {return nil}
+        if senderID == currentUserID{return receiverID}
+        if receiverID == currentUserID{return senderID}
         else {return nil}
     }
     

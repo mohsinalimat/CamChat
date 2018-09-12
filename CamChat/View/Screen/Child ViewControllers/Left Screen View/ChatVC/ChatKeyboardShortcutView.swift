@@ -67,17 +67,19 @@ class ChatKeyboardShortcutView: HKView{
         x.label.font = SCFonts.getFont(type: .demiBold, size: 13)
         x.backgroundColor = BLUECOLOR
         x.label.textColor = .white
+        x.transform = CGAffineTransform(scaleX: 0, y: 0)
         x.addAction({[unowned textView, unowned self] in
-            let message = TempMessage(text: textView.text.withTrimmedWhiteSpaces(), dateSent: Date(), uniqueID: NSUUID().uuidString, senderID: Firebase.currentUser!.uid, receiverID: self.user.uniqueID)
-            Firebase.send(message: message)
             
+            let message = TempMessage(text: textView.text.withTrimmedWhiteSpaces(), dateSent: Date(), uniqueID: NSUUID().uuidString, senderID: DataCoordinator.currentUser!.uniqueID, receiverID: self.user.uniqueID)
+            Firebase.send(message: message)
+            textView.text = ""
+            NotificationCenter.default.post(name: UITextView.textDidChangeNotification, object: textView)
         })
         return x
     }()
     
-    private lazy var textView: ChatKeyboardShortutTextView = {
+    lazy var textView: ChatKeyboardShortutTextView = {
         let x = ChatKeyboardShortutTextView()
-        
         return x
     }()
     
@@ -95,6 +97,7 @@ class ChatKeyboardShortcutView: HKView{
     
     @objc func respondToTextDidChange(){
         
+        adjustSendButton()
         
         guard let previousSize = previousTextViewSize else {
             previousTextViewSize = textView.contentSize
@@ -109,7 +112,35 @@ class ChatKeyboardShortcutView: HKView{
             
         }
         previousTextViewSize = textView.contentSize
+        
+    
     }
+    
+    private func adjustSendButton(){
+        let action: () -> Void
+        if textView.hasValidText{
+            action = {
+                if self.sendButton.transform != CGAffineTransform.identity{
+                    self.sendButton.transform = CGAffineTransform.identity
+                }
+            }
+        } else {
+            action = {
+                if self.sendButton.transform != CGAffineTransform(scaleX: 0, y: 0){
+                    self.sendButton.transform = CGAffineTransform(scaleX: 0, y: 0)
+                }
+            }
+        }
+        
+        UIView.animate(withDuration: 0.2) {
+            action()
+            self.layoutIfNeeded()
+            self.sendButton.setCornerRadius(to: self.sendButton.bounds.height.half)
+        }
+        
+    }
+    
+    
     
     
     
@@ -135,11 +166,11 @@ class ChatKeyboardShortcutView: HKView{
 
 
 
-private class ChatKeyboardShortutTextView: UITextView{
+class ChatKeyboardShortutTextView: UITextView{
     
     init(){
         super.init(frame: CGRect.zero, textContainer: nil)
-        returnKeyType = .send
+        returnKeyType = .default
         font = SCFonts.getFont(type: .medium, size: 17.5)
         tintColor = REDCOLOR
         textContainerInset.left = 4

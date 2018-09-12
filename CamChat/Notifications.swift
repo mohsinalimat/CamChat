@@ -10,3 +10,5 @@ import HelpKit
 
 
 
+let UserLoggedInNotification = HKNotification<User>()
+let UserLoggedOutNotification = HKNotification<Void>()
