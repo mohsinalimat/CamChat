@@ -69,9 +69,8 @@ class ChatKeyboardShortcutView: HKView{
         x.label.textColor = .white
         x.transform = CGAffineTransform(scaleX: 0, y: 0)
         x.addAction({[unowned textView, unowned self] in
-            
-            let message = TempMessage(text: textView.text.withTrimmedWhiteSpaces(), dateSent: Date(), uniqueID: NSUUID().uuidString, senderID: DataCoordinator.currentUser!.uniqueID, receiverID: self.user.uniqueID)
-            Firebase.send(message: message)
+            let message = TempMessage(text: textView.text.withTrimmedWhiteSpaces(), dateSent: Date(), uniqueID: NSUUID().uuidString, senderID: DataCoordinator.currentUserUniqueID!, receiverID: self.user.uniqueID)
+            try! DataCoordinator.send(message: message, sender: DataCoordinator.currentUser!, receiver: self.user)
             textView.text = ""
             NotificationCenter.default.post(name: UITextView.textDidChangeNotification, object: textView)
         })

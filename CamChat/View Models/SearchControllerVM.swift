@@ -47,8 +47,7 @@ class SearchControllerVM<DelegateType: SearchControllerVMDelegate>:NSObject, UIT
                     self.tableView.insertRows(at: indexPaths, with: .fade)
                 }, completion: nil)
             
-            case .failure(let error):
-                print(error)
+            case .failure(let error): print(error)
             }
         }
     }

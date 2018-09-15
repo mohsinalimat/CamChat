@@ -45,64 +45,60 @@ enum InsertionResult: Equatable{
     case block(blockIndex: IndexPath)
     
     ///Represents that only a single message should be inserted within a block. The IndexPath is that of the block of which the message is a part. The Int is
-    case message(newBlock: ChatMessageBlock, newMessage: Message, newMessagesIndex: Int, blockIndex: IndexPath)
+    case message(blockIndex: IndexPath)
     
-    /// Represents that no insertion info could be computed and that the table view should just be completely reloaded
     case reload
 }
 
 
 private struct InsertionCalculator {
     
-    
-    
-    static func getInfoFor(messageToInsert: Message, currentSortedMessageBlocks: [ChatMessageBlock]) -> InsertionResult{
-        
-        guard var lastBlock = currentSortedMessageBlocks.last else {return .reload}
-        
-        if lastBlock.messages.last!.dateSent < messageToInsert.dateSent{
-            if lastBlock.addIfPossible(message: messageToInsert).isTrue{
-                return .message(newBlock: lastBlock, newMessage: messageToInsert, newMessagesIndex: lastBlock.messages.lastItemIndex!, blockIndex: IndexPath(item: currentSortedMessageBlocks.lastItemIndex!, section: 0))
-            } else {
-                return .block(blockIndex: IndexPath(row: currentSortedMessageBlocks.endIndex, section: 0))
+    static func getInfo(blockArray: [ChatMessageBlock], messageToInsert: Message, suggestedInsertionIndexPath: IndexPath) -> InsertionResult{
+        if blockArray.isEmpty{return .reload}
+        var counter = -1
+        for (num, block) in blockArray.enumerated(){
+            counter += block.messages.count
+            if counter >= suggestedInsertionIndexPath.row{
+                return .message(blockIndex: IndexPath(row: num, section: 0))
             }
-        } else {return .reload}
-        
-   
+        }
+        if blockArray.last!.sender === messageToInsert.sender{
+            return .message(blockIndex: IndexPath(row: blockArray.lastItemIndex!, section: 0))
+        } else {return .block(blockIndex: IndexPath(row: blockArray.endIndex, section: 0))}
     }
 }
 
-protocol ChatCollectionViewVMInsertionDelegate: class {
-    func shouldMake(insertions: [InsertionResult])
-}
 
 
 
-class ChatCollectionViewVM: NSObject, NSFetchedResultsControllerDelegate, UICollectionViewDataSource{
+
+
+
+
+class ChatTableViewVM: NSObject, NSFetchedResultsControllerDelegate, UITableViewDataSource{
     
     
-    private weak var collectionView: UICollectionView!
+    private weak var tableView: UITableView!
     private var controller: NSFetchedResultsController<Message>!
 
     private let cellID = "CellID"
     
-    private weak var delegate: ChatCollectionViewVMInsertionDelegate?
     
     
-    init(collectionView: UICollectionView, user: User, delegate: ChatCollectionViewVMInsertionDelegate){
-        self.delegate = delegate
-        self.collectionView = collectionView
+    init(tableView: UITableView, user: User){
+        self.tableView = tableView
         super.init()
-        collectionView.dataSource = self
-        collectionView.register(ChatMessagesCollectionViewCell.self, forCellReuseIdentifier: cellID)
+        tableView.dataSource = self
+        tableView.register(ChatMessagesTableViewCell.self, forCellReuseIdentifier: cellID)
         
         let fetch = Message.typedFetchRequest()
+       
         fetch.predicate = NSPredicate(format: "(\(#keyPath(Message.sender.uniqueID)) == %@) OR \(#keyPath(Message.receiver.uniqueID)) == %@", user.uniqueID, user.uniqueID)
         fetch.sortDescriptors = [NSSortDescriptor(key: #keyPath(Message.dateSent), ascending: true)]
-        self.controller = NSFetchedResultsController(fetchRequest: fetch, managedObjectContext: CoreData.context, sectionNameKeyPath: nil, cacheName: nil)
+        self.controller = NSFetchedResultsController(fetchRequest: fetch, managedObjectContext: CoreData.mainContext, sectionNameKeyPath: nil, cacheName: nil)
         handleErrorWithPrintStatement(action: {try self.controller.performFetch()})
         setMessageBlocks()
-        collectionView.reloadData()
+        tableView.reloadData()
         controller.delegate = self
         
     }
@@ -132,41 +128,33 @@ class ChatCollectionViewVM: NSObject, NSFetchedResultsControllerDelegate, UIColl
         }
     }
     
-    private var insertionUpdates = [InsertionResult]()
-    
     
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        insertionUpdates = []
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        let message = anObject as! Message
-        switch type{
-        case .delete: fatalError()
-        case .move: fatalError()
-        case .update: break
-        case .insert:
-            let update = InsertionCalculator.getInfoFor(messageToInsert: message, currentSortedMessageBlocks: messageBlocks)
-            insertionUpdates.append(update)
-            setMessageBlocks()
-        }
+      
     }
     
+
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        
         setMessageBlocks()
-        delegate?.shouldMake(insertions: insertionUpdates)
-        self.insertionUpdates = []
+        tableView.reloadData()
+        
     }
     
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return messageBlocks.count
-    }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath) as! ChatMessagesCollectionViewCell
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellID, for: indexPath) as! ChatMessagesTableViewCell
         cell.setWithBlock(block: messageBlocks[indexPath.row])
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return messageBlocks.count
     }
 }
 

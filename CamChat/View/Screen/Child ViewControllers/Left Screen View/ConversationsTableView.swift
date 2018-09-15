@@ -6,8 +6,9 @@
 //  Copyright © 2018 Patrick Hanna. All rights reserved.
 //
 
-import UIKit
+import HelpKit
 import CoreData
+
 
 class ConversationsTableVC: SCTableView{
     
@@ -25,7 +26,7 @@ class ConversationsTableVC: SCTableView{
     }
     
     override func registerCells() {
-       viewModel = CoreDataListViewVM(delegate: self)
+        viewModel = CoreDataListViewVM(delegate: self, context: CoreData.mainContext)
     }
     
 
@@ -64,6 +65,7 @@ extension ConversationsTableVC: ChatViewControllerTappedCellProvider{
 }
 
 extension ConversationsTableVC: CoreDataListViewVMDelegate{
+   
     
     var fetchRequest: NSFetchRequest<User>{
         let x = User.typedFetchRequest()

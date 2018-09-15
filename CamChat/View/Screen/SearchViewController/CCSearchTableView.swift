@@ -59,10 +59,10 @@ class CCSearchTableView: UITableView, UITableViewDelegate, SearchControllerVMDel
         deselectRow(at: indexPath, animated: true)
         let object = viewModel.objects[indexPath.row]
         
-        if let user = User.getObjectWith(uniqueID: object.uniqueID){
+        if let user = User.helper(.main).getObjectWith(uniqueID: object.uniqueID){
             self.vcOwner.present(ChatViewController(presenter: vcOwner, user: user))
         } else {
-            viewModel.objects[indexPath.row].persist(){ (callback) in
+            viewModel.objects[indexPath.row].persist(usingContext: .main){ (callback) in
                 
                 switch callback{
                 case .success(let user):

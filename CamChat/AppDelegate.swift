@@ -18,6 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private var window: UIWindow?
     
     func applicationDidFinishLaunching(_ application: UIApplication) {
+        print(UIScreen.main.bounds)
         Firebase.configure()
         
         
@@ -63,7 +64,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         // Saves changes in the application's managed object context before the application terminates.
-        CoreData.saveChanges()
+        CoreData.mainContext.saveChanges()
+        
         print(#function)
     }
 

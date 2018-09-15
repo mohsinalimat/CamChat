@@ -17,24 +17,24 @@ public class Message: NSManagedObject, ManagedObjectProtocol{
         return "Message"
     }
     
-
-    @discardableResult static func createNew(text: String, dateSent: Date, uniqueID: String, sender: User, receiver: User) -> Message{
+    
+    static func createNew(usingTempMessage message: TempMessage, sender: User, receiver: User, context: CoreDataContextType, completion: ((Message) -> Void)? = nil){
         
-        let x = Message(context: CoreData.context)
-        
-        x.text = text
-        x.dateSent = dateSent
-        x.uniqueID = uniqueID
-        x.sender = sender
-        x.receiver = receiver
-        
-        sender.notifyOfMessageCreation(message: x)
-        receiver.notifyOfMessageCreation(message: x)
-        
-        CoreData.saveChanges()
-
-
-        return x
+        context.context.perform {
+            if let message = Message.helper(context).getObjectWith(uniqueID: message.uniqueID){completion?(message); return}
+            
+            let x = Message(context: context.context)
+            
+            x.text = message.text
+            x.dateSent = message.dateSent
+            x.uniqueID = message.uniqueID
+            x.sender = sender
+            x.receiver = receiver
+            
+            sender.notifyOfMessageCreation(message: x)
+            receiver.notifyOfMessageCreation(message: x)
+            completion?(x)
+        }
     }
     
     
@@ -43,8 +43,7 @@ public class Message: NSManagedObject, ManagedObjectProtocol{
     @NSManaged private(set) var uniqueID: String
     @NSManaged private(set) var sender: User
     @NSManaged private(set) var receiver: User
-    
-    
+    @NSManaged private (set) var usersToWhomThisIsTheMostRecentMessage: Set<User>
     
     var currentUserIsReceiver: Bool{
         return receiver === DataCoordinator.currentUser

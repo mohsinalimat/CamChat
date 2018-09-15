@@ -9,29 +9,33 @@
 import HelpKit
 
 
-class ChatMessagesCollectionViewCell: UICollectionViewCell{
+class ChatMessagesTableViewCell: UITableViewCell{
     
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
         setUpViews()
+        selectionStyle = .none
+        
     }
+    
+    
     
     private func setUpViews(){
         addSubview(titleLabel)
         addSubview(line)
         addSubview(stackView)
-        titleLabel.pin(anchors: [.left: contentView.leftAnchor, .top: contentView.topAnchor], constants: [.left: ChatMessagesCollectionViewCell.leftInset - 1])
-        line.pin(anchors: [.left: contentView.leftAnchor, .top: titleLabel.bottomAnchor, .height: stackView.heightAnchor], constants: [.left: ChatMessagesCollectionViewCell.leftInset, .top: topLabelBottomSpacing, .width: lineWidth])
-        stackView.pin(anchors: [.left: line.rightAnchor, .top: line.topAnchor], constants: [.left: rightLineSpacing, .width: labelWidth])
-        self.contentView.translatesAutoresizingMaskIntoConstraints = false
-        self.contentView.bottomAnchor.constraint(equalTo: line.bottomAnchor).isActive = true
-        self.contentView.pinAllSides(pinTo: self)
+        titleLabel.pin(anchors: [.left: contentView.leftAnchor, .top: contentView.topAnchor], constants: [.left: ChatMessagesTableViewCell.leftInset - 1])
+        stackView.pin(anchors: [.left: contentView.leftAnchor, .top: titleLabel.bottomAnchor], constants: [.left: ChatMessagesTableViewCell.leftInset + lineWidth + rightLineSpacing, .width: labelWidth, .top: topLabelBottomSpacing])
+        line.pin(anchors: [.left: contentView.leftAnchor, .top: stackView.topAnchor, .bottom: stackView.bottomAnchor], constants: [.left: ChatMessagesTableViewCell.leftInset, .top: topLabelBottomSpacing, .width: lineWidth])
+        
+        contentView.heightAnchor.constraint(equalTo: stackView.heightAnchor, constant: titleLabel.intrinsicContentSize.height + topLabelBottomSpacing).isActive = true
+        
+        
+        clipsToBounds = true
         
     }
     
-
-    
+   
     
     
     
@@ -44,11 +48,13 @@ class ChatMessagesCollectionViewCell: UICollectionViewCell{
     private let lineWidth: CGFloat = 5.5
     
     private var labelWidth: CGFloat {
-        return UIScreen.main.bounds.width - ChatMessagesCollectionViewCell.leftInset - lineWidth - rightLineSpacing - rightLabelInset
+        return UIScreen.main.bounds.width - ChatMessagesTableViewCell.leftInset - lineWidth - rightLineSpacing - rightLabelInset
     }
     
     
     private var currentBlock: ChatMessageBlock?
+    
+    
     
     func setWithBlock(block: ChatMessageBlock){
         self.currentBlock = block
@@ -63,17 +69,12 @@ class ChatMessagesCollectionViewCell: UICollectionViewCell{
         
     }
     
-    func setWithBlock(newBlock: ChatMessageBlock, insertingNewMessage message: Message, atIndex index: Int){
-        self.currentBlock = newBlock
-        UIView.animate(withDuration: 0.2) {
-            let label = self.getNewLabel(text: message.text)
-            self.stackView.insertArrangedSubview(label, at: index)
-        }
-    }
+
     
     
     private lazy var titleLabel: UILabel = {
-        let x = UILabel(font: SCFonts.getFont(type: .demiBold, size: 12.5))
+        let x = UILabel(text: "PATRICK JAMES HANNA", font: SCFonts.getFont(type: .demiBold, size: 12.5))
+        
         return x
     }()
     
@@ -86,11 +87,9 @@ class ChatMessagesCollectionViewCell: UICollectionViewCell{
     
     private lazy var stackView: UIStackView = {
         let x = UIStackView()
-        x.alignment = .fill
-        x.distribution = .fill
+        x.addArrangedSubview(getNewLabel(text: "yourmother"))
         x.spacing = stackViewSpacing
         x.axis = .vertical
-        
         return x
     }()
     

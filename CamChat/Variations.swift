@@ -20,10 +20,11 @@ struct Devices: OptionSet {
     static let iPhoneX = Devices(rawValue: 2)
     static let iPhone = Devices(rawValue: 4)
     static let iPhoneSE = Devices(rawValue: 8)
-    static let iPhone4 = Devices(rawValue: 32)
-
-
-
+    static let iPhone4 = Devices(rawValue: 64)
+    static let iPhoneXMax = Devices(rawValue: 128)
+    static let iPhoneXR = Devices(rawValue: 256)
+    
+    static let iPhoneWithNotch: Devices = [Devices.iPhoneXR, .iPhoneXMax, .iPhoneX]
 
     static func getFrom(size: CGSize) -> Devices{
         switch size{
@@ -33,8 +34,9 @@ struct Devices: OptionSet {
         case iPhoneSize: return .iPhone
         case iPhoneSESize: return .iPhoneSE
         case iPhone4Size: return .iPhone4
-
-
+        case iPhoneXMaxSize: return .iPhoneXMax
+        case iPhoneXRSize: return .iPhoneXR
+            
         default: fatalError("This device is not supported!!!! The initializer for the Device enum fell into the default case")
         }
     }
@@ -59,17 +61,16 @@ class Variations{
     }
     
     static var notchHeight: CGFloat{
-        switch currentDevice{
-        case .iPhoneX: return 30
-        default: return 0
-        }
+        if Devices.iPhoneWithNotch.contains(currentDevice){
+            return 30
+        } else {return 0}
+        
     }
     
     static var homeIndicatorHeight: CGFloat{
-        switch currentDevice{
-        case .iPhoneX: return 22
-        default: return 0
-        }
+        if Devices.iPhoneWithNotch.contains(currentDevice){
+            return 22
+        } else {return 0}
     }
     
     

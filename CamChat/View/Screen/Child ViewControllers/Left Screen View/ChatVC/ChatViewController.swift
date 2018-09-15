@@ -95,20 +95,14 @@ class ChatViewController: UIViewController{
 
         
         let newKeyboardFrame = notification.userInfo!["UIKeyboardFrameEndUserInfoKey"] as! CGRect
-        
         let keyboardHeightOnScreen = max(self.view.bounds.height - newKeyboardFrame.minY, 0)
         
-        
         UIView.performWithoutAnimation {
-            view.layoutIfNeeded()
-
-            additionalSafeAreaInsets.bottom = max(keyboardHeightOnScreen - APP_INSETS.bottom, 0)
-            view.layoutIfNeeded()
-            
-            
+            let height = max(keyboardHeightOnScreen, 0)
+            let inset = height + ChatMessagesTableViewCell.leftInset
+            self.collectionView.contentInset.bottom = inset
+            self.collectionView.scrollIndicatorInsets.bottom = height
         }
-        
-        
     }
     
     override func viewDidLayoutSubviews() {
@@ -132,8 +126,8 @@ class ChatViewController: UIViewController{
         return true
     }
     
-    private lazy var collectionView: ChatMessagesCollectionView = {
-        return ChatMessagesCollectionView(user: user)
+    private lazy var collectionView: ChatMessagesTableView = {
+        return ChatMessagesTableView(user: user)
     }()
     
     
@@ -187,15 +181,15 @@ extension ChatViewController: HKVCTransEventAwareParticipator{
     func prepareForPresentation() {
         tappedCell = tappedCellProvider?.cellFor(user: user)
     }
-    
-    
-    
+
     func prepareForDismissal() {
         tappedCell = tappedCellProvider?.cellFor(user: user)
     }
     
     func cleanUpAfterDismissal() {
-        user.deleteIfNotNeeded()
+        CoreData.backgroundContext.perform {
+            self.user.deleteIfNotNeeded(context: .background)
+        }
     }
 }
 

@@ -21,7 +21,7 @@ class CurrentUserInfo{
         }
     }
     
-    private var currentUserUniqueID: String?{
+    private(set) var currentUserUniqueID: String?{
         get{
             return UserDefaults.standard.string(forKey: CURRENT_USER_UNIQUE_ID)
         } set {
@@ -34,7 +34,7 @@ class CurrentUserInfo{
     var currentUser: User?{
         if userIsLoggedIn.isFalse{return nil}
         if let user = _cachedCurrentUser{return user}
-        if let userID = currentUserUniqueID, let user = User.getObjectWith(uniqueID: userID){
+        if let userID = currentUserUniqueID, let user = User.helper(.main).getObjectWith(uniqueID: userID){
             _cachedCurrentUser = user
             return user
         } else {fatalError()}

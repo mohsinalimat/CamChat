@@ -27,6 +27,8 @@ class TempUser {
         if let image = profilePicture{
             self.profilePicture = image
             TempUser.imageCache.set(value: image, forKey: uniqueID)
+        } else if let image = TempUser.imageCache.valueFor(key: uniqueID){
+            self.profilePicture = image
         }
         
     }
@@ -63,38 +65,22 @@ class TempUser {
         
     }
     
-    private static var currentPersistQueries = [String: [(User) -> Void]]()
     
     
     
     /// Attempts to save the receiver as a Core Data object.
-    func persist(_ completion: ((HKCompletionResult<User>) -> Void)?){
-        
-        if User.hasStoredObjectWith(uniqueID: uniqueID){
-            completion?(.success(User.getObjectWith(uniqueID: uniqueID)!))
-        }
+    func persist(usingContext context: CoreDataContextType, _ completion: ((HKCompletionResult<User>) -> Void)?){
         
         
-        // Ensures that if 2 callers are trying to persist a User at the same time, only one User object is created and the two completion handlers are called using that one User object.
-        if var queries = TempUser.currentPersistQueries[uniqueID]{
-            queries.append({completion?(.success($0))})
-            TempUser.currentPersistQueries[uniqueID] = queries
-            return
-        } else {
-            TempUser.currentPersistQueries[uniqueID] = [{completion?(.success($0))}]
-        }
-        
-        
-        
-        
+
         setProfileImage { (callBack) in
 
             switch callBack{
-            case .success(let args):
-                
-                let user = User.createNew(lastName: self.lastName, firstName: self.firstName, username: self.username, email: self.email, profilePicture: args.image, uniqueID: self.uniqueID)
-                TempUser.currentPersistQueries[self.uniqueID]!.forEach{$0(user)}
-                TempUser.currentPersistQueries[self.uniqueID] = nil
+            case .success:
+                if self.profilePicture == nil{fatalError()}
+                User.createNew(fromTempUser: self, context: context, completion: { (user) in
+                    completion?(.success(user))
+                })
             case .failure(let error):
                 completion?(.failure(error))
             }

@@ -211,7 +211,6 @@ extension SettingsViewController: UIScrollViewDelegate{
     
     @objc private func respondToGesture(gesture: UIPanGestureRecognizer){
         if gesture.state == .ended{
-            print("received gesture ended function call")
             scrollView.isScrollEnabled = true
             shouldCheckForDisablingScroll = (false, nil)
         }

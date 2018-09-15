@@ -15,55 +15,109 @@ protocol ManagedObjectProtocol {
     var uniqueID:String {get}
 }
 
+
+class StaticManagedObjectHelper<ObjectType: ManagedObjectProtocol & NSManagedObject>{
+    
+    
+    
+    private let context: NSManagedObjectContext
+
+    
+    
+    init(context: CoreDataContextType){
+        self.context = context.context
+    }
+    
+    
+    func hasStoredObjectWith(uniqueID: String) -> Bool{
+        let request = ObjectType.typedFetchRequest()
+        request.predicate = NSPredicate(format: "uniqueID == %@", uniqueID)
+        request.fetchLimit = 1
+        var count = 0
+        handleErrorWithPrintStatement {
+            count = try context.count(for: request)
+        }
+        return count > 0
+    }
+    
+    func getObjectWith(uniqueID: String) -> ObjectType?{
+        if hasStoredObjectWith(uniqueID: uniqueID).isFalse{return nil}
+        let fetchRequest = ObjectType.typedFetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "uniqueID == %@", uniqueID)
+        fetchRequest.fetchLimit = 1
+        fetchRequest.returnsObjectsAsFaults = false
+        
+        var objectToReturn: ObjectType?
+        handleErrorWithPrintStatement {
+            objectToReturn = try context.fetch(fetchRequest).first
+        }
+        return objectToReturn
+    }
+    
+    
+    
+    func deleteAllObjects(){
+        handleErrorWithPrintStatement {
+            let request = NSBatchDeleteRequest(fetchRequest: ObjectType.fetchRequest())
+            try context.execute(request)
+        }
+    }
+    
+    func fetchAll(sortedUsing sortDescriptors: [NSSortDescriptor]? = nil) -> [ObjectType]{
+        var array = [ObjectType]()
+        handleErrorWithPrintStatement {
+            let request = ObjectType.typedFetchRequest()
+            request.sortDescriptors = sortDescriptors
+            array = try context.fetch(request)
+        }
+        return array
+    }
+    
+}
+
+class ManagedObjectInstanceHelper{
+    
+    typealias ObjectType = NSManagedObject & ManagedObjectProtocol
+    
+    private let context: NSManagedObjectContext
+    private let object: ObjectType
+    
+    init(context: CoreDataContextType, managedObject: ObjectType){
+        self.context = context.context
+        self.object = managedObject
+    }
+    
+    func delete(){
+        context.delete(object)
+        
+    }
+    
+}
+
+
+
+
 extension ManagedObjectProtocol where Self: NSManagedObject{
     
     
-    func delete(){
-        CoreData.context.delete(self)
-        CoreData.saveChanges()
-    }
     
-    static func deleteAllObjects(){
-        handleErrorWithPrintStatement {
-            let request = NSBatchDeleteRequest(fetchRequest: fetchRequest())
-            try CoreData.context.execute(request)
-            CoreData.saveChanges()
-        }
-    }
+    
+    
 
     static func typedFetchRequest() -> NSFetchRequest<Self> {
         return NSFetchRequest<Self>(entityName: entityName)
     }
     
-    static func fetchAll(sortedUsing sortDescriptors: [NSSortDescriptor]? = nil) -> [Self]{
-        var array = [Self]()
-        handleErrorWithPrintStatement {
-            let request = typedFetchRequest()
-            request.sortDescriptors = sortDescriptors
-            array = try CoreData.context.fetch(request)
-        }
-        return array
+    func helper(_ context: CoreDataContextType) -> ManagedObjectInstanceHelper{
+        return ManagedObjectInstanceHelper(context: context, managedObject: self)
     }
     
-    static func hasStoredObjectWith(uniqueID: String) -> Bool{
-        let request = typedFetchRequest()
-        request.predicate = NSPredicate(format: "uniqueID == %@", uniqueID)
-        var count = 0
-        handleErrorWithPrintStatement {
-            count = try CoreData.context.count(for: request)
-        }
-        return count > 0
+    static func helper(_ context: CoreDataContextType) -> StaticManagedObjectHelper<Self>{
+        return StaticManagedObjectHelper(context: context)
     }
     
-    static func getObjectWith(uniqueID: String) -> Self?{
-        let fetchRequest = typedFetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "uniqueID == %@", uniqueID)
-        var objectToReturn: Self?
-        handleErrorWithPrintStatement {
-            objectToReturn = try CoreData.context.fetch(fetchRequest).first
-        }
-        return objectToReturn
-    }
+    
+    
     
     
 }
@@ -71,6 +125,35 @@ extension ManagedObjectProtocol where Self: NSManagedObject{
 
 
 
+
+enum CoreDataContextType{
+    case main, background
+    
+    var context: NSManagedObjectContext{
+        switch self{
+        case .main: return CoreData.mainContext
+        case .background: return CoreData.backgroundContext
+        }
+    }
+}
+
+extension NSManagedObjectContext{
+    /// Calls save() if needed, and crashes app if an error is thrown.
+    func saveChanges(){
+        if hasChanges {
+            perform {
+                do {
+                    try self.save()
+                } catch {
+                    let nserror = error as NSError
+                    print(nserror.userInfo)
+                    fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+                }
+                
+            }
+        }
+    }
+}
 
 
 
@@ -85,24 +168,34 @@ class CoreData{
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
+        container.viewContext.mergePolicy = NSOverwriteMergePolicy
         return container
     }()
     
-    static var context: NSManagedObjectContext{
+    static var mainContext: NSManagedObjectContext{
         return persistentContainer.viewContext
     }
     
+    static var backgroundContext: NSManagedObjectContext{
+        return _backgroundContext
+    }
     
-    static func saveChanges() {
-        if context.hasChanges {
-            do {
-                try context.save()
-            } catch {
-                let nserror = error as NSError
-                print(nserror.userInfo)
-                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-            }
+    private static var _backgroundContext: NSManagedObjectContext = {
+        let x = persistentContainer.newBackgroundContext(thatSyncsWith: mainContext)
+        x.mergePolicy = NSOverwriteMergePolicy
+        return x
+    }()
+    
+    static func performAndSaveChanges(context: CoreDataContextType, action: @escaping () -> Void){
+        context.context.perform {
+            action()
+            saveChangesOn(context: context)
         }
+    }
+    
+    
+    static func saveChangesOn(context: CoreDataContextType) {
+       context.context.saveChanges()
     }
 }
 

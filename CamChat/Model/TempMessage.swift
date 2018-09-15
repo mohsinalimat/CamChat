@@ -19,30 +19,34 @@ struct TempMessage{
     var receiverID: String
     
     var chatPartnerID: String?{
-        guard let currentUserID = DataCoordinator.currentUser?.uniqueID else {return nil}
+        guard let currentUserID = DataCoordinator.currentUserUniqueID else {return nil}
         if senderID == currentUserID{return receiverID}
         if receiverID == currentUserID{return senderID}
         else {return nil}
     }
     
-    @discardableResult func persist(sender: User? = nil, receiver: User? = nil) -> Message?{
-        
-        let _sender: User
-        if let sender = sender{_sender = sender}
-        else {
-            if let sender = User.getObjectWith(uniqueID: senderID){_sender = sender}
-            else {return nil}
+    func persist(sender: User? = nil, receiver: User? = nil, context: CoreDataContextType, completion: ((Message?) -> Void)? = nil){
+        context.context.perform {
+            let _sender: User
+            if let sender = sender{_sender = sender}
+            else {
+                if let sender = User.helper(context).getObjectWith(uniqueID: self.senderID){_sender = sender}
+                else {completion?(nil); return}
+            }
+            
+            let _receiver: User
+            if let receiver = receiver{_receiver = receiver}
+            else {
+                if let receiver = User.helper(context).getObjectWith(uniqueID: self.receiverID){_receiver = receiver}
+                else {completion?(nil); return}
+            }
+            
+            Message.createNew(usingTempMessage: self, sender: _sender, receiver: _receiver, context: context, completion: { (message) in
+                completion?(message)
+            })
+            
         }
         
-        let _receiver: User
-        if let receiver = receiver{_receiver = receiver}
-        else {
-            if let receiver = User.getObjectWith(uniqueID: receiverID){_receiver = receiver}
-            else {return nil}
-        }
-        
-        
-        return Message.createNew(text: text, dateSent: dateSent, uniqueID: uniqueID, sender: _sender, receiver: _receiver)
     }
     
 }

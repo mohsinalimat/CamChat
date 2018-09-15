@@ -28,7 +28,7 @@ class PhotoOptionsVC: UIViewController{
         super.viewDidLoad()
         
         let labelsPadding: CGFloat = 15
-        let topPadding = !Variations.currentDevice(is: .iPhoneX) ? labelsPadding : 0
+        let topPadding = !Variations.currentDevice(is: .iPhoneWithNotch) ? labelsPadding : 0
         let labelsHeight = labelStackView.spacing + topLabel.intrinsicContentSize.height + bottomLabel.intrinsicContentSize.height
         labelsLayoutGuide.pin(addTo: view, anchors: [.left: view.leftAnchor, .top: view.safeAreaLayoutGuide.topAnchor, .right: view.rightAnchor], constants: [.left: labelsPadding, .top: topPadding, .right: labelsPadding, .height: labelsHeight])
         
