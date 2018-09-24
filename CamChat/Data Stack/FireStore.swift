@@ -27,9 +27,13 @@ private struct UserKeys{
     static var email = "email"
     static var username = "username"
     
-    static var chatPartnerID = "chatPartnerID"
-    static var messagesCollection = "Messages"
-    static var messageID = "messageID"
+    struct MessageKeys{
+        static var chatPartnerID = "chatPartnerID"
+        static var messagesCollection = "Messages"
+        static var messageID = "messageID"
+        static var wasSeen = "wasSeen"
+    }
+    
 }
 
 private struct MessageKeys{
@@ -39,6 +43,7 @@ private struct MessageKeys{
     static var receiverID = "receiverID"
     static var dateSent = "dateSent"
     static var text = "text"
+    static var wasSeen = "wasSeen"
 }
 
 
@@ -62,7 +67,7 @@ class FirebaseManager{
     }
     
     func messagesCollectionForUserWith(userID: String) -> CollectionReference{
-        return usersCollection.document(userID).collection(UserKeys.messagesCollection)
+        return usersCollection.document(userID).collection(UserKeys.MessageKeys.messagesCollection)
     }
     
     
@@ -170,12 +175,12 @@ class FirebaseManager{
     
     
     func getAllUsers(completion: @escaping(HKCompletionResult<[TempUser]>) -> Void){
-        guard let currentUser = DataCoordinator.currentUser else {fatalError("There must be a current user for this function to work!")}
+        guard let currentUserID = DataCoordinator.currentUserUniqueID else {fatalError("There must be a current user for this function to work!")}
         usersCollection.order(by: UserKeys.firstName).getDocuments(completion: { (snapshot, error) in
             if let snapshot = snapshot{
                 
                 let users = snapshot.documents.map{self.parseUserDocumentInfo(from: $0.data())!}
-                let results = users.filter({$0.uniqueID != currentUser.uniqueID})
+                let results = users.filter({$0.uniqueID != currentUserID})
                 
                 completion(.success(results))
             } else {completion(.failure(error ?? HKError.unknownError))}
@@ -190,10 +195,11 @@ class FirebaseManager{
         
         let dict: [String: Any] = [
             MessageKeys.uniqueID: message.uniqueID,
-            MessageKeys.dateSent: message.dateSent,
+            MessageKeys.dateSent: FieldValue.serverTimestamp(),
             MessageKeys.receiverID: message.receiverID,
             MessageKeys.senderID: message.senderID,
-            MessageKeys.text: message.text
+            MessageKeys.text: message.text,
+            MessageKeys.wasSeen: message.wasSeenByReceiver
         ]
         
         let writeBatch = Firebase.firestore.batch()
@@ -206,18 +212,20 @@ class FirebaseManager{
         // Updating the current user's personal messages Collection
         
         let currentUserMessageDoc = self.messagesCollectionForUserWith(userID: currentUser.uniqueID).document(message.uniqueID)
-        let currentUserData = [
-            UserKeys.messageID: message.uniqueID,
-            UserKeys.chatPartnerID: message.chatPartnerID!
+        let currentUserData: [String: Any] = [
+            UserKeys.MessageKeys.messageID: message.uniqueID,
+            UserKeys.MessageKeys.chatPartnerID: message.chatPartnerID!,
+            UserKeys.MessageKeys.wasSeen: message.wasSeenByReceiver
         ]
         writeBatch.setData(currentUserData, forDocument: currentUserMessageDoc)
         
         // Updating the chatPartner's personal messages Collection
         
         let chatPartnerMessageDoc = messagesCollectionForUserWith(userID: message.chatPartnerID!).document(message.uniqueID)
-        let chatPartnerData = [
-            UserKeys.messageID: message.uniqueID,
-            UserKeys.chatPartnerID: DataCoordinator.currentUser!.uniqueID
+        let chatPartnerData: [String: Any] = [
+            UserKeys.MessageKeys.messageID: message.uniqueID,
+            UserKeys.MessageKeys.chatPartnerID: DataCoordinator.currentUser!.uniqueID,
+            UserKeys.MessageKeys.wasSeen: message.wasSeenByReceiver
         ]
         writeBatch.setData(chatPartnerData, forDocument: chatPartnerMessageDoc)
         writeBatch.commit()
@@ -225,16 +233,24 @@ class FirebaseManager{
     
     
     
+    /// WARNING: IF YOU EVER ENABLE CHAT DELETION, THIS FUNCTION WILL INTERFERE WITH THAT!!! FIX IT!!
+    func markMessageAsSeen(message: TempMessage){
+        messagesCollection.document(message.uniqueID).setData([MessageKeys.wasSeen: true], merge: true)
+        for id in [message.senderID, message.receiverID]{
+            messagesCollectionForUserWith(userID: id).document(message.uniqueID).setData([UserKeys.MessageKeys.wasSeen: true], merge: true)
+        }
+    }
     
     
     
     
-    @discardableResult func observeMessagesForUser(userID: String, action: @escaping (HKCompletionResult<[TempMessage]>) -> Void) -> ListenerRegistration{
+    
+    @discardableResult func observeMessagesForUser(userID: String, action: @escaping (HKCompletionResult<Set<TempMessage>>) -> Void) -> ListenerRegistration{
         
-        return messagesCollectionForUserWith(userID: userID).addSnapshotListener {[weak self] (snapshot, error) in
+        return messagesCollectionForUserWith(userID: userID).addSnapshotListener(includeMetadataChanges: true) {[weak self] (snapshot, error) in
             guard let self = self else { return }
-            if let snapshot = snapshot{
-                var messages = [TempMessage](){
+            if let snapshot = snapshot {
+                var messages = Set<TempMessage>(){
                     didSet{
                         if messages.count >= snapshot.documentChanges.count
                         { action(.success(messages)) }
@@ -242,18 +258,19 @@ class FirebaseManager{
                 }
                 
                 
-                for change in snapshot.documentChanges{
-                    let messageID = change.document.data()[UserKeys.messageID] as! String
+                for change in snapshot.documentChanges(includeMetadataChanges: true){
+                    
+                    let messageID = change.document.documentID
+                    
                     self.getMessageFor(messageID: messageID, completion: { (callback) in
                         switch callback{
-                        case .success(let message): messages.append(message)
+                        case .success(let message):
+                            messages.insert(message)
                         case .failure: return
                         }
                     })
                 }
             } else { action(.failure(error ?? HKError.unknownError ))}
-            
-            
         }
     }
     
@@ -262,16 +279,18 @@ class FirebaseManager{
     private func getMessageFor(messageID: String, completion: @escaping (HKCompletionResult<TempMessage>) -> Void){
         
         messagesCollection.document(messageID).getDocument { (snapshot, error) in
-                if let snapshot = snapshot{
-                    let dict = snapshot.data()!
+                if let snapshot = snapshot {
+                    let dict = snapshot.data(with: ServerTimestampBehavior.estimate)!
                     
                     let receiver = dict[MessageKeys.receiverID] as! String
                     let sender = dict[MessageKeys.senderID] as! String
                     let uniqueID = dict[MessageKeys.uniqueID] as! String
                     let date = (dict[MessageKeys.dateSent] as! Timestamp).dateValue()
                     let text = dict[MessageKeys.text] as! String
+                    let wasSeen = dict[MessageKeys.wasSeen] as! Bool
                     
-                    let message = TempMessage(text: text, dateSent: date, uniqueID: uniqueID, senderID: sender, receiverID: receiver)
+                    let isOnServer = snapshot.metadata.isFromCache.isFalse
+                    let message = TempMessage(text: text, dateSent: date, uniqueID: uniqueID, senderID: sender, receiverID: receiver, wasSeenByReceiver: wasSeen, isOnServer: isOnServer)
                     
                     completion(.success(message))
                 } else { completion(.failure(error ?? HKError.unknownError)) }
@@ -280,38 +299,6 @@ class FirebaseManager{
         
         
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    /// Deletes all user database entries, and user profile pictures from firebase.
-    func cleanOutEntireDatabase(){
-        let writeBatch = firestore.batch()
-        
-        usersCollection.getDocuments { (snapshot, error) in
-            if let snapshot = snapshot{
-                for item in snapshot.documents{
-                    let uniqueID = item.data()[UserKeys.uniqueID]! as! String
-                    self.messagesCollectionForUserWith(userID: uniqueID).delete(writeBatch: writeBatch)
-                    self.profilePicturesFolder.child(uniqueID).delete(completion: nil)
-                    writeBatch.deleteDocument(self.usersCollection.document(uniqueID))
-                }
-            }
-        }
-        writeBatch.commit()
-    }
-    
-    
-    
-    
-    
-    
-    
 }
 
 

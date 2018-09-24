@@ -22,9 +22,9 @@ struct Devices: OptionSet {
     static let iPhoneSE = Devices(rawValue: 8)
     static let iPhone4 = Devices(rawValue: 64)
     static let iPhoneXMax = Devices(rawValue: 128)
-    static let iPhoneXR = Devices(rawValue: 256)
     
-    static let iPhoneWithNotch: Devices = [Devices.iPhoneXR, .iPhoneXMax, .iPhoneX]
+    
+    static let iPhoneWithNotch: Devices = [.iPhoneXMax, .iPhoneX]
 
     static func getFrom(size: CGSize) -> Devices{
         switch size{
@@ -35,7 +35,6 @@ struct Devices: OptionSet {
         case iPhoneSESize: return .iPhoneSE
         case iPhone4Size: return .iPhone4
         case iPhoneXMaxSize: return .iPhoneXMax
-        case iPhoneXRSize: return .iPhoneXR
             
         default: fatalError("This device is not supported!!!! The initializer for the Device enum fell into the default case")
         }
@@ -45,7 +44,9 @@ struct Devices: OptionSet {
 
 class Variations{
 
-    private static var currentDevice = Devices.getFrom(size: UIScreen.main.bounds.size)
+    private static var currentDevice: Devices{
+      return Devices.getFrom(size: UIScreen.main.bounds.size)
+    }
 
     
     static func doOn(_ devices: Devices, action: () -> Void){

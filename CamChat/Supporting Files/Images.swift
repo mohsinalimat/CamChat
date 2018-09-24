@@ -47,10 +47,13 @@ struct AssetImages{
     static var threeDotMoreIcon = getIcon("moreIcon")
     static var snapCode = getPhoto("snapcode")
     
+    static var emptyTinyMessageIcon = getIcon("emptyTinyMessageIcon")
+    static var fullTinyMessageIcon = getIcon("tinyMessageIcon")
     
-    static var tinyMessageIcon = getIcon("tinyMessageIcon")
-    static var tinySentIcon = getIcon("tinySentIcon")
+    static var emptyTinySendButton = getIcon("emptyTinySendButton")
+    static var fullTinySentIcon = getIcon("tinySentIcon")
     
+    static var errorIcon = getIcon("errorIcon")
     
     static var accountUser = getIcon("accountUser")
     static var notification = getIcon("notification")

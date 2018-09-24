@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14315.12.1" systemVersion="18A371a" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14315.18" systemVersion="18A371a" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Message" representedClassName="Message" syncable="YES">
         <attribute name="dateSent" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="isOnServer" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="text" attributeType="String" syncable="YES"/>
         <attribute name="uniqueID" attributeType="String" spotlightIndexingEnabled="YES" syncable="YES"/>
+        <attribute name="wasSeenByReceiver" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="receiver" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="receivedMessages" inverseEntity="User" syncable="YES"/>
         <relationship name="sender" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="sentMessages" inverseEntity="User" syncable="YES"/>
         <relationship name="usersToWhomThisIsTheMostRecentMessage" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="User" inverseName="mostRecentMessage" inverseEntity="User" syncable="YES"/>
@@ -20,7 +22,7 @@
         <relationship name="sentMessages" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Message" inverseName="sender" inverseEntity="Message" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Message" positionX="-404.66796875" positionY="-392.87890625" width="312.20703125" height="133"/>
+        <element name="Message" positionX="-404.66796875" positionY="-392.87890625" width="312.20703125" height="163"/>
         <element name="User" positionX="-644.1796875" positionY="-251.67578125" width="175.25390625" height="178"/>
     </elements>
 </model>

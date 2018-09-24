@@ -23,7 +23,6 @@ class CCSearchBar: UIView{
         super.init(frame: CGRect.zero)
         setUpViews()
         addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(respondToTap)))
-        
     }
     
     
@@ -33,9 +32,7 @@ class CCSearchBar: UIView{
         addSubview(secondaryLabel)
         addSubview(searchTextLabel)
         
-        
         searchIcon.pin(anchors: [.left: leftAnchor, .centerY: centerYAnchor], constants: [.width: CCSearchConstants.searchIconSize.width, .height: CCSearchConstants.searchIconSize.height, .left: CCSearchConstants.searchIconLeftPadding])
-        
         
         searchTextLabel.pin(anchors: [.left: searchIcon.rightAnchor, .centerY: centerYAnchor], constants: [.width: 200, .left: CCSearchConstants.searchIconRightPadding])
         
@@ -61,9 +58,9 @@ class CCSearchBar: UIView{
         searchTextLabel.alpha = searchLabelAlphaEquation.solve(for: gradient)
         secondaryLabel.alpha = secondaryLabelAlphaEquation.solve(for: gradient)
         
-        if gradient < 0{
+        if gradient < 0 {
             secondaryLabel.text = leftText
-        } else if gradient > 0{
+        } else if gradient > 0 {
             switch direction{
             case .horizontal:secondaryLabel.text = rightText
             case .vertical: secondaryLabel.text = bottomText

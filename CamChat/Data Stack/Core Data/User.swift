@@ -7,7 +7,6 @@
 //
 
 import HelpKit
-import CoreData
 
 
 fileprivate extension UIImage{
@@ -26,6 +25,7 @@ public class User: NSManagedObject, ManagedObjectProtocol{
     var isCurrentUser: Bool{
         return self.uniqueID == DataCoordinator.currentUserUniqueID
     }
+    
     
     
     static func createNew(fromTempUser user: TempUser, context: CoreDataContextType, completion: ((User) -> Void)? = nil){
@@ -57,49 +57,59 @@ public class User: NSManagedObject, ManagedObjectProtocol{
     @NSManaged private(set) var uniqueID: String
     @NSManaged private(set) var mostRecentMessage: Message?
 
-    @NSManaged private var receivedMessages: Set<Message>
-    @NSManaged private var sentMessages: Set<Message>
+    @NSManaged private(set) var receivedMessages: Set<Message>
+    @NSManaged private(set) var sentMessages: Set<Message>
     
     var messages: Set<Message>{
         return receivedMessages.union(sentMessages)
     }
-
+    
+    
+    /// This represents the user who's received messages will automtically be seened when received. (Due to their chat currently being open.)
+    private static var currentUserIDForSeening: String?
+    
+    
+    func startSeeningAllSentMessages(){
+        User.currentUserIDForSeening = self.uniqueID
+        managedObjectContext!.perform {
+            self.sentMessages.forEach{$0.markAsSeenIfNeeded()}
+            self.managedObjectContext!.saveChanges()
+        }
+    }
+    
+    func stopSeeningAllSentMessages(){
+        User.currentUserIDForSeening = nil
+    }
+    
     
     func notifyOfMessageCreation(message: Message){
-        
-        managedObjectContext!.perform {
-            if (message.sender === self || message.receiver === self).isFalse{return}
-            if let mostRecent = self.mostRecentMessage {
-                if message.dateSent > mostRecent.dateSent{ self.mostRecentMessage = message }
-            } else { self.mostRecentMessage = message }
+        self.mostRecentMessage = self.getMostRecentMessage()
+        if self.uniqueID == User.currentUserIDForSeening && message.sender == self {
+            message.markAsSeenIfNeeded()
         }
     }
     
     func notifyOfMessageDeletion(message: Message){
         managedObjectContext!.perform {
-            let request = Message.typedFetchRequest()
-            request.predicate = NSPredicate(format: "\(#keyPath(Message.sender.uniqueID))  == %@ OR \(#keyPath(Message.receiver.uniqueID)) == %@", self.uniqueID, self.uniqueID)
-            request.sortDescriptors = [NSSortDescriptor(key: #keyPath(Message.dateSent), ascending: false)]
-            request.fetchLimit = 1
-            
-            do{
-                if let message = try self.managedObjectContext!.fetch(request).first{
-                    self.mostRecentMessage = message
-                } else {self.mostRecentMessage = nil}
-            } catch { fatalError() }
-            
+            self.mostRecentMessage = self.getMostRecentMessage()
         }
         
     }
     
-    /// Deletes the receiver permenantly if it has no messages associated with it.
-    func deleteIfNotNeeded(context: CoreDataContextType){
-        context.context.perform {
-            if self.messages.isEmpty{ self.helper(context).delete() }
-            context.context.saveChanges()
-        }
+    
+    private func getMostRecentMessage() -> Message? {
+        let request = Message.typedFetchRequest()
+        request.predicate = NSPredicate(format: "\(#keyPath(Message.sender.uniqueID))  == %@ OR \(#keyPath(Message.receiver.uniqueID)) == %@", self.uniqueID, self.uniqueID)
+        request.sortDescriptors = [NSSortDescriptor(key: #keyPath(Message.dateSent), ascending: false)]
+        request.fetchLimit = 1
         
+        var messageToReturn: Message?
+        do{ messageToReturn = try self.context.fetch(request).first }
+        catch { fatalError() }
+        
+        return messageToReturn
     }
+   
     
     
     var profilePicture: UIImage {

@@ -29,6 +29,7 @@ class CCAlertController: UIViewController{
     func addPrimaryButtonAction(_ action: @escaping () -> Void){
         alertView.primaryButon.addAction(action)
     }
+    
     func addSecondaryButtonAction(_ action: @escaping () -> Void){
         alertView.secondaryButton.addTarget(self, action: #selector(respondToSecondaryButtonPressed), for: .touchUpInside)
         secondaryButtonActions.append(action)

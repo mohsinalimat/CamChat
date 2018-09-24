@@ -30,7 +30,6 @@ class CCSearchTableViewCell: UITableViewCell{
         customImageView.pinAllSides(addTo: self, pinTo: placeHolderImageView, insets: UIEdgeInsets(allInsets: -1))
         
         labelStackView.pin(addTo: self, anchors: [.left: customImageView.rightAnchor, .centerY: centerYAnchor], constants: [.left: imageViewPadding])
-        
     }
     
     func showLine(){

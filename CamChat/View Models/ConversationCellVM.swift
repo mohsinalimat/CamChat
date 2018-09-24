@@ -9,26 +9,72 @@
 import HelpKit
 
 
-struct ConversationCellVM{
+class ConversationCellVM {
     
-    func getSubtitleInfoFor(user: User) -> (topText: String, bottomText: String, icon: UIImage){
+    enum BottomInfoType{
+        case `default`(image: UIImage, text: String)
+        case sending
+        case failed
+    }
+    
+    
+    private var user: User?
+    
+    func setWith(user: User){
+        self.user = user
+    }
+    
+    func getSubtitleInfo() -> (topText: String, bottomInfo: BottomInfoType)?{
+        guard let user = user, let recentMessage = user.mostRecentMessage else {return nil}
         
         let topText = user.fullName
-        var bottomText: String
+        
+        if let dateSent = DataCoordinator.localDateSentForUnsyncedMessageWith(messageID: recentMessage.uniqueID){
+            if -dateSent.timeIntervalSinceNow < 20 {return (topText, .sending)}
+            else { return (topText, .failed) }
+        } else if recentMessage.isOnServer.isFalse {
+            return (topText, .failed)
+        } else  {
+            let info = getInfoForDefaultCase()
+            
+            return (topText, .default(image: info.image, text: info.text))
+        }
+    }
+    
+    private func getInfoForDefaultCase() -> (image: UIImage, text: String){
+        guard let recentMessage = user?.mostRecentMessage else {fatalError()}
+        
+        
+        var text: String
         let icon: UIImage
         
-        if user.mostRecentMessage!.currentUserIsReceiver{
-            bottomText = "Received"
-            icon = AssetImages.tinyMessageIcon
-        } else if user.mostRecentMessage!.currentUserIsSender{
-            bottomText = "Sent"
-            icon = AssetImages.tinySentIcon
+        
+        if recentMessage.currentUserIsReceiver{
+            
+            if recentMessage.wasSeenByReceiver{
+                text = "Received"
+                icon = AssetImages.emptyTinyMessageIcon
+            } else {
+                text = "New Chat"
+                icon = AssetImages.fullTinyMessageIcon
+            }
+        }  else if recentMessage.currentUserIsSender{
+            
+            if recentMessage.wasSeenByReceiver{
+                text = "Opened"
+                icon = AssetImages.emptyTinySendButton
+            } else {
+                text = "Sent"
+                icon = AssetImages.fullTinySentIcon
+            }
         } else { fatalError() }
         
-        bottomText = bottomText + " · " + getTimeStringFor(date: user.mostRecentMessage!.dateSent)
-        return (topText, bottomText, icon)
+        text = text + " · " + getTimeStringFor(date: recentMessage.dateSent)
         
+        return (icon, text)
     }
+    
+  
     
     private func getTimeStringFor(date: Date) -> String{
         let seconds = -date.timeIntervalSinceNow

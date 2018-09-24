@@ -84,8 +84,6 @@ class UserSignUpProgressionInfo {
             return (firstname, lastname, username, email, password, image)
         } else { return nil }
     }
-    
-    
 }
 
 struct LoginInfo{

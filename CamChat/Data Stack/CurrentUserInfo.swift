@@ -14,19 +14,13 @@ class CurrentUserInfo{
     private let CURRENT_USER_UNIQUE_ID = "CURRENT USER UNIQUE ID"
     
     private(set) var userIsLoggedIn: Bool{
-        get{
-            return UserDefaults.standard.bool(forKey: IS_USER_LOGGED_IN_KEY)
-        } set {
-            UserDefaults.standard.setValue(newValue, forKey: IS_USER_LOGGED_IN_KEY)
-        }
+        get { return UserDefaults.standard.bool(forKey: IS_USER_LOGGED_IN_KEY) }
+        set { UserDefaultsStandard[IS_USER_LOGGED_IN_KEY] = newValue }
     }
     
     private(set) var currentUserUniqueID: String?{
-        get{
-            return UserDefaults.standard.string(forKey: CURRENT_USER_UNIQUE_ID)
-        } set {
-            UserDefaults.standard.setValue(newValue, forKey: CURRENT_USER_UNIQUE_ID)
-        }
+        get { return UserDefaults.standard.string(forKey: CURRENT_USER_UNIQUE_ID) }
+        set { UserDefaultsStandard[CURRENT_USER_UNIQUE_ID] = newValue }
     }
     
     private var _cachedCurrentUser: User?

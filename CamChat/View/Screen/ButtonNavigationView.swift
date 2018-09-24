@@ -190,7 +190,7 @@ class ButtonNavigationView: UIView{
     }()
     
     private lazy var cameraButton: SCNavigationButton = {
-        let x = CameraCaptureButton()
+        let x = NavigationCameraCaptureButton()
         x.translatesAutoresizingMaskIntoConstraints = false
         return x
     }()
@@ -240,17 +240,18 @@ class ButtonNavigationView: UIView{
 
 
 
-fileprivate class CameraCaptureButton: SCNavigationButton{
+fileprivate class NavigationCameraCaptureButton: SCNavigationButton{
     
     init(){
         super.init(type: .cameraCapture)
-        layer.addSublayer(circleLayer)
+        
+        cameraCaptureButton.pinAllSides(addTo: self, pinTo: self)
     }
     private let circleLayer = CAShapeLayer()
     
     override func tintColorDidChange() {
         super.tintColorDidChange()
-        circleLayer.strokeColor = tintColor.cgColor
+        cameraCaptureButton.changeRingTintColor(to: tintColor)
     }
     
     override var iconBacking: UIView{
@@ -265,19 +266,17 @@ fileprivate class CameraCaptureButton: SCNavigationButton{
     }()
     
     
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        self.backgroundColor = .clear
-        
-        circleLayer.frame = self.bounds
-        let radius = (self.frame.width / 2) - 3
-        let path = UIBezierPath(arcCenter: self.centerInBounds, radius: radius, startAngle: 0, endAngle: 2 * CGFloat.pi, clockwise: true)
-        circleLayer.path = path.cgPath
-        circleLayer.fillColor = UIColor.clear.cgColor
-        circleLayer.lineWidth = 6
-        circleLayer.strokeColor = UIColor.white.cgColor
-    }
+    private lazy var cameraCaptureButton: CameraCaptureButton = {
+        let x = CameraCaptureButton()
+        return x
+    }()
     
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let converted = cameraCaptureButton.convert(point, from: self)
+        if let view = cameraCaptureButton.hitTest(converted, with: event){
+            return view
+        } else {return super.hitTest(point, with: event)}
+    }
     
     
     required init?(coder aDecoder: NSCoder) {

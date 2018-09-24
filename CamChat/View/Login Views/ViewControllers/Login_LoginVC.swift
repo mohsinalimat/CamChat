@@ -57,6 +57,7 @@ class Login_LoginVC: LoginFormVCTemplate{
         form.topTextField.setDescriptionText(to: "email")
         form.bottomTextField.setDescriptionText(to: "password")
         form.titleLabel.text = "Log In"
+        
         form.bottomDescriptionLabel.text = "Forgot password?"
         form.bottomDescriptionLabel.textAlignment = .center
         form.bottomDescriptionLabel.textColor = BLUECOLOR

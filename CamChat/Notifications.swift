@@ -12,3 +12,12 @@ import HelpKit
 
 let UserLoggedInNotification = HKNotification<User>()
 let UserLoggedOutNotification = HKNotification<Void>()
+
+
+/// The wasSeenLocally parameter is false if the seen originated from an update from the network, and true, if the message was locally seen and has yet to be synced with the network.
+let MessageWasSeenNotification = HKNotification<(message: TempMessage, wasSeenLocally: Bool)>()
+let MessageWasSentNotification = HKNotification<TempMessage>()
+
+
+
+

@@ -7,7 +7,6 @@
 //
 
 import HelpKit
-import CoreData
 
 class BouncyButton: HKButtonTemplate{
     
@@ -24,6 +23,8 @@ class BouncyButton: HKButtonTemplate{
             return CGRect(center: self!.centerInBounds, width: height, height: width)
         }
     }
+    
+    
     
     
     

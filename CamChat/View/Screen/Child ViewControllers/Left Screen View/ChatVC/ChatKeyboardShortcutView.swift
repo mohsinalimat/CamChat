@@ -68,14 +68,20 @@ class ChatKeyboardShortcutView: HKView{
         x.backgroundColor = BLUECOLOR
         x.label.textColor = .white
         x.transform = CGAffineTransform(scaleX: 0, y: 0)
+        x.isUserInteractionEnabled = false
         x.addAction({[unowned textView, unowned self] in
-            let message = TempMessage(text: textView.text.withTrimmedWhiteSpaces(), dateSent: Date(), uniqueID: NSUUID().uuidString, senderID: DataCoordinator.currentUserUniqueID!, receiverID: self.user.uniqueID)
+            let text = textView.text!
+            
+            textView.setTextTo(newText: "")
+            
+            let message = TempMessage(text: text.withTrimmedWhiteSpaces(), dateSent: Date(), uniqueID: NSUUID().uuidString, senderID: DataCoordinator.currentUserUniqueID!, receiverID: self.user.uniqueID, wasSeenByReceiver: false, isOnServer: false)
             try! DataCoordinator.send(message: message, sender: DataCoordinator.currentUser!, receiver: self.user)
-            textView.text = ""
-            NotificationCenter.default.post(name: UITextView.textDidChangeNotification, object: textView)
+            
         })
         return x
     }()
+    
+    
     
     lazy var textView: ChatKeyboardShortutTextView = {
         let x = ChatKeyboardShortutTextView()
@@ -111,27 +117,29 @@ class ChatKeyboardShortcutView: HKView{
             
         }
         previousTextViewSize = textView.contentSize
-        
-    
     }
     
     private func adjustSendButton(){
         let action: () -> Void
-        if textView.hasValidText{
+        let textIsValid = textView.hasValidText
+        if textIsValid {
             action = {
                 if self.sendButton.transform != CGAffineTransform.identity{
                     self.sendButton.transform = CGAffineTransform.identity
+                    self.sendButton.isUserInteractionEnabled = true
                 }
             }
         } else {
             action = {
-                if self.sendButton.transform != CGAffineTransform(scaleX: 0, y: 0){
-                    self.sendButton.transform = CGAffineTransform(scaleX: 0, y: 0)
+                let tinyScale: CGFloat = 0.0001
+                if self.sendButton.transform != CGAffineTransform(scaleX: tinyScale, y: tinyScale){
+                    self.sendButton.transform = CGAffineTransform(scaleX: tinyScale, y: tinyScale)
+                    self.sendButton.isUserInteractionEnabled = false
                 }
             }
         }
         
-        UIView.animate(withDuration: 0.2) {
+        UIView.animate(withDuration:  0.15) {
             action()
             self.layoutIfNeeded()
             self.sendButton.setCornerRadius(to: self.sendButton.bounds.height.half)

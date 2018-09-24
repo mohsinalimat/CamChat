@@ -7,10 +7,14 @@
 //
 
 import HelpKit
-import CoreData
 
 
-class TempUser {
+class TempUser: Equatable {
+    static func == (lhs: TempUser, rhs: TempUser) -> Bool {
+        return lhs.uniqueID == rhs.uniqueID
+    }
+    
+    
     
     
     private static var imageCache = HKCache<String, UIImage>(objectLimit: 40)

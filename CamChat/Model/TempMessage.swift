@@ -7,16 +7,17 @@
 //
 
 import HelpKit
-import CoreData
 
 
-struct TempMessage{
+struct TempMessage: Hashable{
 
     var text: String
     var dateSent: Date
     var uniqueID: String
     var senderID: String
     var receiverID: String
+    var wasSeenByReceiver: Bool
+    var isOnServer: Bool
     
     var chatPartnerID: String?{
         guard let currentUserID = DataCoordinator.currentUserUniqueID else {return nil}

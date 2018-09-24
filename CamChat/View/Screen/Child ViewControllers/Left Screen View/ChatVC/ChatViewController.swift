@@ -44,7 +44,7 @@ class ChatViewController: UIViewController{
     
     
     @objc private func respondToTextViewDidBeginEditing(){
-        collectionView.scrollToBottom()
+        tableView.scrollToBottom()
     }
     
    
@@ -61,16 +61,13 @@ class ChatViewController: UIViewController{
         additionalSafeAreaInsets.top = topInset
         
         topBarView_typed.topBarRightIcon.addAction({[weak self] in self?.dismiss(animated: true)})
-        collectionView.pin(addTo: view, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor, .top: view.safeAreaLayoutGuide.topAnchor])
-        
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
+        tableView.pin(addTo: view, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor, .top: view.safeAreaLayoutGuide.topAnchor])
         NotificationCenter.default.addObserver(self, selector: #selector(respondToKeyboardWillChangeFrame(notification:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+
+        
     }
     
+
     
 
     override func loadView() {
@@ -84,9 +81,9 @@ class ChatViewController: UIViewController{
     }
     
     private func hitTestView(point: CGPoint, event: UIEvent?) -> UIView?{
-        let convertedPoint = collectionView.convert(point, from: view)
-        if collectionView.point(inside: convertedPoint, with: event){
-            return collectionView
+        let convertedPoint = tableView.convert(point, from: view)
+        if let hitTestedView = tableView.hitTest(convertedPoint, with: event){
+            return hitTestedView
         }
         return nil
     }
@@ -99,22 +96,13 @@ class ChatViewController: UIViewController{
         
         UIView.performWithoutAnimation {
             let height = max(keyboardHeightOnScreen, 0)
-            let inset = height + ChatMessagesTableViewCell.leftInset
-            self.collectionView.contentInset.bottom = inset
-            self.collectionView.scrollIndicatorInsets.bottom = height
+            let inset = height - 10
+            self.tableView.contentInset.bottom = inset
+            self.tableView.scrollIndicatorInsets.bottom = height
         }
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        UIView.performWithoutAnimation {
-            if isBeingPresented{
-                collectionView.scrollToBottom(animated: false)
-            }
-        }
 
-    }
-    
    
     
     
@@ -126,8 +114,8 @@ class ChatViewController: UIViewController{
         return true
     }
     
-    private lazy var collectionView: ChatMessagesTableView = {
-        return ChatMessagesTableView(user: user)
+    private lazy var tableView: ChatMessagesTableView = {
+        return ChatMessagesTableView(user: user, vcOwner: self)
     }()
     
     
@@ -181,15 +169,16 @@ extension ChatViewController: HKVCTransEventAwareParticipator{
     func prepareForPresentation() {
         tappedCell = tappedCellProvider?.cellFor(user: user)
     }
+    func cleanUpAfterPresentation() {
+        DataCoordinator.performChatPresentationActionsForUser(user: user)
+    }
 
     func prepareForDismissal() {
         tappedCell = tappedCellProvider?.cellFor(user: user)
     }
     
     func cleanUpAfterDismissal() {
-        CoreData.backgroundContext.perform {
-            self.user.deleteIfNotNeeded(context: .background)
-        }
+        DataCoordinator.performChatDismissalActionsFor(user: user)
     }
 }
 

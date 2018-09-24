@@ -7,7 +7,6 @@
 //
 
 import HelpKit
-import CoreData
 
 
 protocol ManagedObjectProtocol {
@@ -22,7 +21,16 @@ class StaticManagedObjectHelper<ObjectType: ManagedObjectProtocol & NSManagedObj
     
     private let context: NSManagedObjectContext
 
-    
+    func fetchObjects(configurations: (NSFetchRequest<ObjectType>) -> Void) -> [ObjectType]{
+        let request = ObjectType.typedFetchRequest()
+        configurations(request)
+        var objects = [ObjectType]()
+        
+        handleErrorWithPrintStatement {
+            objects = try context.fetch(request)
+        }
+        return objects
+    }
     
     init(context: CoreDataContextType){
         self.context = context.context
@@ -42,16 +50,16 @@ class StaticManagedObjectHelper<ObjectType: ManagedObjectProtocol & NSManagedObj
     
     func getObjectWith(uniqueID: String) -> ObjectType?{
         if hasStoredObjectWith(uniqueID: uniqueID).isFalse{return nil}
-        let fetchRequest = ObjectType.typedFetchRequest()
-        fetchRequest.predicate = NSPredicate(format: "uniqueID == %@", uniqueID)
-        fetchRequest.fetchLimit = 1
-        fetchRequest.returnsObjectsAsFaults = false
         
-        var objectToReturn: ObjectType?
-        handleErrorWithPrintStatement {
-            objectToReturn = try context.fetch(fetchRequest).first
-        }
-        return objectToReturn
+        
+        let object = fetchObjects { (fetchRequest) in
+            fetchRequest.predicate = NSPredicate(format: "uniqueID == %@", uniqueID)
+            fetchRequest.fetchLimit = 1
+            fetchRequest.returnsObjectsAsFaults = false
+        }.first!
+        
+        
+        return object
     }
     
     
@@ -101,7 +109,9 @@ extension ManagedObjectProtocol where Self: NSManagedObject{
     
     
     
-    
+    static func ==(lhs: Self, rhs: Self) -> Bool{
+        return lhs.uniqueID == rhs.uniqueID
+    }
     
 
     static func typedFetchRequest() -> NSFetchRequest<Self> {
@@ -117,7 +127,9 @@ extension ManagedObjectProtocol where Self: NSManagedObject{
     }
     
     
-    
+    var context: NSManagedObjectContext!{
+        return managedObjectContext
+    }
     
     
 }

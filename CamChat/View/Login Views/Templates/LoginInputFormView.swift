@@ -39,6 +39,7 @@ class LoginInputFormView: UIView, UITextFieldDelegate{
     
     @objc private func textFieldDidChange_field1(){
         delegate?.textFieldTextDidChange(textField: topTextField, text: topTextField.textField.text)
+        
     }
     
     @objc private func textFieldDidChange_field2() {

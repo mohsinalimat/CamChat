@@ -14,7 +14,9 @@ class CCSearchTableView: UITableView, UITableViewDelegate, SearchControllerVMDel
     
     
     
-    
+    func searchTextChanged(to text: String?){
+        viewModel.changeSearchTextTo(text)
+    }
     
     
     private weak var vcOwner: UIViewController!
@@ -57,12 +59,12 @@ class CCSearchTableView: UITableView, UITableViewDelegate, SearchControllerVMDel
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         deselectRow(at: indexPath, animated: true)
-        let object = viewModel.objects[indexPath.row]
+        let object = viewModel.currentSections[indexPath.section].users[indexPath.row]
         
         if let user = User.helper(.main).getObjectWith(uniqueID: object.uniqueID){
             self.vcOwner.present(ChatViewController(presenter: vcOwner, user: user))
         } else {
-            viewModel.objects[indexPath.row].persist(usingContext: .main){ (callback) in
+            object.persist(usingContext: .main){ (callback) in
                 
                 switch callback{
                 case .success(let user):

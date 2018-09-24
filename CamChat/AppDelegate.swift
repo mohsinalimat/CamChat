@@ -6,7 +6,6 @@
 //  Copyright © 2018 Patrick Hanna. All rights reserved.
 //
 
-import CoreData
 import HelpKit
 import Firebase
 
@@ -18,16 +17,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private var window: UIWindow?
     
     func applicationDidFinishLaunching(_ application: UIApplication) {
-        print(UIScreen.main.bounds)
+    
+        
+        
+        
         Firebase.configure()
         
         
         InterfaceManager.shared.launchInterface()
         DataCoordinator.configure()
         
-        
-        
-        
+
     }
     
     

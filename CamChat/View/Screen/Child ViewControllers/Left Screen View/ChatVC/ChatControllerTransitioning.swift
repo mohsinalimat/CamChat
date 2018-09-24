@@ -138,30 +138,31 @@ class ChatControllerAnimationPositioningBrain: HKVCTransBrain{
     }
     
     override func cleanUpAfterPresentation() {
+        super.cleanUpAfterPresentation()
         if let tappedCell = tappedCell{
             tappedCell.transform = CGAffineTransform.identity
         }
     }
     
     
-    
-    
-   /// This holds this instance in memory so that it responds to the keyboard dissmisal notification before it is deallocated.
-    private var myself:ChatControllerAnimationPositioningBrain!
-
     override func prepareForDismissal(){
         super.prepareForDismissal()
         container.insertSubview(presenter.view, at: 0)
-        myself = self
+        
         NotificationCenter.default.removeObserver(self)
-        NotificationCenter.default.addObserver(self, selector: #selector(respondToKeyboardDismissal), name: UIResponder.keyboardDidHideNotification, object: nil)
+
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardDidHideNotification, object: nil, queue: nil) { _ in
+            
+            self.adjustKeyboardWindows{ $0.transform = CGAffineTransform.identity }
+            NotificationCenter.default.removeObserver(self)
+        }
+        
+        
+        if let tappedCell = tappedCell, let equation = tappedCellTransformEquation{
+            tappedCell.transform = CGAffineTransform(translationX: equation.solve(for: 0), y: 0)
+        }
     }
     
-    @objc private func respondToKeyboardDismissal(){
-        adjustKeyboardWindows{ $0.transform = CGAffineTransform.identity }
-        NotificationCenter.default.removeObserver(self)
-        myself = nil
-    }
 
     
     /// This basically performs the unanimated dismissal action.
@@ -271,7 +272,7 @@ class ChatControllerAnimationController: HKVCTransAnimationController<ChatContro
 
 
 
-private class ChatControllerInteractionController: HKVCTransInteractionController<ChatControllerAnimationPositioningBrain>{
+private class ChatControllerInteractionController: HKVCTransInteractionController<ChatControllerAnimationPositioningBrain>, UIGestureRecognizerDelegate{
     
     
     override init(brain: ChatControllerAnimationPositioningBrain) {
@@ -279,8 +280,9 @@ private class ChatControllerInteractionController: HKVCTransInteractionControlle
         setUpGesture(for: presented.viewController)
     }
     
-   
-    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
    
     
     private var presenter: HKVCTransParticipator{
@@ -294,6 +296,9 @@ private class ChatControllerInteractionController: HKVCTransInteractionControlle
     private func setUpGesture(for vc: UIViewController){
         
         let gesture = DirectionAwarePanGesture(target: self, action: #selector(respondToGesture(gesture:)))
+        gesture.delegate = self
+        gesture.stopInterferingWithTouchesInView()
+        
         vc.view.addGestureRecognizer(gesture)
         
     }

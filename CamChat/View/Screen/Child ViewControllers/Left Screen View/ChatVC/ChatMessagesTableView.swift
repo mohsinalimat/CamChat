@@ -7,34 +7,73 @@
 //
 
 import HelpKit
-import CoreData
 
 
 
-class ChatMessagesTableView: UITableView {
+class ChatMessagesTableView: UITableView , UITableViewDelegate, UIGestureRecognizerDelegate{
     
     private var viewModel: ChatTableViewVM?
     private let user: User
-    init(user: User) {
+    private let headerID = "HeaderID"
+    private weak var vcOwner: UIViewController?
+    
+    init(user: User, vcOwner: UIViewController) {
         self.user = user
-
-        super.init(frame: CGRect.zero, style: .plain)
+        self.vcOwner = vcOwner
+        super.init(frame: CGRect.zero, style: .grouped)
         
-        estimatedRowHeight = 100
+        
         rowHeight = UITableView.automaticDimension
+        sectionHeaderHeight = 20
+        sectionFooterHeight = 0.000001
         alwaysBounceVertical = true
         backgroundColor = .white
         keyboardDismissMode = .interactive
+        layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
+
         setCornerRadius(to: 10)
         
-        
-        
-        layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
+        canCancelContentTouches = false
+
         contentInsetAdjustmentBehavior = .never
         separatorStyle = .none
-        contentInset.top = ChatMessagesTableViewCell.leftInset
+        
+        contentInset.top = -30
+        register(ChatMessagesSectionHeaderView.self, forHeaderFooterViewReuseIdentifier: headerID)
         self.viewModel = ChatTableViewVM(tableView: self, user: user)
+        delegate = self
+        panGestureRecognizer.delegate = self
+        // because when you're dealing with a grouped table view, for some reason, when you start off with no cells, there is no additional inset on the top
+        if viewModel!.messageSections.isEmpty{ contentInset.top = 5 }
     }
+    
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+
+ 
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        guard let vcOwner = vcOwner else {return}
+        if vcOwner.isBeingPresented{
+            scrollToBottom(animated: false)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return ChatMessagesTableViewCell.estimatedHeightFor(messageBlock: viewModel!.messageSections[indexPath.section].messageBlocks[indexPath.row])
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let header = dequeueReusableHeaderFooterView(withIdentifier: headerID) as! ChatMessagesSectionHeaderView
+        
+        header.setWith(section: viewModel!.messageSections[section])
+        return header
+    }
+    
+
 
     
     

@@ -30,19 +30,15 @@ class Login_MainVC: UIViewController{
         imageLayoutGuide.pin(addTo: view, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .top: view.topAnchor, .bottom: loginButton.topAnchor])
         
         ghostImage.pin(addTo: view, anchors: [.centerX: imageLayoutGuide.centerXAnchor, .centerY: imageLayoutGuide.centerYAnchor], constants: [.width: 70, .height: 70])
-        
     }
     
     
-    override var prefersStatusBarHidden: Bool{ return true }
-    
+    override var prefersStatusBarHidden: Bool { return true }
     override var prefersHomeIndicatorAutoHidden: Bool { return true}
     
-    
-    
+
     private lazy var ghostImage: UIImageView = {
         let x = UIImageView(image: AssetImages.snapchatGhost)
-        
         x.contentMode = .scaleAspectFit
         return x
     }()
@@ -73,6 +69,3 @@ class Login_MainVC: UIViewController{
         return x
     }()
 }
-
-
-

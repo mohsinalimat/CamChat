@@ -19,7 +19,7 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
         setUpViews()
         view.layoutIfNeeded()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(respondToTextFieldTextDidChange), name: UITextField.textDidChangeNotification, object: searchTextField)
+        
     }
     
     
@@ -93,17 +93,7 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
         searchIcon.bounce()
     }
     
-    @objc private func respondToTextFieldTextDidChange(){
-        if let text = searchTextField.text{
-            if text.withTrimmedWhiteSpaces().isEmpty {
-                dissmiss_cancelButton.showDismissButton()
-            } else {
-                dissmiss_cancelButton.showCancelButton()
-            }
-        } else {
-            dissmiss_cancelButton.showDismissButton()
-        }
-    }
+
 
     
     
@@ -119,18 +109,28 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
     private lazy var searchTextField: UITextField = {
         let x = UITextField()
         x.keyboardAppearance = .dark
+        x.autocorrectionType = .no
         x.tintColor = CCSearchConstants.searchTintColor
-        x.attributedPlaceholder = NSAttributedString(string: "Search", attributes: [NSAttributedString.Key.font: CCSearchConstants.searchLabelFont, .foregroundColor: UIColor(red: 0.7, green: 0.7, blue: 0.7, alpha: 1)])
+        x.attributedPlaceholder = NSAttributedString(string: "Search", attributes: [.font: CCSearchConstants.searchLabelFont, .foregroundColor: UIColor.gray(percentage: 0.7)])
         x.font = CCSearchConstants.searchLabelFont
         x.delegate = self
         x.textColor = CCSearchConstants.searchTintColor
+        
+        x.addTextDidChangeListener({[weak self] (newText) in
+            guard let self = self else {return}
+            self.tableView.searchTextChanged(to: newText)
+            if self.searchTextField.hasValidText{
+                self.dissmiss_cancelButton.showCancelButton()
+            } else { self.dissmiss_cancelButton.showDismissButton() }
+        })
         return x
     }()
     
     private lazy var dissmiss_cancelButton: SearchVCXDeleteButton = {
         let x = SearchVCXDeleteButton()
         x.dismissButton.addAction({[weak self] in self?.dismiss(animated: true)})
-        x.cancelButton.addAction({[weak self] in self?.searchTextField.text = nil; self?.respondToTextFieldTextDidChange()})
+        x.cancelButton.addAction({[weak self] in self?.searchTextField.setTextTo(newText: "")
+        })
         x.pin(constants: [.height: 25, .width: 25])
         return x
     }()

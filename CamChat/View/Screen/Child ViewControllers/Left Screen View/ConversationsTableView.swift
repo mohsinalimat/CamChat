@@ -7,7 +7,6 @@
 //
 
 import HelpKit
-import CoreData
 
 
 class ConversationsTableVC: SCTableView{
@@ -69,7 +68,7 @@ extension ConversationsTableVC: CoreDataListViewVMDelegate{
     
     var fetchRequest: NSFetchRequest<User>{
         let x = User.typedFetchRequest()
-        x.predicate = NSPredicate(format: "\(#keyPath(User.uniqueID)) != %@ AND \(#keyPath(User.mostRecentMessage)) != nil", DataCoordinator.currentUser!.uniqueID)
+        x.predicate = NSPredicate(format: "\(#keyPath(User.uniqueID)) != %@ AND \(#keyPath(User.mostRecentMessage)) != nil", DataCoordinator.currentUserUniqueID!)
         x.sortDescriptors = [NSSortDescriptor(key: #keyPath(User.mostRecentMessage.dateSent), ascending: false)]
         return x
     }
