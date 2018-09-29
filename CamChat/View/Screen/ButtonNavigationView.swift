@@ -18,9 +18,11 @@ protocol ButtonNavigationViewDelegate: class{
 }
 
 class ButtonNavigationView: UIView{
+    private let cameraCaptureButton: CameraCaptureButton
     private weak var delegate: ButtonNavigationViewDelegate?
-    init(delegate: ButtonNavigationViewDelegate){
+    init(delegate: ButtonNavigationViewDelegate, cameraCaptureButton: CameraCaptureButton){
         self.delegate = delegate
+        self.cameraCaptureButton = cameraCaptureButton
         super.init(frame: CGRect.zero)
 
         [photoButton, cameraButton, chatButton, settingsButton].forEach { $0.setAction(action: {[weak delegate = self.delegate] in delegate?.navigationButtonTapped(type: $0)}) }
@@ -40,6 +42,11 @@ class ButtonNavigationView: UIView{
 
         settingsButton.pin(anchors: [.top: cameraButton.bottomAnchor, .centerX: cameraButton.centerXAnchor], constants: [.width: 30, .height: 30, .top: 20])
     }
+    
+    
+    
+    
+    
     
     func setButtonBackingAlphas (to alpha: CGFloat){
         [cameraButton, chatButton, photoButton].forEach{$0.iconBacking.alpha = alpha}
@@ -148,6 +155,11 @@ class ButtonNavigationView: UIView{
     
     func changeObjectPositionsBy(gradient: CGFloat){
     
+        if gradient == 0{
+            cameraButton.enterCameraCaptureMode()
+        } else { cameraButton.enterNavigationMode() }
+        
+        
 
         let iconSizeScale = sideIconsSizeScaleEquation.solve(for: gradient)
         let circleSizeScale = circleSizeScaleEquation.solve(for: gradient)
@@ -175,22 +187,24 @@ class ButtonNavigationView: UIView{
     
     
     
-    private lazy var settingsButton: SCNavigationButton = {
+    private(set) lazy var settingsButton: SCNavigationButton = {
         let x = SCNavigationButton.init(type: .settings)
         return x
     }()
     
-    private lazy var photoButton: SCNavigationButton = {
+    private(set) lazy var photoButton: SCNavigationButton = {
         let x = SCNavigationButton(type: .photoLibrary)
         return x
     }()
-    private lazy var chatButton: SCNavigationButton = {
+    private(set) lazy var chatButton: SCNavigationButton = {
         let x = SCNavigationButton(type: .chat)
+        
         return x
     }()
     
-    private lazy var cameraButton: SCNavigationButton = {
-        let x = NavigationCameraCaptureButton()
+    private lazy var cameraButton: NavigationCameraCaptureButton = {
+        let x = NavigationCameraCaptureButton(cameraCaptureButton: cameraCaptureButton)
+
         x.translatesAutoresizingMaskIntoConstraints = false
         return x
     }()
@@ -241,12 +255,33 @@ class ButtonNavigationView: UIView{
 
 
 fileprivate class NavigationCameraCaptureButton: SCNavigationButton{
-    
-    init(){
+    private let cameraCaptureButton: CameraCaptureButton
+    init(cameraCaptureButton: CameraCaptureButton){
+        self.cameraCaptureButton = cameraCaptureButton
         super.init(type: .cameraCapture)
-        
         cameraCaptureButton.pinAllSides(addTo: self, pinTo: self)
     }
+    
+    private var isInNavigationMode = false
+    
+    func enterNavigationMode(){
+        if isInNavigationMode{ return }
+        
+        cameraCaptureButton.isUserInteractionEnabled = false
+        
+        
+        isInNavigationMode = true
+    }
+    
+    func enterCameraCaptureMode(){
+        if isInNavigationMode.isFalse{return}
+        
+        cameraCaptureButton.isUserInteractionEnabled = true
+        
+        isInNavigationMode = false
+    }
+    
+    
     private let circleLayer = CAShapeLayer()
     
     override func tintColorDidChange() {
@@ -265,17 +300,13 @@ fileprivate class NavigationCameraCaptureButton: SCNavigationButton{
         return x
     }()
     
-    
-    private lazy var cameraCaptureButton: CameraCaptureButton = {
-        let x = CameraCaptureButton()
-        return x
-    }()
+   
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let converted = cameraCaptureButton.convert(point, from: self)
         if let view = cameraCaptureButton.hitTest(converted, with: event){
             return view
-        } else {return super.hitTest(point, with: event)}
+        } else { return super.hitTest(point, with: event) }
     }
     
     
@@ -287,14 +318,12 @@ fileprivate class NavigationCameraCaptureButton: SCNavigationButton{
 
 
 
-fileprivate class SCNavigationButton: BouncyImageButton{
+class SCNavigationButton: BouncyImageButton{
     
     private let type: ButtonType
-    init(type: ButtonType){
+    fileprivate init(type: ButtonType){
         self.type = type
         super.init(image: type.image)
-        
-        
         
         iconBacking.alpha = 0
         addSubview(iconBacking)
@@ -302,14 +331,11 @@ fileprivate class SCNavigationButton: BouncyImageButton{
         tintColor = .white
         iconBacking.pinAllSides(pinTo: self, insets: UIEdgeInsets(allInsets: -5))
         applyShadow(width: 0.5)
-        
-        
     }
     
 
-    private(set) lazy var iconBacking: UIView = {
+    fileprivate private(set) lazy var iconBacking: UIView = {
         let x = UIView()
-        
         x.backgroundColor = .white
         x.layer.cornerRadius = 5
         x.layer.masksToBounds = true
@@ -318,7 +344,7 @@ fileprivate class SCNavigationButton: BouncyImageButton{
     
     
 
-    func setAction(action: @escaping (ButtonType) -> Void){
+    fileprivate func setAction(action: @escaping (ButtonType) -> Void){
         addAction {[unowned self] in action(self.type) }
     }
  
@@ -328,13 +354,3 @@ fileprivate class SCNavigationButton: BouncyImageButton{
     }
     
 }
-
-
-
-
-
-
-
-
-
-

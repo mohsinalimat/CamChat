@@ -9,7 +9,7 @@
 import HelpKit
 
 
-extension Screen{
+extension Screen {
     
     
     func SCScrollViewDidScroll(scrollView: SCScrollView, topContentOffset: CGFloat) {
@@ -17,6 +17,9 @@ extension Screen{
         
         let actualOutset = max(topContentOffset, 0) - APP_INSETS.top
         let totalOutset = topBarHeight
+        if actualOutset <= totalOutset + 2{
+            topBar_typed.isUserInteractionEnabled = true
+        } else { topBar_typed.isUserInteractionEnabled = false }
         
         if actualOutset >= totalOutset{
             
@@ -48,8 +51,8 @@ extension Screen{
                 rightScreen.viewWillDisappear(true)
                 centerScreen.viewWillAppear(true)
             }
-            
         }
+        
         if direction == .vertical{
             if interactor.currentlyFullyVisibleScreen == .center{
                 centerScreen.viewWillDisappear(true)
@@ -109,6 +112,8 @@ extension Screen{
             verticalScrollInteractor.snapGradientTo(screen: .center, animated: false)
             return
         }
+        
+        
         
         switch direction{
         case .horizontal:
@@ -216,18 +221,11 @@ extension Screen{
     
     private func getCurrentSuggestedTopGradientViewAlphaFor(scrollView: SCScrollView) -> CGFloat{
         
-        
         let actualOutset = ((scrollView.topContentOffset >= 0) ? scrollView.topContentOffset : 0) - view.safeAreaInsets.top
         let totalOutset = topBarHeight
         
-        if actualOutset <= totalOutset{
-            return 1 - (actualOutset / totalOutset)
-        } else {
-            return 0
-        }
+        if actualOutset <= totalOutset{ return 1 - (actualOutset / totalOutset) }
+        else { return 0 }
     }
-    
-    
-    
-    
+
 }

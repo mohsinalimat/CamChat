@@ -12,6 +12,7 @@ import HelpKit
 class SimpleLabelledButton: SimpleInteractiveButton{
     
     
+    
     override init(){
         super.init()
         addSubview(label)

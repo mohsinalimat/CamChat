@@ -8,7 +8,12 @@
 
 import HelpKit
 
-/// In case you're lost as to the point of this class, here it is. The actual 'dateSent' property of a Message object, at some point, is gonna be merged with Firebase's server time or an estimate thereof, which is gonna be independent of the time on the user's device. Therefore, this property is not dependable enough to be compared against 'Date()' to see exactly how long ago, according to the device's time, the user actually attempted to send the message.... if that makes sense. Hence, the reason this class exists.
+/**
+ 
+ In case you're lost as to the point of this class, here it is. The actual 'dateSent' property of a Message object, at some point, is gonna be merged with Firebase's server time or an estimate thereof, which is gonna be independent of the time on the user's device. Therefore, this property is not dependable enough to be compared against 'Date()' to see exactly how long ago, according to the device's time, the user actually attempted to send the message.
+
+ This class exists so that the app can know how long ago the user attempted to send a message that has not been uploaded to firebase as yet due to connectivity issues.
+ **/
 
 
 class MessageSender {

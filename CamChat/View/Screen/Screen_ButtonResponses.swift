@@ -8,6 +8,8 @@
 
 import HelpKit
 
+import AVKit
+
 extension Screen: CCSearchBarDelegate{
     func searchBarTapped() {
         topBar_typed.topSearchBar.layoutIfNeeded()
@@ -23,11 +25,14 @@ extension Screen: ScreenButtonsTopBarDelegate{
     }
     
     func flashButtonTapped(to isOn: Bool) {
-
+        centerScreen.isFlashEnabled = isOn
     }
     
     func cameraFlipButtonTapped() {
-
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.centerScreen.flipCamera()
+        }
+        
     }
     
     func photoLibrarySelectButtonTapped() {
@@ -37,6 +42,7 @@ extension Screen: ScreenButtonsTopBarDelegate{
 
 
 extension Screen: ButtonNavigationViewDelegate{
+    
     func navigationButtonTapped(type: ButtonNavigationView.ButtonType) {
         if verticalScrollInteractor.currentlyFullyVisibleScreen == .last && type != .cameraCapture{
             shouldChangeNavViewSize = false
@@ -56,4 +62,117 @@ extension Screen: ButtonNavigationViewDelegate{
             verticalScrollInteractor.snapGradientTo(screen: .last, animated: true)
         }
     }
+}
+
+
+extension Screen: CameraDelegate{
+   
+    
+    
+    func willTakePhoto() {
+        UIApplication.shared.beginIgnoringInteractionEvents()
+    }
+    
+    func didTakePhoto(image: UIImage) {
+        UIApplication.shared.endIgnoringInteractionEvents()
+        self.present(PhotoVideoPreviewVC(.photo(image)), animated: false)
+    }
+    
+    func didStartRecordingVideo() {
+        self.performBeginningRecordingAnimationActions()
+    }
+    
+    func willFinishRecordingVideo() {
+        tempViewLoadSnapshot = view.snapshotView(afterScreenUpdates: false)!
+        view.addSubview(tempViewLoadSnapshot!)
+
+        self.performEndingRecordingAnimationActions()
+    }
+    
+    func didFinishRecordingVideo(url: URL) {
+        let previewer = PhotoVideoPreviewVC(.video(url))
+        previewer.modalPresentationStyle = .overCurrentContext
+
+        self.present(previewer, animated: false)
+        
+
+        Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { [weak self] (timer) in
+            self?.tempViewLoadSnapshot?.removeFromSuperview()
+        }
+        
+    }
+}
+
+
+extension Screen{
+    
+    private var viewsToDimDuringVideoRecordingSession: [UIView]{
+        return [topBarBottomLine,
+                topBar_typed.topSearchBar,
+                topBar_typed.buttonTopBar.flashIcon,
+                navigationView.chatButton,
+                navigationView.settingsButton,
+                navigationView.photoButton
+        ]
+    }
+    
+    fileprivate func performBeginningRecordingAnimationActions(){
+        self.horizontalScrollInteractor.stopAcceptingTouches()
+        self.verticalScrollInteractor.stopAcceptingTouches()
+        self.topBar_typed.topSearchBar.isUserInteractionEnabled = false
+        addGestureToCameraSwitchIcon()
+        
+        UIView.animate(withDuration: 0.1, delay: 0, options: [.curveEaseOut], animations: {
+            self.viewsToDimDuringVideoRecordingSession.forEach{ $0.alpha = 0 }
+            self.statusBarShouldBeHidden = true
+            self.setNeedsStatusBarAppearanceUpdate()
+        })
+        
+        
+    }
+    
+    fileprivate func performEndingRecordingAnimationActions(){
+        
+        self.horizontalScrollInteractor.startAcceptingTouches()
+        self.verticalScrollInteractor.startAcceptingTouches()
+        self.topBar_typed.topSearchBar.isUserInteractionEnabled = true
+        removeGestureFromCameraSwitchIcon()
+        
+        UIView.animate(withDuration: 0.1, delay: 0, options: [.curveEaseOut], animations: {
+            self.viewsToDimDuringVideoRecordingSession.forEach{ $0.alpha = 1 }
+            self.statusBarShouldBeHidden = false
+        })
+    }
+    
+    
+    
+    private var cameraFlipButton: BouncyImageButton{return topBar_typed.buttonTopBar.cameraFlipIcon}
+    
+    private func addGestureToCameraSwitchIcon(){
+        temporaryCameraSwitchButtonGesture = UITapGestureRecognizer(target: self, action: #selector(respondToTapGesture(gesture:)))
+        cameraFlipButton.addGestureRecognizer(temporaryCameraSwitchButtonGesture!)
+        cameraFlipButton.isEnabled = false
+    }
+    
+    private func removeGestureFromCameraSwitchIcon(){
+        
+        cameraFlipButton.removeGestureRecognizer(temporaryCameraSwitchButtonGesture!)
+        temporaryCameraSwitchButtonGesture = nil
+        cameraFlipButton.isEnabled = true
+    }
+    
+    @objc private func respondToTapGesture(gesture: UITapGestureRecognizer){
+        cameraFlipButton.tapBegan()
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.centerScreen.flipCamera()
+        }
+        
+        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false, block: {_ in
+            self.cameraFlipButton.tapEnded()
+        })
+    }
+    
+   
+    
+    
 }

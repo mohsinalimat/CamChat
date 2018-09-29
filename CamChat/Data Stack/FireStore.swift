@@ -224,7 +224,7 @@ class FirebaseManager{
         let chatPartnerMessageDoc = messagesCollectionForUserWith(userID: message.chatPartnerID!).document(message.uniqueID)
         let chatPartnerData: [String: Any] = [
             UserKeys.MessageKeys.messageID: message.uniqueID,
-            UserKeys.MessageKeys.chatPartnerID: DataCoordinator.currentUser!.uniqueID,
+            UserKeys.MessageKeys.chatPartnerID: DataCoordinator.currentUserUniqueID!,
             UserKeys.MessageKeys.wasSeen: message.wasSeenByReceiver
         ]
         writeBatch.setData(chatPartnerData, forDocument: chatPartnerMessageDoc)
@@ -295,9 +295,7 @@ class FirebaseManager{
                     completion(.success(message))
                 } else { completion(.failure(error ?? HKError.unknownError)) }
             }
-            
-        
-        
+
     }
 }
 

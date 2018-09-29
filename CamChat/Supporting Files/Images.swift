@@ -61,7 +61,7 @@ struct AssetImages{
     static var storage = getIcon("storage")
     
     static var profilePicturePlaceholder = getIcon("profilePicturePlaceholder")
-    
+    static var downloadIcon = getIcon("downloadIcon")
     static var examplePhotos = [
         getPhoto("iphoneImage0"),
         getPhoto("iphoneImage1"),

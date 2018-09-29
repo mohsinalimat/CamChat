@@ -19,14 +19,19 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
         super.init()
     }
     
-    
+    private var heightCache = [IndexPath: CGFloat]()
     
     func collectionView(_ collectionView: UICollectionView, heightForItemAt indexPath: IndexPath) -> CGFloat {
-        let defaultHeight: CGFloat = Variations.currentDevice(is: [.iPhone4, .iPhoneSE]) ? 250 : 300
-        switch indexPath.item{
-        case 0, 2, 4, 6: return defaultHeight - 30
-        default: return defaultHeight
+        if let height = heightCache[indexPath]{return height}
+        else {
+            let screenWidth = UIScreen.main.bounds.width
+            let randomUpperBound = Int(screenWidth * 0.16)
+            let height = (screenWidth * 0.45) + CGFloat((0...randomUpperBound).randomElement()!)
+            heightCache[indexPath] = height
+            return height
         }
+        
+
     }
     
     private let imageArray: [UIImage] = {
@@ -90,7 +95,7 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
         cell.screen = screen
         cell.imageView.image = imageArray[indexPath.item]
         cell.layer.masksToBounds = true
-        cell.layer.cornerRadius = 10
+        cell.layer.cornerRadius = 7
         return cell
     }
     

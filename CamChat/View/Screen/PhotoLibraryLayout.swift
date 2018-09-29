@@ -17,7 +17,7 @@ class PhotoLibraryLayout: UICollectionViewLayout{
     
     private var contentHeight: CGFloat = 0
     
-    var numberOfColumns = 2
+    var numberOfColumns = 3
     weak var delegate: PhotoLibraryLayoutDelegate!
     private var width: CGFloat{
         collectionView?.layoutIfNeeded()
@@ -51,7 +51,7 @@ class PhotoLibraryLayout: UICollectionViewLayout{
     private var attributes = [UICollectionViewLayoutAttributes]()
 
     
-    var margins: CGFloat = 10
+    var margins: CGFloat = 6
 
     override func prepare() {
         attributes = []

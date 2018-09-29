@@ -33,6 +33,7 @@ class ScreenTopBar: HKView{
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        if isUserInteractionEnabled.isFalse || isHidden || alpha == 0{return nil}
         for subview in [topSearchBar, buttonTopBar] {
             let newPoint = subview.convert(point, from: self)
             if let view = subview.hitTest(newPoint, with: event){return view}
@@ -47,7 +48,7 @@ class ScreenTopBar: HKView{
         return x
     }()
     
-    private lazy var buttonTopBar: ScreenButtonsTopBar = {
+    lazy var buttonTopBar: ScreenButtonsTopBar = {
         let x = ScreenButtonsTopBar(delegate: delegate!)
         return x
     }()

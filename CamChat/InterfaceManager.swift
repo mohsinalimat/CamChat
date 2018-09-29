@@ -13,7 +13,14 @@ private(set) var APP_INSETS: UIEdgeInsets!
 
 class InterfaceManager{
     
-    private init(){}
+    private init(){
+        UserLoggedInNotification.listen(sender: self) {[weak self] (user) in
+            self?.transitionToMainInterface()
+        }
+        UserLoggedOutNotification.listen(sender: self) { [weak self] in
+            self?.transitionToLoginInterface()
+        }
+    }
     
     static var shared = InterfaceManager()
 

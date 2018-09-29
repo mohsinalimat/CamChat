@@ -67,7 +67,11 @@ class ConversationCellVM {
                 text = "Sent"
                 icon = AssetImages.fullTinySentIcon
             }
-        } else { fatalError() }
+        } else {
+            print(recentMessage)
+            fatalError()
+            
+        }
         
         text = text + " · " + getTimeStringFor(date: recentMessage.dateSent)
         

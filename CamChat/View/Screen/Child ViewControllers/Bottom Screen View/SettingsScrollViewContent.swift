@@ -69,7 +69,6 @@ class SettingsScrollContentView: UIView{
         alert.addPrimaryButtonAction({ [unowned alert] in
             do{
                 try DataCoordinator.logOut()
-                InterfaceManager.shared.transitionToLoginInterface()
             } catch {
                 alert.dismiss(animated: true, completion: {
                     vcOwner.presentOopsAlert(description: error.localizedDescription)
@@ -77,7 +76,6 @@ class SettingsScrollContentView: UIView{
             }
         })
         alert.addSecondaryButtonAction({[unowned alert] in alert.dismiss(animated: true)})
-        
     })
     
     private let settingsblocksInfoObjects = [

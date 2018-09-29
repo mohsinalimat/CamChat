@@ -9,16 +9,11 @@ import UIKit
 import HelpKit
 
 
-
-
-
 class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDelegate, UIGestureRecognizerDelegate{
     
     
     
-    
-    
-    init(){ super.init(nibName: nil, bundle: nil) }
+    init() { super.init(nibName: nil, bundle: nil) }
   
     
     override func viewDidLoad() {
@@ -26,15 +21,14 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
 
         setUpViews()
         view.clipsToBounds = true
+        view.isMultipleTouchEnabled = true
         
         // This is only to ensure they are initialized right now, since they are being lazily loaded. Page Scrolling Interactors start accepting touches by default.
         verticalScrollInteractor.startAcceptingTouches()
         horizontalScrollInteractor.startAcceptingTouches()        
     }
     
-    
-    
-    
+
 
     lazy var leftScreen: SCScrollView = {
         let x = ConversationsTableVC()
@@ -45,8 +39,8 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         return x
     }()
     
-    lazy var centerScreen: UIViewController = {
-        let x = CameraVC()
+    lazy var centerScreen: CameraVC = {
+        let x = CameraVC(cameraDelegate: self)
         self.addChild(x)
         x.additionalSafeAreaInsets.bottom = subviewsBottomSafeAreaInset
         x.additionalSafeAreaInsets.top = topBarHeight
@@ -62,7 +56,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         return x
     }()
     
-     lazy var bottomScreen: SettingsViewController = {
+    lazy var bottomScreen: SettingsViewController = {
         let x = SettingsViewController(screen: self)
         x.additionalSafeAreaInsets.bottom = subviewsBottomSafeAreaInset
         self.addChild(x)
@@ -108,9 +102,12 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     
  
     lazy var navigationView: ButtonNavigationView = {
-        let x = ButtonNavigationView(delegate: self)
+        let x = ButtonNavigationView(delegate: self, cameraCaptureButton: centerScreen.getCaptureButton())
         return x
     }()
+    
+    
+
     
     lazy var horizontalScrollInteractor: PageScrollingInteractor = {
         let x = PageScrollingInteractor(delegate: self, direction: .horizontal)
@@ -154,30 +151,30 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     var rightScreenColor = REDCOLOR
     
     
+    /// This holds the snapshot used to cover the view when the recently captured video is loading
+    var tempViewLoadSnapshot: UIView?
     
     
     
     
     
     let navigationViewBackingAlphaEquation = CGLinearEquation(xy(-1, 1), xy(-0.8, 0), min: 0, max: 1)!
-    
     let navigationViewTintColorEquation = CGLinearEquation(xy(-1, 190), xy(0, 255), min: 190, max: 255)!
-    
     let navigationButtonsShadowAlphaEquation = CGQuadEquation(xy(-1, 0), xy(0, 1), xy(1, 0), min: 0, max: 1)!
     let bottomGradientViewAlpha_horizontal = CGLinearEquation(xy(0, 0), xy(1, 1), min: 0, max: 1)!
     
     let backgroundViewAlphaEquation = CGQuadEquation(xy(-0.7, 1), xy(0, 0), xy(0.7, 1), min: 0, max: 1)!
     
 
+    var temporaryCameraSwitchButtonGesture: UITapGestureRecognizer?
+    
+    
 
+    var statusBarShouldBeHidden = false
     
-    
-    
-
-    
-    
-    
-    
+    override var prefersStatusBarHidden: Bool{
+        return statusBarShouldBeHidden
+    }
     
     
     override var preferredStatusBarStyle: UIStatusBarStyle{

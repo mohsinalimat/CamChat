@@ -107,6 +107,7 @@ class CCSearchBar: UIView{
    
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        if isUserInteractionEnabled.isFalse || isHidden.isTrue || alpha == 0{return nil}
         let newPoint = fingerHitArea.convert(point, from: self)
         return fingerHitArea.hitTest(newPoint, with: event)
     }

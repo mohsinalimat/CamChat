@@ -36,8 +36,7 @@ class Login_LoginVC: LoginFormVCTemplate{
                 self.buttonView.stopShowingLoadingIndicator()
                 
                 switch callback{
-                case .success:
-                    InterfaceManager.shared.transitionToMainInterface()
+                case .success: break
                 case .failure(let error):
                     self.presentOopsAlert(description: error.localizedDescription)
                 }

@@ -82,6 +82,7 @@ class PhotoOptionsMiniVC: UIViewController {
     
     private var customTransitioningDelegate: PhotoOptionsMiniTransitioningDelegate!
     
+    private enum MenuPlacement{case left, right, center}
 
     private let menuSize = CGSize(width: 250, height: 150)
     private let menu_imageSpacing: CGFloat = 20
@@ -94,7 +95,7 @@ class PhotoOptionsMiniVC: UIViewController {
     
     
     private var endingObjectsTranslation: CGAffineTransform!
-    private var menuShouldBePinnedToLeftOfImage: Bool!
+    private var menuPlacement: MenuPlacement!
     private var menuShouldBeOnTop: Bool!
     private var endingSnapshotFrame: CGRect!
 
@@ -118,7 +119,16 @@ class PhotoOptionsMiniVC: UIViewController {
         } else {
             requiredTranslation.y -= max((menuSize.height + menu_imageSpacing + viewPadding) - bottomSpace, 0)
         }
-        menuShouldBePinnedToLeftOfImage = rightSpace >= leftSpace
+        
+        
+        
+        if (newImageFrame.centerAsFrame.x + menuSize.width.half + viewPadding) <= view.frame.width && (newImageFrame.centerAsFrame.x - menuSize.width.half - viewPadding) >= 0{
+            self.menuPlacement = .center
+        } else if rightSpace >= leftSpace {
+            self.menuPlacement = .left
+        } else { self.menuPlacement = .right }
+        
+        
         endingObjectsTranslation = CGAffineTransform(translationX: requiredTranslation.x, y: requiredTranslation.y)
         endingSnapshotFrame = CGRect(origin: snapshotInfo.endingFrame.origin + requiredTranslation, size: snapshotInfo.endingFrame.size)
     }
@@ -136,12 +146,17 @@ class PhotoOptionsMiniVC: UIViewController {
         
         
         optionMenu.pin(addTo: view, constants: [.width: menuSize.width, .height: menuSize.height])
-        
-        if menuShouldBePinnedToLeftOfImage{
+        switch menuPlacement!{
+        case .center:
+            optionMenu.pin(anchors: [.right: view.leftAnchor], constants: [.right: -(endingSnapshotFrame.centerAsFrame.x + menuSize.width.half)])
+        case .left:
             optionMenu.pin(anchors: [.left: view.leftAnchor], constants: [.left: endingSnapshotFrame.minX])
-        } else {
+        case .right:
             optionMenu.pin(anchors: [.right: view.rightAnchor], constants: [.right: view.bounds.width - endingSnapshotFrame.maxX])
         }
+        
+        
+        
         if menuShouldBeOnTop{
             optionMenu.pin(anchors: [.bottom: view.topAnchor], constants: [.bottom: -(endingSnapshotFrame.minY - menu_imageSpacing) - topOffsetToAccountForAnchorPointChange])
         } else {

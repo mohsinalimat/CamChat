@@ -43,7 +43,7 @@ class ScreenButtonsTopBar: UIView{
         leftScreenIcon.addAction({[weak self] in self?.delegate?.newChatButtonTapped()})
         flashIcon.addAction { [weak self, weak flashIcon] in
             guard let flashIcon = flashIcon else {return}
-            self?.delegate?.flashButtonTapped(to: flashIcon.currentImageType == .initial)
+            self?.delegate?.flashButtonTapped(to: flashIcon.currentImageType == .alternative)
         }
         cameraFlipIcon.addAction({[weak self] in self?.delegate?.cameraFlipButtonTapped()})
         rightScreenIcon.addAction({[weak self] in self?.delegate?.photoLibrarySelectButtonTapped()})
@@ -113,7 +113,7 @@ class ScreenButtonsTopBar: UIView{
     private lazy var leftScreenIcon = self.getImageView(for: AssetImages.newChatIcon)
     
     
-    private lazy var centerScreenIcons: UIStackView = {
+    lazy var centerScreenIcons: UIStackView = {
         let x = UIStackView(arrangedSubviews: [flashIcon, cameraFlipIcon] )
         x.axis = .horizontal
         x.spacing = 15
@@ -124,9 +124,9 @@ class ScreenButtonsTopBar: UIView{
     
     private let preferredIconSize = CGSize(width: 30, height: 30)
     
-    private lazy var flashIcon = self.getImageView(for: AssetImages.flashOnIcon, alternativeImage: AssetImages.flashOffIcon, applyLightShadow: true)
+    lazy var flashIcon = self.getImageView(for: AssetImages.flashOffIcon, alternativeImage: AssetImages.flashOnIcon, applyLightShadow: true)
     
-    private lazy var cameraFlipIcon = self.getImageView(for: AssetImages.cameraFlipIcon, applyLightShadow: true)
+    lazy var cameraFlipIcon = self.getImageView(for: AssetImages.cameraFlipIcon, applyLightShadow: true)
     
     
     

@@ -89,7 +89,7 @@ class ChatViewController: UIViewController{
     }
     
     @objc private func respondToKeyboardWillChangeFrame(notification: Notification){
-
+        
         
         let newKeyboardFrame = notification.userInfo!["UIKeyboardFrameEndUserInfoKey"] as! CGRect
         let keyboardHeightOnScreen = max(self.view.bounds.height - newKeyboardFrame.minY, 0)

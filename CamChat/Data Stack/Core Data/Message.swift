@@ -78,11 +78,11 @@ public class Message: NSManagedObject, ManagedObjectProtocol{
     }
     
     var currentUserIsReceiver: Bool{
-        return receiver === DataCoordinator.currentUser
+        return receiver.uniqueID == DataCoordinator.currentUserUniqueID
     }
     
     var currentUserIsSender: Bool{
-        return sender === DataCoordinator.currentUser
+        return sender.uniqueID == DataCoordinator.currentUserUniqueID
     }
 }
 

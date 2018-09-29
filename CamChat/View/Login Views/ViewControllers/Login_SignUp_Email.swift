@@ -32,8 +32,7 @@ class Login_SignUp_Email: SignUpFormVCTemplate{
                 buttonView.stopShowingLoadingIndicator()
                 
                 switch callback{
-                case .success:
-                    InterfaceManager.shared.transitionToMainInterface()
+                case .success: break
                 case .failure(let error):
                     self.presentOopsAlert(description: error.localizedDescription)
                 }

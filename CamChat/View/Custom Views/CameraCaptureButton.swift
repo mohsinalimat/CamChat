@@ -12,7 +12,7 @@ import HelpKit
 
 
 
-class CameraCaptureRingView: UIView{
+private class CameraCaptureRingView: UIView{
     
     init(){
         super.init(frame: CGRect.zero)
@@ -26,6 +26,7 @@ class CameraCaptureRingView: UIView{
     private lazy var redRing: CAShapeLayer = {
         let x = getNewRing(color: .red)
         x.strokeEnd = 0
+        x.lineWidth = 6.25
         return x
     }()
     
@@ -61,10 +62,14 @@ class CameraCaptureRingView: UIView{
         animator.fillMode = CAMediaTimingFillMode.forwards
         animator.duration = 10
         animator.toValue = 0.8
+        animator.isAdditive = true
         animator.repeatCount = Float.greatestFiniteMagnitude
         animator.isRemovedOnCompletion = false
         redRing.add(animator, forKey: animatorKey)
     }
+    
+    
+    
     func stopAnimatingRedRing(){
         redRing.removeAnimation(forKey: animatorKey)
         redRing.strokeEnd = 0
@@ -83,11 +88,33 @@ class CameraCaptureRingView: UIView{
 
 
 
+
+
+
+
+
+
+
+protocol CameraCaptureButtonDelegate: class{
+    func respondToTap()
+    func respondToLongPress(event: CameraCaptureButton.LongPressEvent)
+    func shouldRespondToLongPressGesture() -> Bool
+}
+
+
 class CameraCaptureButton: UIView{
+    
+    
+    
+    enum LongPressEvent{ case began, ended }
+
+    
     private var ringView = CameraCaptureRingView()
+    
     private var redCircle: UIView = {
         let x = HKCircleView()
         x.backgroundColor = .red
+        x.isUserInteractionEnabled = false
         return x
     }()
     
@@ -95,21 +122,47 @@ class CameraCaptureButton: UIView{
         ringView.whiteRing.strokeColor = color.cgColor
     }
     
-    init(){
+    private weak var delegate: CameraCaptureButtonDelegate?
+    
+    init(delegate: CameraCaptureButtonDelegate){
+        self.delegate = delegate
         super.init(frame: CGRect.zero)
         setUpViews()
         let gesture = UILongPressGestureRecognizer(target: self, action: #selector(respondToLongTapGesture(gesture:)))
         addGestureRecognizer(gesture)
+        gesture.minimumPressDuration = 0.3
+        gesture.stopInterferingWithTouchesInView()
+        
+        let gesture2 = UITapGestureRecognizer(target: self, action: #selector(respondToTapGesture(gesture:)))
+        addGestureRecognizer(gesture2)
         
     }
     
+    @objc private func respondToTapGesture(gesture: UITapGestureRecognizer){
+        delegate?.respondToTap()
+    }
+    
     @objc private func respondToLongTapGesture(gesture: UILongPressGestureRecognizer){
+        guard let delegate = delegate else {return}
+        
+        
         if gesture.state == .began {
+            if delegate.shouldRespondToLongPressGesture().isFalse{ return }
+            delegate.respondToLongPress(event: .began)
             self.startAnimating()
         } else if gesture.state == .ended{
+            if delegate.shouldRespondToLongPressGesture().isFalse{ return }
+            delegate.respondToLongPress(event: .ended)
             self.stopAnimating()
         }
+        
     }
+    
+
+    
+    
+    
+    
     
     private func setUpViews(){
         self.ringView.pinAllSides(addTo: self, pinTo: self)
@@ -118,17 +171,16 @@ class CameraCaptureButton: UIView{
     }
     
     private let minRedCircleTransform = CGAffineTransform(scaleX: 0.0000001, y: 0.0000001)
-    
-    
-    
+
     private func startAnimating(){
         UIView.animate(withDuration: 1, delay: 0.2, options: .curveEaseOut, animations: {
             self.ringView.transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
             self.redCircle.transform = CGAffineTransform.identity
-            
         }, completion: nil)
         self.ringView.startAnimatingRedRing()
     }
+    
+
     
     private func stopAnimating(){
         UIView.animate(withDuration: 0.4, delay: 0, options: .curveEaseOut, animations: {

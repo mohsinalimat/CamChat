@@ -6,106 +6,111 @@
 //  Copyright © 2018 Patrick Hanna. All rights reserved.
 //
 
-import UIKit
+import HelpKit
 import AVFoundation
 
-class CameraVC: UIViewController{
+
+
+
+
+
+class CameraVC: UIViewController {
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        prepareCamera()
-
-
+    
+    private let camera: Camera
+    
+    
+    init(cameraDelegate: CameraDelegate){
         
+        self.camera = Camera(delegate: cameraDelegate)
+        super.init(nibName: nil, bundle: nil)
     }
-
-    
-    
-    
-    let captureSession = AVCaptureSession()
-    var previewLayer: AVCaptureVideoPreviewLayer!
-    
-    var captureDevice: AVCaptureDevice!
-    
-    
-    private weak var stopCaptureSessionTimer: Timer!
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
-        stopCaptureSessionTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: false, block: {[weak self, weak captureSession] (timer) in
-            
-            guard let self = self, let captureSession = captureSession else {return}
-            
-            DispatchQueue.global(qos: .background).async {
-                if captureSession.isRunning{
-                    captureSession.stopRunning()
-                }
-            }
-            timer.invalidate()
-            self.stopCaptureSessionTimer = nil
-        })
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        if let timer = stopCaptureSessionTimer{timer.invalidate(); stopCaptureSessionTimer = nil}
-        DispatchQueue.global(qos: .background).async { [weak captureSession] in
-            
-            guard let captureSession = captureSession else {return}
-            
-            if captureSession.isRunning.isFalse{
-                captureSession.startRunning()
-            }
-        }
-    }
-    
   
     
-    
-    
-    
-    
-    
-    func prepareCamera() {
-        captureSession.sessionPreset = AVCaptureSession.Preset.photo
-        
-        let availableDevices = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: AVMediaType.video, position: .back).devices
-        
-        if let availableDevice = availableDevices.first{
-            captureDevice = availableDevice
-            beginSession()
-            
-        }
+    func getCaptureButton() -> CameraCaptureButton{
+        return cameraCaptureButton
     }
     
-    func beginSession () {
-        do {
-            let captureDeviceInput = try AVCaptureDeviceInput(device: captureDevice)
-            
-            captureSession.addInput(captureDeviceInput)
-            
-        } catch {
-            print(error.localizedDescription)
-        }
-    
-        previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        previewLayer.videoGravity = .resizeAspectFill
-        previewLayer.connection?.videoOrientation = .portrait
-        previewLayer.frame = view.bounds
+    private lazy var cameraCaptureButton: CameraCaptureButton = {
+        let x = CameraCaptureButton(delegate: self)
+        return x
+    }()
 
-        view.layer.addSublayer(previewLayer)
-        captureSession.startRunning()
 
-        let dataOutput = AVCaptureVideoDataOutput()
-        dataOutput.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: NSNumber(value:kCVPixelFormatType_32BGRA)]
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setUpPreviewLayer()
         
-        dataOutput.alwaysDiscardsLateVideoFrames = true
-        
-        if captureSession.canAddOutput(dataOutput) {
-            captureSession.addOutput(dataOutput)
-        }
-        
-        captureSession.commitConfiguration()
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(respondToTapGesture(gesture:)))
+        tapGesture.numberOfTapsRequired = 2
+        view.addGestureRecognizer(tapGesture)
     }
+    
+    
+    
+    @objc private func respondToTapGesture(gesture: UITapGestureRecognizer){
+        if gesture.state == .ended{
+            camera.flipCamera()
+        }
+    }
+
+    
+    private func setUpPreviewLayer() {
+        
+        let layer = camera.getPreviewLayer()
+        layer.frame = view.bounds
+        view.layer.addSublayer(layer)
+        
+    }
+    
+    var isFlashEnabled: Bool{
+        get{return camera.isFlashEnabled}
+        set{camera.isFlashEnabled = newValue}
+    }
+   
+    func flipCamera(){
+        camera.flipCamera()
+    }
+    
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init coder has not being implemented")
+    }
+}
+
+
+extension CameraVC: CameraCaptureButtonDelegate{
+    
+    private var cameraAccessWarning: String {
+        return "Please allow CamChat access to the camera and microphone in your privacy settings."
+    }
+    
+    func respondToTap() {
+        if camera.isActive.isFalse {
+            presentOopsAlert(description: cameraAccessWarning)
+            return
+        }
+        camera.takePhoto()
+    }
+    
+    func respondToLongPress(event: CameraCaptureButton.LongPressEvent) {
+        
+        switch event {
+        case .began: camera.startRecordingVideo()
+        case .ended: camera.stopRecordingVideo()
+        }
+    }
+
+    func shouldRespondToLongPressGesture() -> Bool {
+        if camera.isActive.isFalse{
+            showCameraAccessWarning()
+            return false
+        } else { return true }
+    }
+    
+    private func showCameraAccessWarning(){
+        cameraCaptureButton.gestureRecognizers?.forEach{ $0.cancelCurrentTouch() }
+        presentOopsAlert(description: cameraAccessWarning)
+    }
+    
 }
