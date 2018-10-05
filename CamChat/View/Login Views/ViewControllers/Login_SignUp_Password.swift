@@ -14,9 +14,6 @@ class Login_SignUp_Password: SignUpFormVCTemplate{
     override func viewDidLoad() {
         super.viewDidLoad()
         buttonView.setButtonText(to: "Continue")
-    
-        
-    
     }
     
     override var nextScreenType: SignUpFormVCTemplate.Type{

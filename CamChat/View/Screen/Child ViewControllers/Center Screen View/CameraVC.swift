@@ -60,7 +60,6 @@ class CameraVC: UIViewController {
         let layer = camera.getPreviewLayer()
         layer.frame = view.bounds
         view.layer.addSublayer(layer)
-        
     }
     
     var isFlashEnabled: Bool{
@@ -81,27 +80,27 @@ class CameraVC: UIViewController {
 
 extension CameraVC: CameraCaptureButtonDelegate{
     
-    private var cameraAccessWarning: String {
-        return "Please allow CamChat access to the camera and microphone in your privacy settings."
-    }
+    
     
     func respondToTap() {
-        if camera.isActive.isFalse {
-            presentOopsAlert(description: cameraAccessWarning)
-            return
-        }
         camera.takePhoto()
     }
     
     func respondToLongPress(event: CameraCaptureButton.LongPressEvent) {
-        
         switch event {
         case .began: camera.startRecordingVideo()
         case .ended: camera.stopRecordingVideo()
         }
     }
-
-    func shouldRespondToLongPressGesture() -> Bool {
+    
+    
+    func panGestureTranslationChangedTo(translation: CGPoint) {
+        let desiredScale = -translation.y / 4200
+        camera.setZoomScaleTo(desiredScale)
+    }
+    
+    
+    func shouldRespondToUserInteraction() -> Bool {
         if camera.isActive.isFalse{
             showCameraAccessWarning()
             return false
@@ -110,7 +109,6 @@ extension CameraVC: CameraCaptureButtonDelegate{
     
     private func showCameraAccessWarning(){
         cameraCaptureButton.gestureRecognizers?.forEach{ $0.cancelCurrentTouch() }
-        presentOopsAlert(description: cameraAccessWarning)
+        presentOopsAlert(description: "Please allow CamChat access to the camera and microphone in your privacy settings.")
     }
-    
 }

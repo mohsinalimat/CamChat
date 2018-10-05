@@ -9,89 +9,139 @@
 import AVFoundation
 import HelpKit
 
+
+
+
 protocol CameraDelegate: class {
+
     func willTakePhoto()
     func didTakePhoto(image: UIImage)
     
     func didStartRecordingVideo()
     func willFinishRecordingVideo()
     func didFinishRecordingVideo(url: URL)
+
 }
+
 
 
 
 
 class Camera: NSObject {
     
-    private let captureSession = AVCaptureSession()
+    private let cameraCaptureSession = AVCaptureSession()
+    private let microphoneCaptureSession = AVCaptureSession()
     
-    var isActive: Bool{
-        
-        return captureSession.inputs.count >= 2 || captureSession.isRunning.isFalse
-    }
+    var isActive = false
     
     private var photoCaptureOutput: AVCapturePhotoOutput?
     private var videoCaptureOutput: AVCaptureVideoDataOutput?
     private var audioCaptureOutput: AVCaptureAudioDataOutput?
     
     private var videoWriter: VideoWriter!
-    
+    private var photoWriter: PhotoWriter!
     
     private weak var delegate: CameraDelegate?
+    
+    private enum CameraPosition{case front, back}
+    
+    
+    private var currentCameraInfo: (deviceInput: AVCaptureDeviceInput, position: CameraPosition)?
+    
+    private let flasher = Flasher()
     
     init(delegate: CameraDelegate){
         self.delegate = delegate
         super.init()
-        prepareCamera()
-    }
+        
+        
+        handleAuthoriziationOfCaptureDevices { (callback) in
+            switch callback{
+            case .success: self.setUp()
     
-    
-    var isFlashEnabled = false
-    
-
-    func getPreviewLayer() -> CALayer{
-        let previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        previewLayer.videoGravity = .resizeAspectFill
-        previewLayer.connection?.videoOrientation = .portrait
-        return previewLayer
-    }
-    
-    
-    func startRecordingVideo(){
-        videoWriter?.startWriting()
-        delegate?.didStartRecordingVideo()
-    }
-    
-    func stopRecordingVideo(){
-        guard let videoWriter = videoWriter else {return}
-        self.delegate?.willFinishRecordingVideo()
-        videoWriter.stopWriting { (url) in
-            DispatchQueue.main.async {
-                self.delegate?.didFinishRecordingVideo(url: url)
+            case .failure: return
             }
         }
     }
     
     
-    func takePhoto(){
-        if captureSession.isRunning.isFalse{return}
-        delegate?.willTakePhoto()
-        let settings = AVCapturePhotoSettings()
-        settings.isAutoStillImageStabilizationEnabled = false
-        settings.flashMode = isFlashEnabled ? .on : .off
+    var isFlashEnabled = false
+    
+    
+    private func setUp(){
+        
+        #if !targetEnvironment(simulator)
+        
+        setUpMicrophoneCaptureSession()
+        setUpCameraCaptureSession()
+        
+        videoWriter = VideoWriter(videoOutput: self.videoCaptureOutput!, audioOutput: self.audioCaptureOutput!)
+        photoWriter = PhotoWriter(photoOutput: self.photoCaptureOutput!)
+        isActive = true
+        
+        #endif
+    }
+    
+    private func tearDown(){
+        photoWriter = nil
+        videoWriter = nil
+        audioCaptureOutput = nil
+        videoCaptureOutput = nil
+        photoCaptureOutput = nil
+        isActive = false
+    }
+    
+    
+    private func handleAuthoriziationOfCaptureDevices(completion: @escaping (HKFailableCompletion) -> Void){
+    
+        handleAuthorization(for: .audio) { (callback) in
+            switch callback {
+            case .success: self.handleAuthorization(for: .video, completion: {completion($0)})
+            case .failure(let error): completion(.failure(error))
+            }
+        }
+        
+    }
+    
+    private func handleAuthorization(for deviceType: AVMediaType, completion: @escaping (HKFailableCompletion) -> Void){
+        
+        switch AVCaptureDevice.authorizationStatus(for: deviceType){
+        case .authorized: completion(.success)
+        case .notDetermined: AVCaptureDevice.requestAccess(for: deviceType) {
+                completion($0 ? .success : .failure(HKError.unknownError))
+            }
+        case .denied, .restricted: completion(.failure(HKError.unknownError))
+        }
         
         
-        photoCaptureOutput?.capturePhoto(with: settings, delegate: self)
     }
     
     
     
-    private func prepareCamera() {
+    
 
-        captureSession.beginConfiguration()
-        captureSession.sessionPreset = .hd1280x720
+    private func setUpMicrophoneCaptureSession(){
+        microphoneCaptureSession.beginConfiguration()
         
-        self.setUpCaptureSesionInputsFor(position: .back)
+        microphoneCaptureSession.sessionPreset = .hd1280x720
+        
+        let audioOutput = AVCaptureAudioDataOutput()
+        self.audioCaptureOutput = audioOutput
+        
+        microphoneCaptureSession.addOutput(audioOutput)
+        
+        let audioDevice = AVCaptureDevice.default(for: .audio)!
+        set(session: microphoneCaptureSession, withCaptureDevice: audioDevice)
+        
+        microphoneCaptureSession.commitConfiguration()
+
+    }
+    
+    private func setUpCameraCaptureSession(){
+        cameraCaptureSession.beginConfiguration()
+        
+        cameraCaptureSession.sessionPreset = .hd1280x720
+        
         
         let photoOutput = AVCapturePhotoOutput()
         self.photoCaptureOutput = photoOutput
@@ -99,75 +149,122 @@ class Camera: NSObject {
         
         let videoOutput = AVCaptureVideoDataOutput()
         videoOutput.alwaysDiscardsLateVideoFrames = true
-        
         self.videoCaptureOutput = videoOutput
         
-        let audioOutput = AVCaptureAudioDataOutput()
-        self.audioCaptureOutput = audioOutput
-
-        
-        for ouput in [photoOutput, videoOutput, audioOutput]{
-            captureSession.addOutput(ouput)
+        for ouput in [photoOutput, videoOutput]{
+            cameraCaptureSession.addOutput(ouput)
         }
+        setUpCameraCaptureSesionInputFor(position: .back)
+
+        cameraCaptureSession.commitConfiguration()
         
-        captureSession.commitConfiguration()
-        self.videoWriter = VideoWriter(audioOutput: audioOutput, videoOutput: videoOutput, flashController: self)
-        captureSession.startRunning()
+        cameraCaptureSession.startRunning()
     }
     
     
     
+    func getPreviewLayer() -> CALayer {
+        let previewLayer = AVCaptureVideoPreviewLayer(session: cameraCaptureSession)
+        previewLayer.videoGravity = .resizeAspectFill
+        previewLayer.connection?.videoOrientation = .portrait
+        return previewLayer
+    }
     
+    
+    func startRecordingVideo() {
+        guard let videoWriter = videoWriter, let currentCamera = currentCameraInfo?.deviceInput else {return}
+        if isActive.isFalse || videoWriter.isWriting {return}
+        microphoneCaptureSession.startRunning()
+        if isFlashEnabled{ flasher.turnOnFlash(forCaptureInput: currentCamera) }
+        videoWriter.startWriting()
+        delegate?.didStartRecordingVideo()
+    }
+    
+    func stopRecordingVideo(){
+        defer{ self.microphoneCaptureSession.stopRunning() }
+        guard isActive, let videoWriter = videoWriter else {return}
+        
+        let camera = currentCameraInfo!.deviceInput
+        flasher.turnOffFlash(forCaptureInput: camera)
+        
+        self.delegate?.willFinishRecordingVideo()
+        videoWriter.finishWriting { (url) in
+            DispatchQueue.main.async {
+                self.delegate?.didFinishRecordingVideo(url: url)
+                
+                handleErrorWithPrintStatement {
+                    
+                    let device = self.currentCameraInfo!.deviceInput.device
+                    if device.videoZoomFactor == 1 {return}
+                    try device.lockForConfiguration()
+                    device.ramp(toVideoZoomFactor: 1, withRate: 15)
+                    device.unlockForConfiguration()
+                }
+            }
+        }
+    }
+    
+    
+    func takePhoto(){
+        if isActive.isFalse{return}
+        delegate?.willTakePhoto()
+        photoWriter?.takePhoto(shouldUseFlash: isFlashEnabled, completion: { (image) in
+            self.delegate?.didTakePhoto(image: image)
+        })
+    }
+    
+
+    func flipCamera() {
+        
+        guard isActive, let cameraInfo = currentCameraInfo else { return }
+        setUpCameraCaptureSesionInputFor(position: cameraInfo.position == .back ? .front : .back)
+    }
+    
+    /// 0 represents no zoom, 1 represents the maximum zoom allowed.
+    func setZoomScaleTo(_ val: CGFloat){
+        guard let currentCamera = currentCameraInfo?.deviceInput.device else {return}
+        let desiredScale = currentCamera.minAvailableVideoZoomFactor + ((currentCamera.maxAvailableVideoZoomFactor - currentCamera.minAvailableVideoZoomFactor) * val)
+        handleErrorWithPrintStatement {
+            try currentCamera.lockForConfiguration()
+            currentCamera.videoZoomFactor = max(min(desiredScale, currentCamera.maxAvailableVideoZoomFactor), currentCamera.minAvailableVideoZoomFactor)
+            currentCamera.unlockForConfiguration()
+        }
+    }
     
  
-    
-    
-    
-    func flipCamera(){
-        setUpCaptureSesionInputsFor(position: currentCameraPosition == .back ? .front : .back)
+  
+    private func setUpCameraCaptureSesionInputFor(position: CameraPosition){
+
+        cameraCaptureSession.beginConfiguration()
+        
+        let camera = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: AVMediaType.video, position: position == .back ? .back : .front).devices.first!
+        
+        if let previousCameraInput = currentCameraInfo?.deviceInput{
+            flasher.turnOffFlash(forCaptureInput: previousCameraInput)
+            cameraCaptureSession.removeInput(previousCameraInput)
+        }
+        
+        let cameraInput = set(session: cameraCaptureSession, withCaptureDevice: camera)!
+        currentCameraInfo = (cameraInput, position)
+        
+        adjustOutputConnectionMirroringFor(position: position)
+        
+        
+        cameraCaptureSession.commitConfiguration()
+        
+        if let writer = videoWriter {
+            if writer.isWriting && isFlashEnabled.isTrue{
+                flasher.turnOnFlash(forCaptureInput: cameraInput)
+            }
+        }
     }
     
-    
-    private enum CameraPosition{case front, back}
-    
-    private var currentCameraPosition = CameraPosition.back
-    
-    private var currentCameraInput: AVCaptureDeviceInput?
-    private var previousUserBrighnesSetting: CGFloat?
-    private var currentBrightnessWhiteView: UIView?
-    
-    
-    
-    private func setUpCaptureSesionInputsFor(position: CameraPosition){
-        
-        if let writer = self.videoWriter{writer.pauseForCameraFlip()}
-    
-        captureSession.beginConfiguration()
-
-        defer {
-            currentCameraPosition = position
-            captureSession.commitConfiguration()
-            if let writer = self.videoWriter{writer.resumeAfterCameraFlip()}
-        }
-        
-        guard let camera = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: AVMediaType.video, position: position == .back ? .back : .front).devices.first,
-            let audioDevice = AVCaptureDevice.default(for: .audio)
-            else { return }
-        
-        
-        if let previousCameraInput = currentCameraInput{
-            captureSession.removeInput(previousCameraInput)
-        } else {
-            setSessionWith(captureDevice: audioDevice)
-        }
-        
-        let cameraInput = setSessionWith(captureDevice: camera)!
-        currentCameraInput = cameraInput
-        
+    private func adjustOutputConnectionMirroringFor(position: CameraPosition){
         let shouldMirrorOutput = position == .front
         
-        for output in [photoCaptureOutput].filterOutNils(){
-            output.connections.forEach{
+        for output in [photoCaptureOutput, videoCaptureOutput].filterOutNils(){
+            output.connections.forEach {
+                $0.videoOrientation = .portrait
                 $0.automaticallyAdjustsVideoMirroring = false
                 $0.isVideoMirrored = shouldMirrorOutput
             }
@@ -177,97 +274,19 @@ class Camera: NSObject {
     
     
     
-    
-    
-    @discardableResult private func setSessionWith(captureDevice: AVCaptureDevice) -> AVCaptureDeviceInput? {
+    @discardableResult private func set(session: AVCaptureSession, withCaptureDevice device: AVCaptureDevice) -> AVCaptureDeviceInput? {
         
-        if let input = try? AVCaptureDeviceInput(device: captureDevice){
-            if captureSession.canAddInput(input){
-                captureSession.addInput(input)
+        if let input = try? AVCaptureDeviceInput(device: device){
+            if session.canAddInput(input){
+                session.addInput(input)
+                return input
             }
-            return input
         }
         return nil
     }
-    
-    
-    
-    
-    
-}
-
-extension Camera: CaptureDeviceFlashController{
-    
-    func flashIsNeeded() {
-        if let currentCamera = currentCameraInput{
-            if currentCamera.device.isTorchAvailable{
-                handleErrorWithPrintStatement {
-                    try currentCamera.device.lockForConfiguration()
-                    currentCamera.device.torchMode = .on
-                    currentCamera.device.unlockForConfiguration()
-                }
-            }
-            
-            if currentCameraPosition == .front{
-                enableArtificialFlash()
-            }
-        }
-    }
-    
-    func flashIsNoLongerNeeded() {
-        if let currentCamera = currentCameraInput{
-            
-            if currentCamera.device.isTorchAvailable{
-                handleErrorWithPrintStatement {
-                    try currentCamera.device.lockForConfiguration()
-                    currentCamera.device.torchMode = .off
-                    currentCamera.device.unlockForConfiguration()
-                }
-            }
-            
-            disableArtificialFlash()
-            
-        }
-    }
-    
-    private func enableArtificialFlash(){
-        
-        DispatchQueue.main.async {
-            self.previousUserBrighnesSetting = UIScreen.main.brightness
-            UIScreen.main.brightness = 1
-            let whitenessView = UIView(frame: UIScreen.main.bounds)
-            whitenessView.backgroundColor = .white
-            whitenessView.alpha = 0.8
-            whitenessView.isUserInteractionEnabled = false
-            self.currentBrightnessWhiteView = whitenessView
-            UIApplication.shared.keyWindow?.addSubview(whitenessView)
-        }
-    }
-    
-    private func disableArtificialFlash(){
-        if let previous = previousUserBrighnesSetting{
-            previousUserBrighnesSetting = nil
-            UIScreen.main.brightness = previous
-        }
-        if let whitenessView = currentBrightnessWhiteView{
-            DispatchQueue.main.async {
-                whitenessView.removeFromSuperview()
-                self.currentBrightnessWhiteView = nil
-            }
-            
-        }
-    }
 }
 
 
-extension Camera: AVCapturePhotoCaptureDelegate{
-    
-    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        if let error = error{ print(error); return }
-        
-        if let imageData = photo.fileDataRepresentation(), let image = UIImage(data: imageData, scale: 1){
-            delegate?.didTakePhoto(image: image)
-        } else { fatalError() }
-    }
-    
-}
+
+
+

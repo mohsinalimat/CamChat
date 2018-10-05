@@ -238,17 +238,17 @@ class ChatTableViewVM: NSObject, NSFetchedResultsControllerDelegate, UITableView
         
         for insertion in insertions{
             switch insertion{
-            case .cellInsert(let indexPath):
+            case let .cellInsert(indexPath):
                 tableView.insertRows(at: [indexPath], with: .none)
-            case .cellReload(let indexPath):
+            case let .cellReload(indexPath):
                 tableView.reloadRows(at: [indexPath], with: .none)
-            case .cellRemoval(let indexPath):
+            case let .cellRemoval(indexPath):
                 tableView.deleteRows(at: [indexPath], with: .none)
-            case .sectionInsert(let index):
+            case let .sectionInsert(index):
                 tableView.insertSections([index], with: .none)
-            case .sectionRemoval(let index):
+            case let .sectionRemoval(index):
                 tableView.deleteSections([index], with: .none)
-            case .sectionHeaderReload(let index):
+            case let .sectionHeaderReload(index):
                 if let header = tableView.headerView(forSection: index) as? ChatMessagesSectionHeaderView{
                     header.setWith(section: messageSections[index])
                 }

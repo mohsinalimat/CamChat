@@ -72,7 +72,7 @@ public class User: NSManagedObject, ManagedObjectProtocol{
     func startSeeningAllSentMessages(){
         User.currentUserIDForSeening = self.uniqueID
         managedObjectContext!.perform {
-            self.sentMessages.forEach{$0.markAsSeenIfNeeded()}
+            self.sentMessages.forEach { $0.markAsSeenIfNeeded() }
             self.managedObjectContext!.saveChanges()
         }
     }
@@ -93,7 +93,6 @@ public class User: NSManagedObject, ManagedObjectProtocol{
         managedObjectContext!.perform {
             self.mostRecentMessage = self.getMostRecentMessage()
         }
-        
     }
     
     
@@ -104,7 +103,7 @@ public class User: NSManagedObject, ManagedObjectProtocol{
         request.fetchLimit = 1
         
         var messageToReturn: Message?
-        do{ messageToReturn = try self.context.fetch(request).first }
+        do { messageToReturn = try self.context.fetch(request).first }
         catch { fatalError() }
         
         return messageToReturn
@@ -113,6 +112,7 @@ public class User: NSManagedObject, ManagedObjectProtocol{
     
     
     var profilePicture: UIImage {
+        
         return NSKeyedUnarchiver.unarchiveObject(with: profilePictureData) as! UIImage
     }
     

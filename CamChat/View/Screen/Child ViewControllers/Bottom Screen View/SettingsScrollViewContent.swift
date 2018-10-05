@@ -67,9 +67,8 @@ class SettingsScrollContentView: UIView{
         
         
         alert.addPrimaryButtonAction({ [unowned alert] in
-            do{
-                try DataCoordinator.logOut()
-            } catch {
+            do { try DataCoordinator.logOut() }
+            catch {
                 alert.dismiss(animated: true, completion: {
                     vcOwner.presentOopsAlert(description: error.localizedDescription)
                 })
@@ -102,14 +101,13 @@ class SettingsScrollContentView: UIView{
     }()
     
     
-    
     lazy var logOutButton: UIView = {
         let x = LogOutSettingsButton(info: logOutButtonInfo)
         x.pin(constants: [.height: 40, .width: 200])
         return x
     }()
     
-
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init coder has not being implemented")
     }

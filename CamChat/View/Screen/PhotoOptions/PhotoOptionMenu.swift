@@ -7,26 +7,55 @@
 //
 
 import HelpKit
+import Photos
 
 private struct PhotoOption{
     
+    init(image: UIImage?, text: String, action: (() -> Void)? = nil){
+        self.image = image
+        self.text = text
+        self.action = action
+    }
+    
     var image: UIImage?
     var text: String
-    
+    var action: (() -> Void)?
 }
 
+protocol PhotoOptionMenuDelegate: class {
+    func memoryWillBeDeleted()
+}
 
 class PhotoOptionMenu: UIView{
     
     
-    private var options = [
-        PhotoOption(image: AssetImages.shareIcon, text: "Share Photo"),
-        PhotoOption(image: AssetImages.trashIcon, text: "Delete Photo"),
-        PhotoOption(image: nil, text: "Send Photo")
+    private lazy var options = [
+        PhotoOption(image: AssetImages.downloadIcon, text: "Save \(memoryLabel) to Camera Roll", action: { [weak self] in self?.respondToCameraRollSaveOptionTapped()}),
+        PhotoOption(image: AssetImages.shareIcon, text: "Share \(memoryLabel)", action: {[weak self ] in self?.respondToShareOption()}),
+        PhotoOption(image: AssetImages.trashIcon, text: "Delete \(memoryLabel)", action: {[weak self] in self?.respondToMemoryDeletionOption()}),
+        PhotoOption(image: nil, text: "Send \(memoryLabel)")
     ]
     
     
-    init(){
+    
+    
+    private let memory: Memory
+    
+    private var memoryLabel: String{
+        switch memory.info{
+        case .photo: return "Photo"
+        case .video: return "Video"
+        }
+    }
+    
+    private weak var vcOwner: UIViewController?
+    private weak var delegate: PhotoOptionMenuDelegate?
+    init(memory: Memory, vcOwner: UIViewController, delegate: PhotoOptionMenuDelegate?){
+        
+
+        self.delegate = delegate
+        self.vcOwner = vcOwner
+        self.memory = memory
         super.init(frame: CGRect.zero)
         setUpViews()
         setCornerRadius(to: 10)
@@ -64,9 +93,11 @@ private class PhotoOptionView: SimpleInteractiveButton{
         self.option = option
         
         super.init()
+        if let action = option.action{addAction(action)}
+        
         maximumDimmingAlpha = 0.1
         imageViewLayoutGuide.pin(addTo: self, anchors: [.left: leftAnchor, .top: topAnchor, .bottom: bottomAnchor, .width: heightAnchor])
-        imageView.pin(addTo: self, anchors: [.centerX: imageViewLayoutGuide.centerXAnchor, .centerY: imageViewLayoutGuide.centerYAnchor], constants: [.height: 30, .width: 30])
+        imageView.pin(addTo: self, anchors: [.centerX: imageViewLayoutGuide.centerXAnchor, .centerY: imageViewLayoutGuide.centerYAnchor], constants: [.height: 25, .width: 25])
         label.pin(addTo: self, anchors: [.left: imageViewLayoutGuide.rightAnchor, .centerY: centerYAnchor])
         bottomLine.pin(addTo: self, anchors: [.left: leftAnchor, .bottom: bottomAnchor, .right: rightAnchor])
     }
@@ -104,5 +135,66 @@ private class PhotoOptionView: SimpleInteractiveButton{
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init coder has not being implemented")
+    }
+}
+
+
+
+
+extension PhotoOptionMenu{
+    
+
+    private func respondToCameraRollSaveOptionTapped(){
+        Memory.saveToCameraRoll(memories: [self.memory]) {[weak self] (success) in
+            self?.respondToCameraRollSaveCompletion(success: success)
+        }
+    }
+    
+    private func respondToCameraRollSaveCompletion(success: Bool){
+        
+        if success {
+            if let presenting = self.vcOwner?.presentingViewController{
+                self.vcOwner?.dismiss(animated: true, completion: {[weak self] in
+                    self?.presentSuccessfulCameraRollSaveAlertFor(vc: presenting)
+                })
+            } else { self.presentSuccessfulCameraRollSaveAlertFor(vc: vcOwner!) }
+
+        } else {
+            self.vcOwner?.presentOopsAlert(description: "Something went wrong when trying to save the \(self.memoryLabel.lowercased()). Please ensure that you have allowed CamChat access to your photo library in your privacy settings.")
+        }
+    }
+
+    private func presentSuccessfulCameraRollSaveAlertFor(vc: UIViewController){
+        vc.presentSuccessAlert(description: "The \(self.memoryLabel.lowercased()) was successfully saved to your device!")
+    }
+    
+    private func respondToMemoryDeletionOption(){
+        
+        let alert = vcOwner?.presentCCAlert(title: "Are you sure you want to delete this \(self.memoryLabel.lowercased())?", description: "Deleted photos and videos cannot be recovered.", primaryButtonText: "Delete", secondaryButtonText: "Cancel")
+        alert?.addPrimaryButtonAction { [weak alert, weak self] in
+            guard let self = self else { return }
+            alert?.dismiss(animated: true, completion: {
+                if (self.vcOwner?.presentingViewController).isNotNil{
+                    self.vcOwner?.dismiss(animated: true) {
+                        self.delegate?.memoryWillBeDeleted()
+                        Memory.delete(memories: [self.memory])
+                    }
+                } else {
+                    self.delegate?.memoryWillBeDeleted()
+                    Memory.delete(memories: [self.memory])
+                }
+            })
+        }
+        alert?.addSecondaryButtonAction {
+            alert?.dismiss()
+        }
+    }
+    
+
+    private func respondToShareOption(){
+        let vc = Memory.getActivityVCFor(memories: [memory])
+        if let presenter = vcOwner?.presentingViewController{
+            vcOwner?.dismiss(animated: true) { presenter.present(vc) }
+        } else { self.vcOwner?.present(vc) }
     }
 }

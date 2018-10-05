@@ -22,9 +22,6 @@ extension CGRect{
     }
 }
 
-
-
-
 protocol PhotoOptionsMiniPresenter: HKVCTransEventAwareParticipator{
     func getSnapshotInfo() -> (snapshot: UIView, cornerRadius: CGFloat, currentFrame: CGRect, currentTransform: CGAffineTransform, endingFrame: CGRect)
 }
@@ -33,7 +30,7 @@ protocol PhotoOptionsMiniPresenter: HKVCTransEventAwareParticipator{
 
 class PhotoOptionsMiniVC: UIViewController {
     
-    override var prefersStatusBarHidden: Bool{return true}
+    override var prefersStatusBarHidden: Bool { return true }
     
     private weak var presenter: PhotoOptionsMiniPresenter!
 
@@ -43,7 +40,11 @@ class PhotoOptionsMiniVC: UIViewController {
         return snapshotInfo.snapshot
     }
     
-    init(presenter: PhotoOptionsMiniPresenter){
+    private let memory: Memory
+    private weak var optionMenuDelegate: PhotoOptionMenuDelegate?
+    init(presenter: PhotoOptionsMiniPresenter, memory: Memory, delegate: PhotoOptionMenuDelegate?){
+        self.optionMenuDelegate = delegate
+        self.memory = memory
         UISelectionFeedbackGenerator().selectionChanged()
         self.presenter = presenter
         
@@ -84,7 +85,7 @@ class PhotoOptionsMiniVC: UIViewController {
     
     private enum MenuPlacement{case left, right, center}
 
-    private let menuSize = CGSize(width: 250, height: 150)
+    private let menuSize = CGSize(width: 280, height: 200)
     private let menu_imageSpacing: CGFloat = 20
     private let viewPadding: CGFloat = 20
     
@@ -119,8 +120,6 @@ class PhotoOptionsMiniVC: UIViewController {
         } else {
             requiredTranslation.y -= max((menuSize.height + menu_imageSpacing + viewPadding) - bottomSpace, 0)
         }
-        
-        
         
         if (newImageFrame.centerAsFrame.x + menuSize.width.half + viewPadding) <= view.frame.width && (newImageFrame.centerAsFrame.x - menuSize.width.half - viewPadding) >= 0{
             self.menuPlacement = .center
@@ -186,7 +185,8 @@ class PhotoOptionsMiniVC: UIViewController {
     
     
     private lazy var optionMenu: PhotoOptionMenu = {
-        let x = PhotoOptionMenu()
+        let x = PhotoOptionMenu(memory: memory, vcOwner: self, delegate: self.optionMenuDelegate)
+        
         return x
     }()
 
@@ -199,15 +199,24 @@ class PhotoOptionsMiniVC: UIViewController {
 extension PhotoOptionsMiniVC: HKVCTransEventAwareParticipator{
     
     func prepareForPresentation() {
-        setInitialViewPositions()
+        if isBeingPresented{
+            setInitialViewPositions()
+        }
+        
     }
     
     func performUnanimatedPresentationAction() {
-        setEndingViewPositions()
+        if isBeingPresented{
+            setEndingViewPositions()
+        }
+        
     }
     
     func performUnanimatedDismissalAction() {
-        revertPositionsBackToInitial()
+        if isBeingDismissed{
+            revertPositionsBackToInitial()
+        }
+        
     }
 }
 

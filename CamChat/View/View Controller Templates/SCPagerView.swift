@@ -11,17 +11,18 @@ import Foundation
 import HelpKit
 
 class SCPagerViewController: UIViewController, SCPagerDataSource, SCPagerDelegate{
-   
-    
-    
-    
+    private let desiredBeginningIndex: Int
+    init(desiredCurrentIndex: Int){
+        self.desiredBeginningIndex = desiredCurrentIndex
+        super.init(nibName: nil, bundle: nil)
+    }
     
     func pagerView(numberOfItemsIn pagerView: SCPagerView) -> Int {
         return 10 
     }
     
-    func pagerView(_ pagerView: SCPagerView, viewForItemAt index: Int, cachedView: UIView?) -> UIView {
-        let newView = UIView()
+    func pagerView(_ pagerView: SCPagerView, cellForItemAt index: Int, cachedView: UIView?) -> SCPagerViewCell {
+        let newView = SCPagerViewCell()
         newView.backgroundColor = UIColor.random
         return newView
     }
@@ -33,18 +34,22 @@ class SCPagerViewController: UIViewController, SCPagerDataSource, SCPagerDelegat
     var pagerView: SCPagerView!
     
     override func loadView() {
-        let newView = SCPagerView(dataSource: self)
+        let newView = SCPagerView(dataSource: self, desiredCurrentIndex: desiredBeginningIndex)
         newView.delegate = self
         self.pagerView = newView
         newView.frame = UIScreen.main.bounds
         self.view = newView
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init coder has not being implemented")
     }
 }
 
 
 protocol SCPagerDataSource: class {
     func pagerView(numberOfItemsIn pagerView: SCPagerView) -> Int
-    func pagerView(_ pagerView: SCPagerView, viewForItemAt index: Int, cachedView: UIView?) -> UIView
+    func pagerView(_ pagerView: SCPagerView, cellForItemAt index: Int, cachedView: UIView?) -> SCPagerViewCell
 }
 
 protocol SCPagerDelegate: class{
@@ -58,21 +63,28 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
     
     private weak var dataSource: SCPagerDataSource?
     
-    private var cachedViews = [UIView]()
+    private var cachedCells = [SCPagerViewCell]()
     
     
-    private func getView(for index: Int) -> UIView{
-        let cachedView = cachedViews.first
-        let cell = dataSource!.pagerView(self, viewForItemAt: index, cachedView: nil)
-        if cell === cachedView{cachedViews.remove(at: 0)}
+    private func getCell(for index: Int) -> SCPagerViewCell{
+        let cachedView = cachedCells.first
+        let cell = dataSource!.pagerView(self, cellForItemAt: index, cachedView: nil)
+        if cell === cachedView{cachedCells.remove(at: 0)}
         return cell
     }
     
     weak var delegate: SCPagerDelegate?
-    
-    init(dataSource: SCPagerDataSource){
+    private(set) var currentItemIndex: Int
+
+    init(dataSource: SCPagerDataSource, desiredCurrentIndex: Int){
+        self.currentItemIndex = desiredCurrentIndex
         self.dataSource = dataSource
         super.init(frame: CGRect.zero)
+        
+        let validIndexRange = (0...dataSource.pagerView(numberOfItemsIn: self) - 1)
+        precondition(validIndexRange.contains(desiredCurrentIndex), "the desired current Index provided to SCPagerView is not valid.")
+        precondition(dataSource.pagerView(numberOfItemsIn: self) > 0, "You must have at least one item to display in an SCPagerView")
+        
         view.backgroundColor = .black
         view.clipsToBounds = true
         setUpViews()
@@ -81,16 +93,28 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         interactor.startAcceptingTouches()
         interactor.onlyAcceptInteractionInSpecifiedDirection = false
         
-        if numberOfItems >= 1{
-            centerView.setContainedView(to: getView(for: 0))
-            if numberOfItems >= 2{
-                rightView.setContainedView(to: getView(for: 1))
-            }
-        } else {fatalError("You must have at least one item to display in an SCPagerView")}
+        let centerCell = getCell(for: desiredCurrentIndex)
+        centerView.setContainedView(to: centerCell)
+        centerCell.didEnterPagerView(); centerCell.willAppear(); centerCell.didAppear()
+        
+        if validIndexRange.contains(desiredCurrentIndex + 1){
+            let rightCell = getCell(for: desiredCurrentIndex + 1)
+            rightView.setContainedView(to: rightCell)
+            rightCell.didEnterPagerView()
+        }
+        
+        if validIndexRange.contains(desiredCurrentIndex - 1){
+            let leftCell = getCell(for: desiredCurrentIndex - 1)
+            leftView.setContainedView(to: leftCell)
+            leftCell.didEnterPagerView()
+        }
+        
     }
     
     
-    
+    var currentCenterCell: SCPagerViewCell{
+        return centerView.containedView!
+    }
  
     
     
@@ -132,17 +156,26 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         if newIndex > numberOfItems - 1 || newIndex < 0 {fatalError("index out of bounds")}
         currentItemIndex = newIndex
         
-        let cache = [leftView.removeContainedView(), rightView.removeContainedView(), centerView.removeContainedView()].filter({$0 != nil}) as! [UIView]
+        let cache = [leftView.removeContainedView(), rightView.removeContainedView(), centerView.removeContainedView()].filterOutNils()
+        cache.forEach{$0.willDisappear(); $0.didDisappear(); $0.didLeavePagerView()}
+        cachedCells.append(contentsOf: cache)
         
-        cachedViews.append(contentsOf: cache)
         
-        centerView.setContainedView(to: getView(for: newIndex))
+        let centerCell = getCell(for: newIndex)
+        centerView.setContainedView(to: centerCell)
+        centerCell.didEnterPagerView(); centerCell.willAppear(); centerCell.didAppear()
+
+        
         if numberOfItems <= 1{return}
         if newIndex > 0 {
-            leftView.setContainedView(to: getView(for: newIndex - 1))
+            let leftCell = getCell(for: newIndex - 1)
+            leftView.setContainedView(to: leftCell)
+            leftCell.didEnterPagerView()
         }
         if newIndex < numberOfItems - 1{
-            rightView.setContainedView(to: getView(for: newIndex + 1))
+            let rightCell = getCell(for: newIndex + 1)
+            rightView.setContainedView(to: rightCell)
+            rightCell.didEnterPagerView()
         }
     }
     
@@ -161,34 +194,69 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         return dataSource!.pagerView(numberOfItemsIn: self)
     }
     
-    private(set) var currentItemIndex = 0
+    
+    
+    private var shouldRespondToGradientDidSnap = true
     
     func gradientDidSnap(fromScreen: PageScrollingInteractor.ScreenType, toScreen: PageScrollingInteractor.ScreenType, direction: ScrollingDirection, interactor: PageScrollingInteractor) {
         
-        if toScreen == .center{return}
+        if shouldRespondToGradientDidSnap.isFalse{return}
         
+        if toScreen == .center{
+            
+            centerView.containedView?.didAppear()
+            leftView.containedView?.didDisappear()
+            rightView.containedView?.didDisappear()
+            
+            return
+        }
+        
+        shouldRespondToGradientDidSnap = false
         interactor.snapGradientTo(screen: .center, animated: false)
+        shouldRespondToGradientDidSnap = true
         
         switch toScreen{
         case .first:
             currentItemIndex -= 1
             
-            if let view = rightView.removeContainedView(){cachedViews.append(view)}
+            if let view = rightView.removeContainedView(){
+                view.didDisappear(); view.didLeavePagerView()
+                cachedCells.append(view)
+            }
             
-            rightView.setContainedView(to: centerView.removeContainedView()!)
-            centerView.setContainedView(to: leftView.removeContainedView()!)
+            let newRightCell = centerView.removeContainedView()!
+            rightView.setContainedView(to: newRightCell)
+            newRightCell.didDisappear()
+            
+            let newCenterCell = leftView.removeContainedView()!
+            centerView.setContainedView(to: newCenterCell)
+            newCenterCell.didAppear()
+            
             if currentItemIndex > 0{
-                leftView.setContainedView(to: getView(for: currentItemIndex - 1))
+                let newLeftCell = getCell(for: currentItemIndex - 1)
+                leftView.setContainedView(to: newLeftCell)
+                newLeftCell.didEnterPagerView()
             }
         case .last:
             currentItemIndex += 1
             
-            if let view = leftView.removeContainedView(){cachedViews.append(view)}
+            if let view = leftView.removeContainedView(){
+                view.didDisappear(); view.didLeavePagerView()
+                cachedCells.append(view)
+            }
             
-            leftView.setContainedView(to: centerView.removeContainedView()!)
-            centerView.setContainedView(to: rightView.removeContainedView()!)
+            let newLeftCell = centerView.removeContainedView()!
+            leftView.setContainedView(to: newLeftCell)
+            newLeftCell.didDisappear()
+            
+            let newCenterCell = rightView.removeContainedView()!
+            centerView.setContainedView(to: newCenterCell)
+            newCenterCell.didAppear()
+            
             if currentItemIndex < numberOfItems - 1{
-                rightView.setContainedView(to: getView(for: currentItemIndex + 1))
+                let newRightCell = getCell(for: currentItemIndex + 1)
+                rightView.setContainedView(to: newRightCell)
+                newRightCell.didEnterPagerView()
             }
         default: break
         }
@@ -207,13 +275,24 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
     private lazy var sideViewsTransformEquation = CGAbsEquation(xy(-1, 1), xy(0, minimumViewTransform), xy(1, 1), min: minimumViewTransform, max: 1)!
     private lazy var sideViewsAlphaEquation = CGAbsEquation(xy(-1, 1), xy(0, 0), xy(1, 1), min: 0, max: 1)!
     
+    func gradientWillBeginChanging(interactor: PageScrollingInteractor, direction: ScrollingDirection) {
+        if shouldRespondToGradientDidSnap.isFalse{return}
+        
+        centerView.containedView?.willDisappear()
+        leftView.containedView?.willAppear()
+        rightView.containedView?.willAppear()
+        
+        
+    }
     
     
     func gradientDidChange(to gradient: CGFloat, direction: ScrollingDirection, interactor: PageScrollingInteractor) {
        
         if (currentItemIndex == 0 && gradient < 0) ||
             (currentItemIndex == numberOfItems - 1 && gradient > 0){
+            shouldRespondToGradientDidSnap = false
             interactor.snapGradientTo(screen: .center, animated: false)
+            shouldRespondToGradientDidSnap = true
             return
         }
         
@@ -267,7 +346,7 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         var views = [SCPagerContainerView]()
         for x in 1...3{
             let x = SCPagerContainerView()
-            x.backgroundColor = .orange
+            x.backgroundColor = .black
             views.append(x)
         }
         return views
@@ -293,16 +372,16 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
 
 fileprivate class SCPagerContainerView: UIView {
     
-    private var containedView: UIView?
+    private(set) var containedView: SCPagerViewCell?
     
-    func removeContainedView() -> UIView?{
+    func removeContainedView() -> SCPagerViewCell?{
         containedView?.removeFromSuperview()
         let x = containedView
         containedView = nil
         return x
     }
     
-    func setContainedView(to view: UIView){
+    func setContainedView(to view: SCPagerViewCell){
         subviews.forEach{$0.removeFromSuperview()}
         self.layoutIfNeeded()
         self.containedView = view
@@ -315,5 +394,32 @@ fileprivate class SCPagerContainerView: UIView {
         if let containedView = containedView{
             containedView.frame = self.bounds
         }
+    }
+}
+
+
+
+class SCPagerViewCell: UIView{
+    
+    required init(){ super.init(frame: CGRect.zero) }
+
+    
+    
+    func willAppear(){ }
+    
+    func didAppear(){ }
+    
+    func willDisappear(){ }
+    
+    func didDisappear(){ }
+    
+    
+    func didEnterPagerView(){ }
+    
+    func didLeavePagerView(){ }
+    
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init coder has not being implemented")
     }
 }

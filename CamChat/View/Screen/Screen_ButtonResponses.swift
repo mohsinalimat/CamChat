@@ -32,11 +32,10 @@ extension Screen: ScreenButtonsTopBarDelegate{
         DispatchQueue.global(qos: .userInitiated).async {
             self.centerScreen.flipCamera()
         }
-        
     }
     
     func photoLibrarySelectButtonTapped() {
-
+        rightScreen.selectionButtonTapped()
     }
 }
 
@@ -83,23 +82,15 @@ extension Screen: CameraDelegate{
     }
     
     func willFinishRecordingVideo() {
-        tempViewLoadSnapshot = view.snapshotView(afterScreenUpdates: false)!
-        view.addSubview(tempViewLoadSnapshot!)
-
-        self.performEndingRecordingAnimationActions()
+        
     }
     
     func didFinishRecordingVideo(url: URL) {
         let previewer = PhotoVideoPreviewVC(.video(url))
-        previewer.modalPresentationStyle = .overCurrentContext
-
-        self.present(previewer, animated: false)
-        
-
-        Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { [weak self] (timer) in
-            self?.tempViewLoadSnapshot?.removeFromSuperview()
+        Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) {[weak self] (timer) in
+            self?.present(previewer, animated: false)
+            self?.performEndingRecordingAnimationActions()
         }
-        
     }
 }
 

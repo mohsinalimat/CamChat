@@ -87,6 +87,7 @@ private class PhotoLibraryViewerTransitioningBrain: HKVCTransBrain{
         presented.view.frame = container.bounds
         presented.view.layer.cornerRadius = 0
         presented.view.layoutIfNeeded()
+        super.carryOutUnanimatedPresentationAction()
     }
     
     
@@ -106,6 +107,7 @@ private class PhotoLibraryViewerTransitioningBrain: HKVCTransBrain{
     
     override func prepareForDismissal() {
         prepareForDismissal(fingerPositionInPresentedView: nil)
+        super.prepareForDismissal()
     }
     
     func prepareForDismissal(fingerPositionInPresentedView: CGPoint? = nil){
@@ -219,11 +221,11 @@ class PhotoLibraryViewerTransitioningDelegate: NSObject, UIViewControllerTransit
 private class PhotoLibraryTransitioningAnimator: HKVCTransAnimationController<PhotoLibraryViewerTransitioningBrain>{
     
     override var duration: TimeInterval{
-        return 0.5
+        return 0.4
     }
     
     override func getAnimator() -> (TimeInterval, @escaping () -> Void, @escaping (Bool) -> Void) -> Void {
-        return {UIView.animate(withDuration: $0, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.4, options: [.curveEaseIn], animations: $1, completion: $2)}
+        return {UIView.animate(withDuration: $0, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.4, options: [.curveEaseOut], animations: $1, completion: $2)}
     }
 }
 
@@ -291,7 +293,7 @@ private class PhotoLibraryViewerInteractionController: HKVCTransInteractionContr
         shouldCompleteAnimation = false
         
         brain.prepareForEndingDismissalAnimation()
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.4, options: [.curveEaseIn], animations: {
+        UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.4, options: [.curveEaseIn], animations: {
             self.brain.carryOutUnanimatedDismissalAction()
         }) { _ in
             self.brain.cleanUpAfterDismissal()
@@ -315,7 +317,7 @@ private class PhotoLibraryViewerInteractionController: HKVCTransInteractionContr
         case .began: begin()
         case .changed: update(translation: translation, velocity: velocity)
         case .cancelled, .failed: cancel()
-        case .ended: if shouldCompleteAnimation{finish()} else {cancel()}
+        case .ended: if shouldCompleteAnimation{ finish() } else { cancel() }
 
         default: break
             

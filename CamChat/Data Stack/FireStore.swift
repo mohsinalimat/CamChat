@@ -27,7 +27,7 @@ private struct UserKeys{
     static var email = "email"
     static var username = "username"
     
-    struct MessageKeys{
+    struct MessageKeys {
         static var chatPartnerID = "chatPartnerID"
         static var messagesCollection = "Messages"
         static var messageID = "messageID"

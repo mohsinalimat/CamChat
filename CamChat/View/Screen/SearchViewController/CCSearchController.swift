@@ -108,6 +108,7 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
     
     private lazy var searchTextField: UITextField = {
         let x = UITextField()
+        
         x.keyboardAppearance = .dark
         x.autocorrectionType = .no
         x.tintColor = CCSearchConstants.searchTintColor

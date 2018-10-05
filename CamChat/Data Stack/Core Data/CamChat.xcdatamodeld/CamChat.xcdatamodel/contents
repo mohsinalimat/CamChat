@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14315.18" systemVersion="18A371a" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Memory" representedClassName="Memory" syncable="YES">
+        <attribute name="authorID" attributeType="String" syncable="YES"/>
+        <attribute name="data" attributeType="Binary" syncable="YES"/>
+        <attribute name="dateTaken" attributeType="Date" usesScalarValueType="NO" customClassName="NSObject" syncable="YES"/>
+        <attribute name="uniqueID" attributeType="String" syncable="YES"/>
+    </entity>
     <entity name="Message" representedClassName="Message" syncable="YES">
         <attribute name="dateSent" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="isOnServer" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
@@ -22,7 +28,8 @@
         <relationship name="sentMessages" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Message" inverseName="sender" inverseEntity="Message" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Message" positionX="-404.66796875" positionY="-392.87890625" width="312.20703125" height="163"/>
+        <element name="Memory" positionX="-538.7578125" positionY="21.625" width="128" height="103"/>
+        <element name="Message" positionX="-384.3046875" positionY="-328.41796875" width="312.20703125" height="163"/>
         <element name="User" positionX="-644.1796875" positionY="-251.67578125" width="175.25390625" height="178"/>
     </elements>
 </model>

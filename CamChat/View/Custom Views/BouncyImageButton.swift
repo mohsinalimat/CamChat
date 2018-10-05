@@ -29,18 +29,22 @@ class BouncyImageButton: BouncyButton{
         self.alternateImage = alternateImage
         super.init()
         imageView.image = image
-
+        
         imageView.pinAllSides(addTo: contentView, pinTo: contentView)
         tintColor = .white
+        if let altImage = alternateImage{
+            addAction { [weak self] in
+                guard let self = self else {return}
+                self.imageView.image = (self.imageView.image == image) ? altImage : image
+            }
+        }
+        
     }
 
     
-    override func tapEnded() {
-        if let altImage = self.alternateImage{
-            imageView.image = (imageView.image == image) ? altImage : image
-        }
-        super.tapEnded()
-    }
+    
+    
+    
 
 
 

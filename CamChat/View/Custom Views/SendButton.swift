@@ -35,6 +35,7 @@ class SendButton: BouncyButton{
     }
     
     
+
     private lazy var imageView: UIImageView = {
         let x = UIImageView(image: AssetImages.sendIcon)
         x.contentMode = .scaleAspectFit

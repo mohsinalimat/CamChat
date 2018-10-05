@@ -62,6 +62,8 @@ class ChatMessagesTableViewCell: UITableViewCell{
        
     }
     
+ 
+    
     private static var instances = Set<WeakWrapper<ChatMessagesTableViewCell>>()
     private static var currentAnimator: UIViewPropertyAnimator?
     private static var previousMaxTranslation: CGFloat?

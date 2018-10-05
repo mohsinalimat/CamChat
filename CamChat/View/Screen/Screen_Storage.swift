@@ -47,7 +47,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
         return x
     }()
     
-    lazy var rightScreen: SCScrollView = {
+    lazy var rightScreen: PhotoLibraryCollectionVC = {
         let x = PhotoLibraryCollectionVC(screen: self)
         self.addChild(x)
         x.delegate = self
@@ -151,8 +151,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     var rightScreenColor = REDCOLOR
     
     
-    /// This holds the snapshot used to cover the view when the recently captured video is loading
-    var tempViewLoadSnapshot: UIView?
+
     
     
     
@@ -167,7 +166,7 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     
 
     var temporaryCameraSwitchButtonGesture: UITapGestureRecognizer?
-    
+    var currentSelectionModeTopBar: UIView?
     
 
     var statusBarShouldBeHidden = false

@@ -13,53 +13,63 @@ import AVFoundation
 
 class SimpleVideoPlayer: UIView{
     
-    private let player: AVPlayer
-    private let previewLayer: AVPlayerLayer
+    private var player: AVPlayer!
+    private var previewLayer: AVPlayerLayer!
     
     
     
-    
-    init(url: URL){
-        
-        let asset = AVAsset(url: url)
-        let playerItem = AVPlayerItem(asset: asset)
-        self.player = AVPlayer(playerItem: playerItem)
-        self.previewLayer = AVPlayerLayer(player: player)
+    init(url: URL, setUpCompletionHandler: ((SimpleVideoPlayer) -> Void)? = nil){
         super.init(frame: CGRect.zero)
         backgroundColor = .clear
-        previewLayer.videoGravity = .resizeAspectFill
-        previewLayer.backgroundColor = UIColor.clear.cgColor
-        layer.addSublayer(previewLayer)
-
-        self.player.play()
-        
-        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false) {[weak self] (timer) in
-            self?.startRepeatTimerUsing(asset: asset)
-        }
-    }
-    
-    private func startRepeatTimerUsing(asset: AVAsset){
-        Timer.scheduledTimer(withTimeInterval: asset.duration.seconds, repeats: true) { [weak self] (timer) in
-            guard let self = self else {return}
+        DispatchQueue.global(qos: .userInitiated).async {
+            let asset = AVAsset(url: url)
+            let playerItem = AVPlayerItem(asset: asset)
+            self.player = AVPlayer(playerItem: playerItem)
+            self.previewLayer = AVPlayerLayer(player: self.player)
             
-            self.player.pause()
-            self.player.seek(to: CMTime.zero) {(succes) in
-                self.player.play()
+            DispatchQueue.main.async {
+                
+                self.previewLayer.videoGravity = .resizeAspectFill
+                self.previewLayer.backgroundColor = UIColor.clear.cgColor
+                self.layer.addSublayer(self.previewLayer)
+                
+                Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) {[weak self] (timer) in
+                    guard let self = self else {timer.invalidate(); return}
+                    if self.player.currentTime() == playerItem.duration{
+                        self.player.seek(to: CMTime.zero, completionHandler: { _ in
+                            self.player.play()
+                        })
+                    }
+                }
+                setUpCompletionHandler?(self)
             }
         }
     }
+
+    
+    func play(){
+        player?.play()
+    }
+    
+    func pause(){
+        player?.pause()
+    }
     
     
+    func rewindToBeginning(){
+        self.player?.seek(to: CMTime.zero)
+    }
+    
+
     
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        
-        previewLayer.frame = bounds
+        previewLayer?.frame = bounds
     }
     
     
-    
+ 
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init coder has not being implemented")

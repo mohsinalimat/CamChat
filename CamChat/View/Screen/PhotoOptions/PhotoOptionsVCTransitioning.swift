@@ -13,12 +13,7 @@ import HelpKit
 
 protocol PhotoOptionsVCPresented: HKVCTransParticipator{
     
-    func prepareForObjectsPresentation()
-    func performUnanimatedObjectsPresentation()
-    
-    func prepareForObjectsDismissal()
-    func performUnanimatedObjectsDismissal()
-    
+
     func getPhotoViewSnapshotInfo() -> (snapshot: UIView, endingFrame: CGRect, endingCornerRadius: CGFloat)
     
 }
@@ -44,7 +39,6 @@ class PhotoOptionsVCTransitioningBrain: HKVCTransBrain{
         container.addSubview(snapshotInfo.snapshot)
         snapshotInfo.snapshot.alpha = 0
         snapshotInfo.snapshot.frame = container.bounds
-        presented.prepareForObjectsPresentation()
     }
     
     override func carryOutUnanimatedPresentationAction() {
@@ -55,11 +49,12 @@ class PhotoOptionsVCTransitioningBrain: HKVCTransBrain{
         presenter.view.setCornerRadius(to: snapshotInfo.endingCornerRadius)
         presenter.view.frame = snapshotInfo.endingFrame
         presenter.view.layoutIfNeeded()
-        presented.performUnanimatedObjectsPresentation()
+        super.carryOutUnanimatedPresentationAction()
     }
     
     override func cleanUpAfterPresentation() {
         snapshotInfo.snapshot.removeFromSuperview()
+        super.cleanUpAfterPresentation()
     }
     
     override func prepareForDismissal() {
@@ -72,7 +67,7 @@ class PhotoOptionsVCTransitioningBrain: HKVCTransBrain{
         snapshotInfo.snapshot.alpha = 1
         snapshotInfo.snapshot.frame = snapshotInfo.endingFrame
         container.addSubview(snapshotInfo.snapshot)
-        presented.prepareForObjectsDismissal()
+        super.prepareForDismissal()
     }
     
     override func carryOutUnanimatedDismissalAction() {
@@ -83,7 +78,7 @@ class PhotoOptionsVCTransitioningBrain: HKVCTransBrain{
         presenter.view.layer.cornerRadius = 0
         presenter.view.frame = container.bounds
         presenter.view.layoutIfNeeded()
-        presented.performUnanimatedObjectsDismissal()
+        super.carryOutUnanimatedDismissalAction()
     }
     
     override func cleanUpAfterDismissal() {

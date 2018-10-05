@@ -78,6 +78,7 @@ class CCDataCoordinator{
                     CoreData.mainContext.saveChanges()
                     self.messageSender = MessageSender()
                     UserLoggedInNotification.post(with: user)
+                    InterfaceManager.shared.transitionToMainInterface()
                     completion(.success(user))
                     self.beginSyncing()
                 case .failure(let error):
@@ -97,6 +98,7 @@ class CCDataCoordinator{
             try Firebase.logOut()
             endSyncing()
             messageSender = nil
+            InterfaceManager.shared.transitionToLoginInterface()
             UserLoggedOutNotification.post()
             CoreData.performAndSaveChanges(context: .background) {
                 Message.helper(.background).deleteAllObjects()
@@ -144,9 +146,4 @@ class CCDataCoordinator{
         coreDataSyncer = nil
         firebaseSyncer = nil
     }
-    
-    
-    
-    
-    
 }

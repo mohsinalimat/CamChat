@@ -12,13 +12,16 @@ import HelpKit
 class PhotoOptionsVC: UIViewController{
     
     override var prefersStatusBarHidden: Bool{ return true }
-    
-    init(image: UIImage, presenter: HKVCTransParticipator){
+    private let memory: Memory
+    private weak var photoOptionsDelegate: PhotoOptionMenuDelegate?
+    init(memory: Memory, presenter: HKVCTransParticipator, delegate: PhotoOptionMenuDelegate){
+        self.memory = memory
+        self.photoOptionsDelegate = delegate
         super.init(nibName: nil, bundle: nil)
         view.backgroundColor = .black
         customTransitioningDelegate = PhotoOptionsVCTransitioningDelegate(presenter: presenter, presented: self)
         transitioningDelegate = customTransitioningDelegate
-        imageView.image = image
+        imageView.image = memory.info.image
         
     }
     
@@ -32,8 +35,8 @@ class PhotoOptionsVC: UIViewController{
         let labelsHeight = labelStackView.spacing + topLabel.intrinsicContentSize.height + bottomLabel.intrinsicContentSize.height
         labelsLayoutGuide.pin(addTo: view, anchors: [.left: view.leftAnchor, .top: view.safeAreaLayoutGuide.topAnchor, .right: view.rightAnchor], constants: [.left: labelsPadding, .top: topPadding, .right: labelsPadding, .height: labelsHeight])
         
-        let optionsPadding: CGFloat = 15
-        optionsMenuLayoutGuide.pin(addTo: view, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.safeAreaLayoutGuide.bottomAnchor], constants: [.height: 180, .left: optionsPadding, .right: optionsPadding, .bottom: optionsPadding])
+        let optionsPadding: CGFloat = 25
+        optionsMenuLayoutGuide.pin(addTo: view, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.safeAreaLayoutGuide.bottomAnchor], constants: [.height: 200, .left: optionsPadding, .right: optionsPadding, .bottom: optionsPadding])
         
         let imagePadding: CGFloat = 23
         let widthRatio = UIScreen.main.bounds.width / UIScreen.main.bounds.height
@@ -116,7 +119,7 @@ class PhotoOptionsVC: UIViewController{
     }()
     
     private lazy var optionsMenu: PhotoOptionMenu = {
-        let x = PhotoOptionMenu()
+        let x = PhotoOptionMenu(memory: memory, vcOwner: self, delegate: photoOptionsDelegate)
         return x
     }()
     
@@ -128,26 +131,6 @@ class PhotoOptionsVC: UIViewController{
 
 extension PhotoOptionsVC: PhotoOptionsVCPresented{
     
-
-    
-    
-    func prepareForObjectsPresentation() {
-        moveViewsOffScreen()
-    }
-    
-    func performUnanimatedObjectsPresentation() {
-        moveViewsOnScreen()
-    }
-    
-    func prepareForObjectsDismissal() {
-        // ya ma
-    }
-    
-    func performUnanimatedObjectsDismissal() {
-        moveViewsOffScreen()
-    }
-    
- 
     
     func getPhotoViewSnapshotInfo() -> (snapshot: UIView, endingFrame: CGRect, endingCornerRadius: CGFloat) {
         view.layoutIfNeeded()
@@ -158,6 +141,37 @@ extension PhotoOptionsVC: PhotoOptionsVCPresented{
     }
     
     
+    
+    
+}
+
+extension PhotoOptionsVC: HKVCTransEventAwareParticipator{
+    
+    func prepareForPresentation() {
+        if isBeingPresented{
+            moveViewsOffScreen()
+        }
+        
+
+    }
+    
+    func performUnanimatedPresentationAction() {
+        if isBeingPresented{
+            moveViewsOnScreen()
+        }
+        
+
+    }
+    
+    func performUnanimatedDismissalAction() {
+        if isBeingDismissed{
+            moveViewsOffScreen()
+        }
+        
+
+    }
+    
+
     
     
 }

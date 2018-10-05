@@ -28,6 +28,7 @@ class TempUser: Equatable {
         self.uniqueID = uniqueID
         
         
+        
         if let image = profilePicture{
             self.profilePicture = image
             TempUser.imageCache.set(value: image, forKey: uniqueID)

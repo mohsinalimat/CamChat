@@ -35,9 +35,7 @@ class Login_LoginVC: LoginFormVCTemplate{
                 UIApplication.shared.endIgnoringInteractionEvents()
                 self.buttonView.stopShowingLoadingIndicator()
                 
-                switch callback{
-                case .success: break
-                case .failure(let error):
+                if case let .failure(error) = callback{
                     self.presentOopsAlert(description: error.localizedDescription)
                 }
             })

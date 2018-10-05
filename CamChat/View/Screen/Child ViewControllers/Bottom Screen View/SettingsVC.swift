@@ -39,7 +39,6 @@ class SettingsViewController: UIViewController, UIGestureRecognizerDelegate{
         super.viewDidLoad()
         view.backgroundColor = .clear
         setUpViews()
-        
     }
     
  

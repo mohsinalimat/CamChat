@@ -20,6 +20,14 @@ extension UIViewController{
     }
     
     
+    func presentSuccessAlert(description: String){
+        let alert = self.presentCCAlert(title: "Success! 😃", description: description, primaryButtonText: "OK")
+        alert.addPrimaryButtonAction { [weak alert] in
+            alert?.dismiss()
+        }
+    }
+    
+    
     /// Performs the action closure specified, and if it throws an error, the function handles the error by presenting a CCAlert with the error's localized description.
     func handleErrorWithOopsAlert(action: () throws -> Void){
         do{ try action() }

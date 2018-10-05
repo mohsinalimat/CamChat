@@ -26,13 +26,14 @@ enum SearchTableViewSection{
         }
     }
     var users: [TempUser]{
+        
         switch self{
-        case .friends(let objects): return objects
-        case .strangers(let objects): return objects
+        case let .friends(objects): return objects
+        case let .strangers(objects): return objects
         }
     }
     var isFriends: Bool{
-        switch self{
+        switch self {
         case .friends: return true
         case .strangers: return false
         }
@@ -40,7 +41,8 @@ enum SearchTableViewSection{
 }
 
 
-class SearchControllerVM<DelegateType: SearchControllerVMDelegate>:NSObject, UITableViewDataSource{
+class SearchControllerVM<DelegateType: SearchControllerVMDelegate>:NSObject, UITableViewDataSource {
+    
     private let cellID = "cellID"
     private unowned let delegate: DelegateType
     private unowned let tableView: UITableView
@@ -87,7 +89,7 @@ class SearchControllerVM<DelegateType: SearchControllerVMDelegate>:NSObject, UIT
         return User.helper(.background).fetchObjects { (fetchRequest) in
             fetchRequest.predicate = NSPredicate(format: "\(#keyPath(User.uniqueID)) != %@ AND \(#keyPath(User.mostRecentMessage)) != nil", DataCoordinator.currentUserUniqueID!)
             fetchRequest.returnsObjectsAsFaults = false
-            fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(User.mostRecentMessage.dateSent), ascending: true)]
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(User.mostRecentMessage.dateSent), ascending: false)]
             }.map{$0.tempUser}
     }
     

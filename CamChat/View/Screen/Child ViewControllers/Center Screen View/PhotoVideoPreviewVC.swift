@@ -18,13 +18,24 @@ class PhotoVideoPreviewVC: UIViewController{
     
     private let mediaType: MediaType
     
+    private var mediaIsSaved = false
+    
+    
     init(_ mediaType: MediaType){
         self.mediaType = mediaType
         super.init(nibName: nil, bundle: nil)
         
         switch mediaType {
         case .photo(let image): self.imageView.image = image
-        case .video(let url): self.playerView = SimpleVideoPlayer(url: url)
+        case .video(let url):
+            self.imageView.image = Memory.getImageForVideoAt(url: url)
+            
+            let player = SimpleVideoPlayer(url: url) { (videoPlayer) in
+                videoPlayer.play()
+            }
+            
+            self.playerView = player
+            
         }
     }
     
@@ -38,13 +49,14 @@ class PhotoVideoPreviewVC: UIViewController{
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         statusBar.alpha = 1
+        
     }
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .clear
-
+        view.backgroundColor = .black
+        
         imageView.pinAllSides(addTo: view, pinTo: view)
         
         if let playerView = self.playerView {
@@ -82,6 +94,21 @@ class PhotoVideoPreviewVC: UIViewController{
         let x = BouncyImageButton(image: AssetImages.downloadIcon)
         x.pin(constants: [.height: 25, .width: 25])
         x.applyShadow(width: 3)
+        x.addAction { [weak self] in
+            guard let self = self else {return}
+            if self.mediaIsSaved{return}
+            
+            let memoryType: MemoryType
+            
+            switch self.mediaType{
+            case .photo(let image): memoryType = MemoryType.getFor(image: image)!
+            case .video(let url): memoryType = MemoryType.video(url)
+            }
+        
+            Memory.createNew(uniqueID: NSUUID().uuidString, authorID: DataCoordinator.currentUserUniqueID!, type: memoryType, dateTaken: Date(), context: .background, completion: {_ in CoreData.backgroundContext.saveChanges()})
+            
+            self.mediaIsSaved = true
+        }
         return x
     }()
     
@@ -92,4 +119,25 @@ class PhotoVideoPreviewVC: UIViewController{
     required init?(coder aDecoder: NSCoder) {
         fatalError("init coder has not being implemented")
     }
+    
+    
+    
+    
+    deinit {
+        playerView?.pause()
+        if mediaIsSaved.isFalse{
+            
+            switch mediaType{
+            case .video(let url):
+                
+                handleErrorWithPrintStatement {
+                    try FileManager.default.removeItem(at: url)
+                }
+            default: break
+            }
+        }
+    }
+    
+    
+    
 }

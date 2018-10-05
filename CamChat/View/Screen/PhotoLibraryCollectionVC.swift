@@ -6,7 +6,7 @@
 //  Copyright © 2018 Patrick Hanna. All rights reserved.
 //
 
-import UIKit
+import HelpKit
 
 
 class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
@@ -17,9 +17,15 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
     init(screen: Screen){
         self.screen = screen
         super.init()
+        collectionView.alwaysBounceVertical = true
+        viewModel = CoreDataListViewVM(delegate: self, context: CoreData.mainContext)
+        collectionView.canCancelContentTouches = false
     }
     
     private var heightCache = [IndexPath: CGFloat]()
+    
+    
+    private var viewModel: CoreDataListViewVM<PhotoLibraryCollectionVC>!
     
     func collectionView(_ collectionView: UICollectionView, heightForItemAt indexPath: IndexPath) -> CGFloat {
         if let height = heightCache[indexPath]{return height}
@@ -34,30 +40,87 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
 
     }
     
-    private let imageArray: [UIImage] = {
-        let images = AssetImages.examplePhotos
+    private var currentSelectionBottomBar: UIView?
+    private let totalBottomSelectionBarHeight = APP_INSETS.bottom + 50
+    
+    private var isInSelectionMode = false
+    private let minBottomBarAlpha: CGFloat = 0.5
+    private var currentSelectedCellIndexPaths = [IndexPath](){
+        didSet{
+            if let bar = currentSelectionBottomBar?.subviews.first as? PhotoSelectionBottomBar{
+                if currentSelectedCellIndexPaths.count < 1{
+                    bar.alpha = minBottomBarAlpha
+                    bar.isUserInteractionEnabled = false
+                } else {
+                    bar.alpha = 1
+                    bar.isUserInteractionEnabled = true
+                }
+            }
+        }
+    }
+    private var allCellsInUse = Set<PhotoLibraryCollectionViewCell>()
+    func selectionButtonTapped(){
+        isInSelectionMode = true
+        currentSelectedCellIndexPaths = []
+        let topBar = PhotoSelectionTopBar { [weak self] in
+            self?.selectionDissmissButtonTapped()
+        }
+        screen?.enterSelectionMode(newTopBar: topBar)
+        
+        let bottomBarContainer = UIView()
+        bottomBarContainer.backgroundColor = REDCOLOR
+        let bottomBar = PhotoSelectionBottomBar()
+        bottomBar.alpha = minBottomBarAlpha
+        bottomBar.isUserInteractionEnabled = false
+        bottomBar.pinAllSides(addTo: bottomBarContainer, pinTo: bottomBarContainer, insets: UIEdgeInsets(bottom: APP_INSETS.bottom))
+        bottomBarContainer.pin(addTo: view, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor], constants: [.height: totalBottomSelectionBarHeight])
+        currentSelectionBottomBar = bottomBarContainer
         
         
-        var imagesToReturn = [UIImage]()
-        for i in 1...30{
-            imagesToReturn.append(images.randomElement()!)
+        bottomBarContainer.transform = CGAffineTransform(translationX: 0, y: totalBottomSelectionBarHeight)
+        UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseOut, animations: {
+            bottomBarContainer.transform = CGAffineTransform.identity
+        }, completion: nil)
+        
+       changeEditingStateForAllCellsTo(true)
+        
+        bottomBar.cameraRollButton.addAction {[weak self] in self?.respondToCameraRollSaveButtonTapped()
+        }
+        bottomBar.shareButton.addAction {[weak self] in
+            self?.respondToShareButtonTapped()
+        }
+        bottomBar.trashButton.addAction {[weak self] in
+            self?.respondToDeletionButtonTapped()
+        }
+    }
+    
+    private func selectionDissmissButtonTapped(){
+        self.screen?.endSelectionMode()
+        isInSelectionMode = false
+        currentSelectedCellIndexPaths = []
+        self.changeEditingStateForAllCellsTo(false)
+        if let bottomBar = self.currentSelectionBottomBar {
+            UIView.animate(withDuration: 0.15, delay: 0, options: .curveEaseOut, animations: {
+                bottomBar.transform = CGAffineTransform(translationX: 0, y: self.totalBottomSelectionBarHeight)
+            }, completion: { _ in
+                bottomBar.removeFromSuperview()
+                self.currentSelectionBottomBar = nil
+            })
+        }
+    }
+    
+    private func changeEditingStateForAllCellsTo(_ isEditing: Bool){
+        if isEditing.isFalse{
+            allCellsInUse.forEach{$0.setAsDeselected(animated: true)}
+        }
+        allCellsInUse.forEach{
+            $0.isInSelectionMode = isEditing
         }
         
-        return imagesToReturn
-    }()
-    
-   
-    
-    
-    private let cellID = "The Best cell ever"
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
+        
     }
     
-    override func registerCells() {
-        collectionView.register(PhotoLibraryCollectionViewCell.self, forCellWithReuseIdentifier: cellID)
-    }
+
     
     override var topLabelText: String{
         return "Photo Library"
@@ -68,13 +131,6 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
     }
     
    
-    
-  
-    
-    
-   
-    
-    
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -88,24 +144,32 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
     
     private var cellToHideForPhotoViewerDismissal: UICollectionViewCell?
     
-    
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath) as! PhotoLibraryCollectionViewCell
-        cell.vcOwner = self
-        cell.screen = screen
-        cell.imageView.image = imageArray[indexPath.item]
-        cell.layer.masksToBounds = true
-        cell.layer.cornerRadius = 7
-        return cell
-    }
-    
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return imageArray.count
-    }
+
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let viewer = PhotoLibraryViewerVC(imageArray: imageArray, currentIndex: indexPath.row, presenter: self)
-        self.present(viewer, animated: true, completion: nil)
+        
+        collectionView.deselectItem(at: indexPath, animated: false)
+        if isInSelectionMode {
+            let cell = collectionView.cellForItem(at: indexPath) as? PhotoLibraryCollectionViewCell
+            if self.currentSelectedCellIndexPaths.contains(indexPath){
+                cell?.setAsDeselected(animated: true)
+                
+                self.currentSelectedCellIndexPaths.removeElementsEqual(to: indexPath)
+                
+            } else {
+                cell?.setAsSelected(animated: true)
+                self.currentSelectedCellIndexPaths.append(indexPath)
+            }
+        } else {
+            let viewer = PhotoLibraryViewerVC(imageArray: viewModel.objects, currentIndex: indexPath.row, presenter: self)
+            
+            DispatchQueue.main.async {
+                self.present(viewer, animated: true, completion: nil)
+            }
+        }
+        
+        
+        
     }
     
     private lazy var _collectionViewLayout: UICollectionViewLayout = {
@@ -122,6 +186,13 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+
+
+
+
+
+
 
 
 
@@ -174,6 +245,80 @@ extension PhotoLibraryCollectionVC: PhotoLibraryViewerTransitioningPresenter{
     }
     
    
+    
+}
+
+
+extension PhotoLibraryCollectionVC: CoreDataListViewVMDelegate{
+    var listView: UICollectionView {
+        return collectionView
+    }
+    
+    var fetchRequest: NSFetchRequest<Memory> {
+        let request = Memory.typedFetchRequest()
+        request.predicate = NSPredicate(format: "\(#keyPath(Memory.authorID)) == %@", DataCoordinator.currentUserUniqueID!)
+        request.sortDescriptors = [NSSortDescriptor(key: #keyPath(Memory.dateTaken), ascending: false)]
+        return request
+    }
+    
+    
+    func configureCell(_ cell: PhotoLibraryCollectionViewCell, at indexPath: IndexPath, for object: Memory) {
+        allCellsInUse.insert(cell)
+        cell.vcOwner = self
+        cell.screen = screen
+        cell.setWith(memory: viewModel.objects[indexPath.row])
+    
+        cell.isInSelectionMode = self.isInSelectionMode
+        cell.setAsDeselected(animated: false)
+        if self.currentSelectedCellIndexPaths.contains(indexPath){
+            cell.setAsSelected(animated: false)
+        }
+    }
+}
+
+
+extension PhotoLibraryCollectionVC{
+    
+    private var selectedMemories: [Memory]{
+        return currentSelectedCellIndexPaths.map{viewModel.objects[$0.row]}
+    }
+    
+    private func respondToDeletionButtonTapped(){
+        
+        
+        let alert = self.presentCCAlert(title: "Are you sure?", description: "Deleted photos and videos cannot be recovered.", primaryButtonText: "Delete", secondaryButtonText: "cancel")
+        alert.addPrimaryButtonAction { [weak alert, weak self] in
+            guard let self = self else {return}
+            alert?.dismiss(animated: true, completion: {
+                Memory.delete(memories: self.selectedMemories)
+                self.currentSelectedCellIndexPaths = []
+
+            })
+        }
+        alert.addSecondaryButtonAction {
+            alert.dismiss()
+        }
+    }
+    
+    private func respondToShareButtonTapped(){
+        let vc = Memory.getActivityVCFor(memories: selectedMemories)
+        self.present(vc)
+    }
+    
+    private func respondToCameraRollSaveButtonTapped(){
+        Memory.saveToCameraRoll(memories: selectedMemories) {[weak self] (success) in
+            guard let self = self else {return}
+            
+            if success {
+                self.presentSuccessAlert(description: "The items were successfully saved to your device.")
+            } else {
+                self.presentOopsAlert(description: "Something went wrong when trying to save the items to your device. Please ensure that you have allowed CamChat access to your photo library in your privacy settings.")
+            }
+        }
+    }
+    
+    
+    
     
 }
 

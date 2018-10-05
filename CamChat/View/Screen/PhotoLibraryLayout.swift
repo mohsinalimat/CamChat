@@ -20,7 +20,7 @@ class PhotoLibraryLayout: UICollectionViewLayout{
     var numberOfColumns = 3
     weak var delegate: PhotoLibraryLayoutDelegate!
     private var width: CGFloat{
-        collectionView?.layoutIfNeeded()
+        
         return collectionView!.frame.width
     }
     
@@ -51,12 +51,17 @@ class PhotoLibraryLayout: UICollectionViewLayout{
     private var attributes = [UICollectionViewLayoutAttributes]()
 
     
+    
+    
     var margins: CGFloat = 6
 
+    
+    
     override func prepare() {
         attributes = []
+        contentHeight = 0
         let columnWidth = (self.width - (margins * CGFloat(numberOfColumns + 1))) / CGFloat(numberOfColumns)
-        var xOffsets = Array<CGFloat>.init(repeating: 0, count: numberOfColumns)
+        var xOffsets = Array<CGFloat>(repeating: 0, count: numberOfColumns)
         
         for i in 0..<numberOfColumns{
             xOffsets[i] = (margins * CGFloat(i + 1)) + (columnWidth * CGFloat(i))

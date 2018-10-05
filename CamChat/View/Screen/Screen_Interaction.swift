@@ -29,14 +29,13 @@ extension Screen {
             statusBar.frame.origin.y = extraOutset * 0.3
             self.view.layoutIfNeeded()
             
-        } else {
-            adjustTopGradientLayerViewTo_ScrollViewScrolled(scrollView: scrollView)
-        }
+        } else { adjustTopGradientLayerViewTo_ScrollViewScrolled(scrollView: scrollView) }
     }
     
     
     
     func gradientWillBeginChanging(interactor: PageScrollingInteractor, direction: ScrollingDirection) {
+        topBar_typed.isUserInteractionEnabled = false
         if direction == .horizontal{
             if interactor.currentlyFullyVisibleScreen == .center {
                 leftScreen.viewWillAppear(true)
@@ -67,6 +66,7 @@ extension Screen {
     
     
     func gradientDidSnap(fromScreen: PageScrollingInteractor.ScreenType, toScreen: PageScrollingInteractor.ScreenType, direction: ScrollingDirection, interactor: PageScrollingInteractor) {
+        topBar_typed.isUserInteractionEnabled = true
         if toScreen == .center{
             
             horizontalScrollInteractor.startAcceptingTouches()
