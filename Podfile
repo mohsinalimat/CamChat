@@ -16,7 +16,7 @@ target 'CamChat' do
   pod 'Firebase/Auth'
   pod 'Firebase/Storage'
   pod 'NVActivityIndicatorView'
-  
+  pod 'Reachability'
   
 
   target 'CamChatTests' do

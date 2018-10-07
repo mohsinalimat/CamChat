@@ -83,17 +83,13 @@ class ChatMessagesTableViewCell: UITableViewCell{
        
         if gesture.swipingDirection != .towardRight{return}
         
-        
-        
         var translation = gesture.translation(in: self).x
-
 
         let action = {
             for wrapper in ChatMessagesTableViewCell.instances{
                 if let cell = wrapper.value{
                     cell.fingerTranslated(by: translation)
                 }
-            
             }
         }
         if gesture.state == .ended{
@@ -103,7 +99,7 @@ class ChatMessagesTableViewCell: UITableViewCell{
             let animator = UIViewPropertyAnimator(duration: 0.3, curve: .easeOut, animations: action)
             ChatMessagesTableViewCell.currentAnimator = animator
             animator.addCompletion { (position) in
-                if position == .end{
+                if position == .end {
                     ChatMessagesTableViewCell.previousMaxTranslation = nil
                     ChatMessagesTableViewCell.currentAnimator = nil
                 }

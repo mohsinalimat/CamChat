@@ -2,9 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/Users/patrickhanna/Documents/CamChat/CamChat/View Models/ChatTableViewVM.swift">
-   </FileRef>
-   <FileRef
       location = "group:CamChat.xcodeproj">
    </FileRef>
    <FileRef

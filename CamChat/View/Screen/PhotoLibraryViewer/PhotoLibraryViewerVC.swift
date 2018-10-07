@@ -135,7 +135,7 @@ private class PagerView: SCPagerViewCell{
         
         self.imageView.image = memory.info.image
         
-        if case let .video(url) = memory.info{
+        if case let .video(url, _) = memory.info{
             
             let newVideoPlayer = SimpleVideoPlayer(url: url)
             UIView.performWithoutAnimation {

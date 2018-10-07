@@ -8,12 +8,19 @@
 
 import HelpKit
 
-class CCSearchController: UIViewController, UITextFieldDelegate{
+class CCSearchController: SearchTableVC, UITextFieldDelegate{
+    
+    
     private let searchBarHeight: CGFloat
+    
+    override var desiredTopBarHeight: CGFloat{
+        return searchBarHeight
+    }
+    
     
     init(searchBarHeight: CGFloat){
         self.searchBarHeight = searchBarHeight
-        super.init(nibName: nil, bundle: nil)
+        super.init()
         transitioningDelegate = fadeTransitionDelegate
     
         setUpViews()
@@ -26,42 +33,20 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
 
     private lazy var fadeTransitionDelegate = CCSearchVCTransition(searchController: self)
     
-    override func loadView(){
-        let view = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
-        view.frame = UIScreen.main.bounds
-        self.view = view
-        
-    }
-    /// The content view of the main view (because the main view is a UIVisualEffectView)
-    private var contentView: UIView{
-        return (self.view as! UIVisualEffectView).contentView
-    }
-    
-    private let tableViewPadding: CGFloat = 15
-    
+
     private func setUpViews(){
         
-        topBarLayoutGuide.pin(addTo: contentView, anchors: [.left: view.leftAnchor, .top: view.safeAreaLayoutGuide.topAnchor, .right: view.rightAnchor], constants: [.height: self.searchBarHeight])
+        let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+        blurView.pinAllSides(addTo: view, pinTo: view)
+        view.sendSubviewToBack(blurView)
         
-        tableViewHolderView.pin(addTo: contentView, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor, .top: view.topAnchor], constants: [.left: tableViewPadding, .right: tableViewPadding])
+        searchIcon.pin(addTo: view, anchors: [.left: topBarLayoutGuide.leftAnchor, .centerY: topBarLayoutGuide.centerYAnchor],constants: [.left: CCSearchConstants.searchIconLeftPadding])
         
-        searchIcon.pin(addTo: contentView, anchors: [.left: topBarLayoutGuide.leftAnchor, .centerY: topBarLayoutGuide.centerYAnchor],constants: [.left: CCSearchConstants.searchIconLeftPadding])
+        dissmiss_cancelButton.pin(addTo: view, anchors: [.right: topBarLayoutGuide.rightAnchor, .centerY: topBarLayoutGuide.centerYAnchor], constants: [.right: CCSearchConstants.searchIconLeftPadding])
         
-        dissmiss_cancelButton.pin(addTo: contentView, anchors: [.right: topBarLayoutGuide.rightAnchor, .centerY: topBarLayoutGuide.centerYAnchor], constants: [.right: CCSearchConstants.searchIconLeftPadding])
-        
-        searchTextField.pin(addTo: contentView, anchors: [.left: searchIcon.rightAnchor, .centerY: topBarLayoutGuide.centerYAnchor, .right: dissmiss_cancelButton.leftAnchor], constants: [.right: 15, .left: CCSearchConstants.searchIconRightPadding])
+        searchTextField.pin(addTo: view, anchors: [.left: searchIcon.rightAnchor, .centerY: topBarLayoutGuide.centerYAnchor, .right: dissmiss_cancelButton.leftAnchor], constants: [.right: 15, .left: CCSearchConstants.searchIconRightPadding])
     }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        tableViewGradient.frame = tableViewHolderView.bounds
-        let middleEndPoint = NSNumber(value: Float((APP_INSETS.top + searchBarHeight - 10) / tableViewHolderView.bounds.height))
-        let lastEndpoint = NSNumber(value: Float((APP_INSETS.top + searchBarHeight + 10) / tableViewHolderView.bounds.height))
-        tableViewGradient.gradientLayer.locations = [0, middleEndPoint, lastEndpoint]
-    }
-    
-    
+
     
     override func viewWillAppear(_ animated: Bool) {
         if isBeingPresented{
@@ -98,10 +83,9 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
     
     
     
-    private lazy var topBarLayoutGuide = UILayoutGuide()
     
-    private lazy var searchIcon: CCBouncySearchIcon = {
-        let x = CCBouncySearchIcon()
+    private lazy var searchIcon: BouncySearchIcon = {
+        let x = BouncySearchIcon()
         x.pin(constants: [.height: CCSearchConstants.searchIconSize.height, .width: CCSearchConstants.searchIconSize.width])
         return x
     }()
@@ -119,7 +103,7 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
         
         x.addTextDidChangeListener({[weak self] (newText) in
             guard let self = self else {return}
-            self.tableView.searchTextChanged(to: newText)
+            self._tableView.searchTextChanged(to: newText)
             if self.searchTextField.hasValidText{
                 self.dissmiss_cancelButton.showCancelButton()
             } else { self.dissmiss_cancelButton.showDismissButton() }
@@ -136,25 +120,16 @@ class CCSearchController: UIViewController, UITextFieldDelegate{
         return x
     }()
     
-    private lazy var tableViewHolderView: UIView = {
-        let x = UIView()
-        tableView.pinAllSides(addTo: x, pinTo: x)
-        x.mask = tableViewGradient
-        return x
-    }()
+
     
-    private lazy var tableView: CCSearchTableView = {
+    private lazy var _tableView: CCSearchTableView = {
         let x = CCSearchTableView(owner: self)
-        x.contentInset.bottom = self.tableViewPadding
-        x.contentInset.top = searchBarHeight - 5
-        x.keyboardDismissMode = .onDrag
         return x
     }()
     
-    private lazy var tableViewGradient: HKGradientView = {
-        let x = HKGradientView(colors: [UIColor.black.withAlphaComponent(0), UIColor.black.withAlphaComponent(0.3), .black])
-        return x
-    }()
+    override var tableView: UITableView{
+        return _tableView
+    }
     
 
     required init?(coder aDecoder: NSCoder) {

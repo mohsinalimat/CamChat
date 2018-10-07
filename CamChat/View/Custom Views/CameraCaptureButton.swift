@@ -117,7 +117,7 @@ class CameraCaptureButton: UIView{
     
     
     
-    enum LongPressEvent{ case began, ended }
+    enum LongPressEvent { case began, ended }
 
     
     private var ringView = CameraCaptureRingView()

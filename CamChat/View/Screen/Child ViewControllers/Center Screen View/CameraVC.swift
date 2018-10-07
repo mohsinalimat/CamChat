@@ -40,7 +40,6 @@ class CameraVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpPreviewLayer()
-        
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(respondToTapGesture(gesture:)))
         tapGesture.numberOfTapsRequired = 2
         view.addGestureRecognizer(tapGesture)

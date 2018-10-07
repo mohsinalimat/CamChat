@@ -13,9 +13,7 @@ class TempUser: Equatable {
     static func == (lhs: TempUser, rhs: TempUser) -> Bool {
         return lhs.uniqueID == rhs.uniqueID
     }
-    
-    
-    
+   
     
     private static var imageCache = HKCache<String, UIImage>(objectLimit: 40)
     
@@ -75,9 +73,7 @@ class TempUser: Equatable {
     
     /// Attempts to save the receiver as a Core Data object.
     func persist(usingContext context: CoreDataContextType, _ completion: ((HKCompletionResult<User>) -> Void)?){
-        
-        
-
+    
         setProfileImage { (callBack) in
 
             switch callBack{

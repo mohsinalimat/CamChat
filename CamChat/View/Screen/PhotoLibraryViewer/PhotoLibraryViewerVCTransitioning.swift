@@ -94,7 +94,7 @@ private class PhotoLibraryViewerTransitioningBrain: HKVCTransBrain{
     
     override func cleanUpAfterPresentation() {
         thumbnailInfo.snapshot.removeFromSuperview()
-
+        super.cleanUpAfterPresentation()
     }
     
     
@@ -168,6 +168,7 @@ private class PhotoLibraryViewerTransitioningBrain: HKVCTransBrain{
         thumbnailInfo.snapshot.frame = thumbnailInfo.frame
         
         dimmerView.alpha = 0
+        super.carryOutUnanimatedDismissalAction()
     }
     
     

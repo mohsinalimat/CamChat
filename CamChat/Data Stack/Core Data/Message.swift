@@ -63,7 +63,7 @@ public class Message: NSManagedObject, ManagedObjectProtocol{
     
     
     
-    @NSManaged private(set) var text: String
+    @NSManaged private var data: Data
     @NSManaged private(set) var dateSent: Date
     @NSManaged private(set) var uniqueID: String
     @NSManaged private(set) var sender: User
@@ -71,6 +71,15 @@ public class Message: NSManagedObject, ManagedObjectProtocol{
     @NSManaged private(set) var wasSeenByReceiver: Bool
     @NSManaged private(set) var isOnServer: Bool
     
+    private var _info: MessageData?
+    
+    var info: MessageData{
+        if let data = _info{ return data }
+        else {
+            self._info = try! JSONDecoder().decode(MessageData, from: data)
+            return self._info!
+        }
+    }
     
     
     var tempMessage: TempMessage{

@@ -77,7 +77,6 @@ class ChatViewController: UIViewController{
         view.didMoveToSuperviewAction = { [weak self] in self?.becomeFirstResponder() }
         view.hitTestAction = { [weak self] in self?.hitTestView(point: $0, event: $1) }
         self.view = view
-        
     }
     
     private func hitTestView(point: CGPoint, event: UIEvent?) -> UIView?{

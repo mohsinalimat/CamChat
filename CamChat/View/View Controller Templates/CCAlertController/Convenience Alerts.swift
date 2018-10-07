@@ -10,7 +10,7 @@ import HelpKit
 
 
 
-extension UIViewController{
+extension UIViewController {
     
     /// Presents a CCAlertController with a simple Oops title, the description provided and the primary button, with its text set to "OK."
     func presentOopsAlert(description: String){

@@ -10,7 +10,6 @@ import HelpKit
 
 class PhotoLibraryCollectionViewCell: UICollectionViewCell {
     
-    private static var cachedImages = HKCache<Memory, UIImage>(objectLimit: 100)
     
     weak var vcOwner: UIViewController?
     weak var screen: Screen?
@@ -18,6 +17,7 @@ class PhotoLibraryCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: CGRect.zero)
         imageView.pinAllSides(addTo: self, pinTo: self)
+        slideshowView.pinAllSides(addTo: self, pinTo: self)
         let gesture = UILongPressGestureRecognizer(target: self, action: #selector(respondToGesture(gesture:)))
         self.longPressGesture = gesture
         addGestureRecognizer(gesture)
@@ -34,12 +34,11 @@ class PhotoLibraryCollectionViewCell: UICollectionViewCell {
     
     func setWith(memory: Memory){
         self.currentMemory = memory
-        if let image = PhotoLibraryCollectionViewCell.cachedImages[memory]{
-            imageView.image = image
-        } else {
-            let image = memory.info.image
-            PhotoLibraryCollectionViewCell.cachedImages[memory] = image
-            imageView.image = image
+        imageView.image = memory.info.thumbnail
+        slideshowView.stopPreviewing()
+        
+        if case let .video(url, _) = memory.info{
+            slideshowView.setWithVideo(url: url)
         }
     }
     
@@ -89,6 +88,11 @@ class PhotoLibraryCollectionViewCell: UICollectionViewCell {
     private lazy var imageView: UIImageView = {
         let x = UIImageView()
         x.contentMode = .scaleAspectFill
+        return x
+    }()
+    
+    private lazy var slideshowView: VideoThumbnailPreview = {
+        let x = VideoThumbnailPreview()
         return x
     }()
     
@@ -145,12 +149,15 @@ extension PhotoLibraryCollectionViewCell: PhotoOptionsMiniPresenter{
         let endingFrame = collectionView.layoutAttributesForItem(at: collectionView.indexPath(for: self)!)!.frame
         let frameToUse = UIScreen.main.coordinateSpace.convert(frame, from: superview!)
         let endingFrameToUse = UIScreen.main.coordinateSpace.convert(endingFrame, from: superview!)
-        
         return (snapshot, layer.cornerRadius, frameToUse, transform, endingFrameToUse)
     }
     
+    
+    
     func prepareForPresentation() {
+        
         self.alpha = 0
+        
     }
     
     func cleanUpAfterDismissal() {

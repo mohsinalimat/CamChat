@@ -42,7 +42,10 @@ private struct MessageKeys{
     static var senderID = "senderID"
     static var receiverID = "receiverID"
     static var dateSent = "dateSent"
+    static var messageType = "messageType"
     static var text = "text"
+    static var photoText = "photo"
+    static var videoText = "video"
     static var wasSeen = "wasSeen"
 }
 
@@ -74,6 +77,10 @@ class FirebaseManager{
     
     private var profilePicturesFolder: StorageReference{
         return Storage.storage().reference(withPath: "UserProfilePictures")
+    }
+    
+    private var messageMediaFoler: StorageReference{
+        return Storage.storage().reference(withPath: "MessageMedia")
     }
     
     
@@ -142,7 +149,7 @@ class FirebaseManager{
         }
     }
     
-    private func parseUserDocumentInfo(from dict: [String: Any]?, profilePicture: UIImage? = nil) -> TempUser?{
+    private func parseUserDocumentInfo(from dict: [String: Any]?, profilePicture: UIImage? = nil) -> TempUser? {
         if let dict = dict,
             let email = dict[UserKeys.email] as? String,
             let firstName = dict[UserKeys.firstName] as? String,
@@ -168,7 +175,6 @@ class FirebaseManager{
                 }
             }
         }
-        
     }
     
     
@@ -190,17 +196,79 @@ class FirebaseManager{
     
     
     
-    func send(message: TempMessage){
-        guard let currentUser = DataCoordinator.currentUser else {return}
+    
+    
+
+    
+    
+    func send(message: TempMessage, completion: @escaping (HKFailableCompletion) -> ()){
+        guard case let .forUpload(data) = message.data else {fatalError()}
         
-        let dict: [String: Any] = [
+        switch data{
+        case .photo, .video:
+            uploadMessageMedia(for: message) { callback in
+                switch callback{
+                case .success:
+                    self.uploadMessageMetadata(for: message)
+                    completion(.success)
+                case .failure(let error): completion(.failure(error))
+                }
+            }
+        case .text:
+            uploadMessageMetadata(for: message)
+            completion(.success)
+        }
+        
+    }
+    
+    
+    
+    private func uploadMessageMedia(for message: TempMessage, completion: @escaping (HKFailableCompletion) -> Void){
+        
+        let actualCompletion = { (error: Error?) -> Void in
+            if let error = error{completion(.failure(error)); return}
+            completion(.success)
+        }
+    
+        if case let .forUpload(.photo(url)) = message.data{
+            if let data = try? Data(contentsOf: url), let image = UIImage(data: data), let compressedData = image.jpegData(compressionQuality: 0.3){
+                messageMediaFoler.child(message.uniqueID).putData(compressedData, metadata: nil) { (metadata, error) in
+                    actualCompletion(error)
+                }
+            } else { fatalError() }
+            
+        } else if case let .forUpload(.video(url)) = message.data{
+            messageMediaFoler.child(message.uniqueID).putFile(from: url, metadata: nil) { (metadata, error) in
+                actualCompletion(error)
+            }
+        } else { fatalError() }
+    }
+    
+    
+    
+    
+    private func uploadMessageMetadata(for message: TempMessage){
+        
+        guard let currentUser = DataCoordinator.currentUser else {return}
+        guard case let .forUpload(uploadData) = message.data else {fatalError()}
+        
+        var dict: [String: Any] = [
             MessageKeys.uniqueID: message.uniqueID,
             MessageKeys.dateSent: FieldValue.serverTimestamp(),
             MessageKeys.receiverID: message.receiverID,
             MessageKeys.senderID: message.senderID,
-            MessageKeys.text: message.text,
-            MessageKeys.wasSeen: message.wasSeenByReceiver
+            MessageKeys.wasSeen: message.wasSeenByReceiver,
         ]
+        
+
+        switch uploadData{
+        case .text(let text):
+            dict[MessageKeys.messageType] = MessageKeys.text
+            dict[MessageKeys.text] = text
+        case .photo: dict[MessageKeys.messageType] = MessageKeys.photoText
+        case .video: dict[MessageKeys.messageType] = MessageKeys.videoText
+        }
+
         
         let writeBatch = Firebase.firestore.batch()
         
@@ -229,9 +297,10 @@ class FirebaseManager{
         ]
         writeBatch.setData(chatPartnerData, forDocument: chatPartnerMessageDoc)
         writeBatch.commit()
+        
     }
     
-    
+
     
     /// WARNING: IF YOU EVER ENABLE CHAT DELETION, THIS FUNCTION WILL INTERFERE WITH THAT!!! FIX IT!!
     func markMessageAsSeen(message: TempMessage){
@@ -240,7 +309,6 @@ class FirebaseManager{
             messagesCollectionForUserWith(userID: id).document(message.uniqueID).setData([UserKeys.MessageKeys.wasSeen: true], merge: true)
         }
     }
-    
     
     
     
@@ -286,11 +354,20 @@ class FirebaseManager{
                     let sender = dict[MessageKeys.senderID] as! String
                     let uniqueID = dict[MessageKeys.uniqueID] as! String
                     let date = (dict[MessageKeys.dateSent] as! Timestamp).dateValue()
-                    let text = dict[MessageKeys.text] as! String
                     let wasSeen = dict[MessageKeys.wasSeen] as! Bool
-                    
                     let isOnServer = snapshot.metadata.isFromCache.isFalse
-                    let message = TempMessage(text: text, dateSent: date, uniqueID: uniqueID, senderID: sender, receiverID: receiver, wasSeenByReceiver: wasSeen, isOnServer: isOnServer)
+                    
+                    let data: TempMessageDownloadData
+                    switch dict[MessageKeys.messageType] as! String{
+                    case MessageKeys.text: data = .text(dict[MessageKeys.text] as! String)
+                    case MessageKeys.photoText: data = .photo(messageID: uniqueID)
+                    case MessageKeys.videoText: data = .video(messageID: uniqueID)
+                    default: fatalError()
+                    }
+                    
+                    
+                    
+                    let message = TempMessage(data: .forDownload(data), dateSent: date, uniqueID: uniqueID, senderID: sender, receiverID: receiver, wasSeenByReceiver: wasSeen, isOnServer: isOnServer)
                     
                     completion(.success(message))
                 } else { completion(.failure(error ?? HKError.unknownError)) }

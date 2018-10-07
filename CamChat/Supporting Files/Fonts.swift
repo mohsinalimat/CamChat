@@ -16,7 +16,7 @@ enum SCFontType: String{
     case medium = "Medium"
 }
 
-class SCFonts{
+class SCFonts {
     
     private static var fontTypeString = "AvenirNext"
     

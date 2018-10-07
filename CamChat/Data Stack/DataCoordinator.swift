@@ -96,10 +96,11 @@ class CCDataCoordinator{
     func logOut() throws{
         do {
             try Firebase.logOut()
-            endSyncing()
-            messageSender = nil
+           
             InterfaceManager.shared.transitionToLoginInterface()
             UserLoggedOutNotification.post()
+            endSyncing()
+            messageSender = nil
             CoreData.performAndSaveChanges(context: .background) {
                 Message.helper(.background).deleteAllObjects()
                 User.helper(.background).deleteAllObjects()

@@ -25,7 +25,6 @@ class VideoWriter: NSObject{
     private var audioAssetInput: AVAssetWriterInput!
     private var videoAssetInput: AVAssetWriterInput!
     
-    private let urlGenerator = UniqueURLGenerator()
     
     init(videoOutput: AVCaptureVideoDataOutput, audioOutput: AVCaptureAudioDataOutput){
         self.videoOutput = videoOutput
@@ -38,7 +37,7 @@ class VideoWriter: NSObject{
     }
     
     private func resetAssetWriter(){
-        assetWriter = try! AVAssetWriter(outputURL: urlGenerator.getNewPermanentURL(), fileType: .mp4)
+        assetWriter = try! AVAssetWriter(outputURL: getNewURL(), fileType: .mp4)
         
         audioAssetInput = AVAssetWriterInput(mediaType: .audio, outputSettings: audioOutput.recommendedAudioSettingsForAssetWriter(writingTo: .mp4) as? [String: Any])
         videoAssetInput = AVAssetWriterInput(mediaType: .video, outputSettings: videoOutput.recommendedVideoSettingsForAssetWriter(writingTo: .mp4))
@@ -57,7 +56,6 @@ class VideoWriter: NSObject{
         if assetWriter.status == .failed{resetAssetWriter()}
         hasStartedWritingCurrentVideo = false
         isWriting = true
-       
     }
     
 
@@ -75,6 +73,16 @@ class VideoWriter: NSObject{
         }
         hasStartedWritingCurrentVideo = false
     }
+    
+    
+    
+    func getNewURL() -> URL{
+        let uniqueString = NSUUID().uuidString
+        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let documentsURL = url.appendingPathComponent(uniqueString + ".mp4")
+        return documentsURL
+    }
+
 }
 
 extension VideoWriter: AVCaptureVideoDataOutputSampleBufferDelegate { }
@@ -111,33 +119,5 @@ extension VideoWriter: AVCaptureAudioDataOutputSampleBufferDelegate {
 
 
 
-private class UniqueURLGenerator{
-    
-//    private var currentTempUrls = [URL]()
-//
-//    func getNewTempURL() -> URL{
-//        let url = getNewPermanentURL()
-//        currentTempUrls.append(url)
-//        return url
-//    }
-    
-    func getNewPermanentURL() -> URL{
-        let uniqueString = NSUUID().uuidString
-        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let documentsURL = url.appendingPathComponent(uniqueString + ".mp4")
-        return documentsURL
-    }
-    
-//    func clearAndDeleteTempURLs(){
-//        for url in currentTempUrls{
-//            if FileManager.default.fileExists(atPath: url.path){
-//                handleErrorWithPrintStatement {
-//                    try FileManager.default.removeItem(at: url)
-//                }
-//            }
-//        }
-//        currentTempUrls.removeAll()
-//    }
-    
-}
+
 

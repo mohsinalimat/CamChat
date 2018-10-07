@@ -33,7 +33,7 @@ class PhotoOptionMenu: UIView{
         PhotoOption(image: AssetImages.downloadIcon, text: "Save \(memoryLabel) to Camera Roll", action: { [weak self] in self?.respondToCameraRollSaveOptionTapped()}),
         PhotoOption(image: AssetImages.shareIcon, text: "Share \(memoryLabel)", action: {[weak self ] in self?.respondToShareOption()}),
         PhotoOption(image: AssetImages.trashIcon, text: "Delete \(memoryLabel)", action: {[weak self] in self?.respondToMemoryDeletionOption()}),
-        PhotoOption(image: nil, text: "Send \(memoryLabel)")
+        PhotoOption(image: nil, text: "Send \(memoryLabel)", action: {[weak self] in self?.respondToSendOption()})
     ]
     
     
@@ -197,4 +197,15 @@ extension PhotoOptionMenu{
             vcOwner?.dismiss(animated: true) { presenter.present(vc) }
         } else { self.vcOwner?.present(vc) }
     }
+    
+    
+    private func respondToSendOption(){
+        
+        if let presenting = vcOwner?.presentingViewController{
+            vcOwner?.dismiss(animated: true, completion: {
+                presenting.present(MemorySenderVC(presenter: presenting))
+            })
+        } else {vcOwner!.present(MemorySenderVC(presenter: vcOwner!))}
+    }
+    
 }

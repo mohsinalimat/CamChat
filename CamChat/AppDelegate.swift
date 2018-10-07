@@ -17,11 +17,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private var window: UIWindow?
     
     func applicationDidFinishLaunching(_ application: UIApplication) {
-    
-        
+
+
+
         Firebase.configure()
         InterfaceManager.shared.launchInterface()
         DataCoordinator.configure()
+
         
     }
     

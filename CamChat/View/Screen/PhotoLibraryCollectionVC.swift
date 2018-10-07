@@ -7,7 +7,7 @@
 //
 
 import HelpKit
-
+import AVFoundation
 
 class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
     
@@ -15,6 +15,9 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
     
     
     init(screen: Screen){
+        
+        
+        
         self.screen = screen
         super.init()
         collectionView.alwaysBounceVertical = true
@@ -92,6 +95,9 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
         bottomBar.trashButton.addAction {[weak self] in
             self?.respondToDeletionButtonTapped()
         }
+        bottomBar.sendButton.addAction { [weak self] in
+            self?.respondToSendButtonTapped()
+        }
     }
     
     private func selectionDissmissButtonTapped(){
@@ -132,13 +138,7 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
     
    
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        if let cell = cellToHideForPhotoViewerDismissal{
-            cell.alpha = 1
-            cellToHideForPhotoViewerDismissal = nil
-        }
-    }
+
     
   
     
@@ -240,12 +240,24 @@ extension PhotoLibraryCollectionVC: PhotoLibraryViewerTransitioningPresenter{
         
         
         cellToHideForPhotoViewerDismissal = cell
-        
-        return (cell.snapshotView(afterScreenUpdates: true)!, view.convert(cell.frame, from: collectionView), cell.layer.cornerRadius)
+        let snapshot = cell.snapshotView(afterScreenUpdates: true)!
+        cell.alpha = 0
+        return (snapshot, view.convert(cell.frame, from: collectionView), cell.layer.cornerRadius)
     }
     
    
     
+}
+
+extension PhotoLibraryCollectionVC: HKVCTransEventAwareParticipator{
+    func cleanUpAfterDismissal() {
+        if isBeingDismissed.isFalse{
+            if let cell = cellToHideForPhotoViewerDismissal{
+                cell.alpha = 1
+                cellToHideForPhotoViewerDismissal = nil
+            }
+        }
+    }
 }
 
 
@@ -306,15 +318,20 @@ extension PhotoLibraryCollectionVC{
     }
     
     private func respondToCameraRollSaveButtonTapped(){
+        UIApplication.shared.beginIgnoringInteractionEvents()
         Memory.saveToCameraRoll(memories: selectedMemories) {[weak self] (success) in
             guard let self = self else {return}
-            
+            UIApplication.shared.endIgnoringInteractionEvents()
             if success {
                 self.presentSuccessAlert(description: "The items were successfully saved to your device.")
             } else {
                 self.presentOopsAlert(description: "Something went wrong when trying to save the items to your device. Please ensure that you have allowed CamChat access to your photo library in your privacy settings.")
             }
         }
+    }
+    
+    private func respondToSendButtonTapped(){
+        self.present(MemorySenderVC(presenter: self))
     }
     
     

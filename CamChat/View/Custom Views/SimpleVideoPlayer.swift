@@ -21,6 +21,15 @@ class SimpleVideoPlayer: UIView{
     init(url: URL, setUpCompletionHandler: ((SimpleVideoPlayer) -> Void)? = nil){
         super.init(frame: CGRect.zero)
         backgroundColor = .clear
+        
+        
+        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) {[weak self] _ in
+            guard let self = self else {return}
+            if self.userWantsVideoPlaying{
+                self.play()
+            }
+        }
+        
         DispatchQueue.global(qos: .userInitiated).async {
             let asset = AVAsset(url: url)
             let playerItem = AVPlayerItem(asset: asset)
@@ -46,13 +55,15 @@ class SimpleVideoPlayer: UIView{
         }
     }
 
-    
+    private var userWantsVideoPlaying = false
     func play(){
         player?.play()
+        userWantsVideoPlaying = true
     }
     
     func pause(){
         player?.pause()
+        userWantsVideoPlaying = false
     }
     
     

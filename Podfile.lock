@@ -113,6 +113,7 @@ PODS:
     - NVActivityIndicatorView/Presenter (= 4.3.0)
   - NVActivityIndicatorView/Presenter (4.3.0)
   - Protobuf (3.6.1)
+  - Reachability (3.2)
 
 DEPENDENCIES:
   - Firebase
@@ -121,6 +122,7 @@ DEPENDENCIES:
   - Firebase/Firestore
   - Firebase/Storage
   - NVActivityIndicatorView
+  - Reachability
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -144,6 +146,7 @@ SPEC REPOS:
     - nanopb
     - NVActivityIndicatorView
     - Protobuf
+    - Reachability
 
 SPEC CHECKSUMS:
   BoringSSL: e10f92a27043805c01071fe815a5cd98ae8212e7
@@ -166,7 +169,8 @@ SPEC CHECKSUMS:
   nanopb: 5601e6bca2dbf1ed831b519092ec110f66982ca3
   NVActivityIndicatorView: 963f62bf9f993fcf23218e55958e5b1761b9504c
   Protobuf: 1eb9700044745f00181c136ef21b8ff3ad5a0fd5
+  Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
 
-PODFILE CHECKSUM: 42735aaa1d0a9414e314f2898c7caa6f49aade6b
+PODFILE CHECKSUM: 4ea94de8c525c6bc72c108fe8dc421a17cfa20e7
 
 COCOAPODS: 1.5.3

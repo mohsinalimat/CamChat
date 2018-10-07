@@ -68,6 +68,7 @@ class PhotoSelectionBottomBar: UIView{
             buttons.forEach{ $0.transform = CGAffineTransform.identity }
         }, completion: nil)
     }
+
     
     private(set) var buttons = [BouncyImageButton]()
     

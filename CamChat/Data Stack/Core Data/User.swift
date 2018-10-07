@@ -9,11 +9,7 @@
 import HelpKit
 
 
-fileprivate extension UIImage{
-    var data: Data{
-        return NSKeyedArchiver.archivedData(withRootObject: self)
-    }
-}
+
 
 @objc(User)
 public class User: NSManagedObject, ManagedObjectProtocol{
@@ -40,7 +36,7 @@ public class User: NSManagedObject, ManagedObjectProtocol{
             x.email = user.email
             x.uniqueID = user.uniqueID
             
-            if let data = user.profilePicture?.data{
+            if let data = user.profilePicture?.jpegData(compressionQuality: 0.2){
                 x.profilePictureData = data
             } else {
                 fatalError("the profile picture must be set on the provided TempUser object")
@@ -110,10 +106,15 @@ public class User: NSManagedObject, ManagedObjectProtocol{
     }
    
     
+    private var _profilePicture: UIImage?
     
     var profilePicture: UIImage {
-        
-        return NSKeyedUnarchiver.unarchiveObject(with: profilePictureData) as! UIImage
+        if let picture = _profilePicture{ return picture }
+        else {
+            let image = UIImage(data: profilePictureData)!
+            _profilePicture = image
+            return image
+        }
     }
     
     var fullName: String{

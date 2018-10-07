@@ -8,16 +8,43 @@
 
 import HelpKit
 
+enum TempMessageDownloadData: Hashable{
+    case text(String)
+    case photo(messageID: String)
+    case video(messageID: String)
+}
 
-struct TempMessage: Hashable{
+enum TempMessageUploadData: Hashable{
+    case text(String)
+    case photo(localURL: URL)
+    case video(localURL: URL)
+}
 
-    var text: String
-    var dateSent: Date
-    var uniqueID: String
-    var senderID: String
-    var receiverID: String
-    var wasSeenByReceiver: Bool
-    var isOnServer: Bool
+enum TempMessageData{
+    case forUpload(TempMessageUploadData)
+    case forDownload(TempMessageDownloadData)
+}
+
+
+class TempMessage: NSObject {
+
+    init(data: TempMessageData, dateSent: Date, uniqueID: String, senderID: String, receiverID: String, wasSeenByReceiver: Bool, isOnServer: Bool){
+        self.data = data
+        self.dateSent = dateSent
+        self.uniqueID = uniqueID
+        self.senderID = senderID
+        self.receiverID = receiverID
+        self.wasSeenByReceiver = wasSeenByReceiver
+        self.isOnServer = isOnServer
+    }
+    
+    let data: TempMessageData
+    let dateSent: Date
+    let uniqueID: String
+    let senderID: String
+    let receiverID: String
+    let wasSeenByReceiver: Bool
+    let isOnServer: Bool
     
     var chatPartnerID: String?{
         guard let currentUserID = DataCoordinator.currentUserUniqueID else {return nil}
@@ -51,4 +78,10 @@ struct TempMessage: Hashable{
     }
     
 }
+
+
+
+
+
+
 

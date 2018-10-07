@@ -69,7 +69,6 @@ extension Memory{
             }
         default: completion(false)
         }
-        
     }
 
     private static func performCameraRollSaveChanges(for memories: [Memory], completion: @escaping (_ success: Bool) -> Void){
@@ -77,9 +76,9 @@ extension Memory{
             
             for memory in memories{
                 switch memory.info {
-                case .photo(let url):
+                case .photo(let url, _):
                     PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: url)
-                case .video(let url):
+                case .video(let url, _):
                     PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
                 }
             }
@@ -92,12 +91,27 @@ extension Memory{
     
     static func getImageForVideoAt(url: URL) -> UIImage{
         
-        let clip = AVURLAsset(url: url)
-        let generator = AVAssetImageGenerator(asset: clip)
-        if let cgImage = try? generator.copyCGImage(at: CMTime(value: 0, timescale: 1), actualTime: nil){
-            return UIImage(cgImage: cgImage)
-        } else { return UIImage() }
+        return getImagesForVideoAt(url: url, atTimes: [0]).first!
         
+    }
+    
+    
+    /// The times should be expressed as percentages of the total video duration.
+    static func getImagesForVideoAt(url: URL, atTimes times: [Double]) -> [UIImage]{
+        let clip = AVURLAsset(url: url)
+
+        let generator = AVAssetImageGenerator(asset: clip)
+        
+        return times.map({ (time) -> UIImage in
+            let duration = generator.asset.duration.seconds
+            let cmTime = CMTime(seconds: time * duration , preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+            
+            
+            if let cgImage = try? generator.copyCGImage(at: cmTime, actualTime: nil){
+                return UIImage(cgImage: cgImage)
+            } else { return UIImage() }
+        })
+
     }
     
 }

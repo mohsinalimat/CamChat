@@ -7,9 +7,9 @@
         <attribute name="uniqueID" attributeType="String" syncable="YES"/>
     </entity>
     <entity name="Message" representedClassName="Message" syncable="YES">
+        <attribute name="data" attributeType="Binary" syncable="YES"/>
         <attribute name="dateSent" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="isOnServer" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="text" attributeType="String" syncable="YES"/>
         <attribute name="uniqueID" attributeType="String" spotlightIndexingEnabled="YES" syncable="YES"/>
         <attribute name="wasSeenByReceiver" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="receiver" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="receivedMessages" inverseEntity="User" syncable="YES"/>

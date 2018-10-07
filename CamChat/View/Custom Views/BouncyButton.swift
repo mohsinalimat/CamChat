@@ -50,9 +50,7 @@ class BouncyButton: HKButtonTemplate{
     
     
     required init?(coder aDecoder: NSCoder) {
-        fatalError()
-        
-        
+        fatalError("init coder has not being implemented")
     }
     
 }

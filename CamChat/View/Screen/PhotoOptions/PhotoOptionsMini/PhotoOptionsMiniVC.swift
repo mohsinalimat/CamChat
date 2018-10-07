@@ -10,9 +10,9 @@ import HelpKit
 
 
 
-extension CGRect{
+fileprivate extension CGRect{
     
-    fileprivate func translationToFitInside(rect: CGRect) -> CGPoint{
+    func translationToFitInside(rect: CGRect) -> CGPoint{
         var translation = CGPoint.zero
         translation.x += max(rect.minX - minX, 0)
         translation.x += min(-(maxX - rect.maxX), 0)

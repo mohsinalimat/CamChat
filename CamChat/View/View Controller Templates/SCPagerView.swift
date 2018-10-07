@@ -6,8 +6,7 @@
 //  Copyright © 2018 Patrick Hanna. All rights reserved.
 //
 
-import UIKit
-import Foundation
+
 import HelpKit
 
 class SCPagerViewController: UIViewController, SCPagerDataSource, SCPagerDelegate{

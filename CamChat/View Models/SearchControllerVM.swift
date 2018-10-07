@@ -20,14 +20,14 @@ enum SearchTableViewSection{
     case strangers([TempUser])
     
     var sectionTitle: String{
-        switch self{
+        switch self {
         case .friends: return "Friends"
         case .strangers: return "Add a Friend"
         }
     }
     var users: [TempUser]{
         
-        switch self{
+        switch self {
         case let .friends(objects): return objects
         case let .strangers(objects): return objects
         }

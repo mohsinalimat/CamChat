@@ -98,11 +98,11 @@ class PhotoVideoPreviewVC: UIViewController{
             guard let self = self else {return}
             if self.mediaIsSaved{return}
             
-            let memoryType: MemoryType
+            let memoryType: PhotoVideoData
             
-            switch self.mediaType{
-            case .photo(let image): memoryType = MemoryType.getFor(image: image)!
-            case .video(let url): memoryType = MemoryType.video(url)
+            switch self.mediaType { 
+            case .photo(let image): memoryType = PhotoVideoData.getFor(image: image)!
+            case .video(let url): memoryType = PhotoVideoData.getFor(videoAt: url)!
             }
         
             Memory.createNew(uniqueID: NSUUID().uuidString, authorID: DataCoordinator.currentUserUniqueID!, type: memoryType, dateTaken: Date(), context: .background, completion: {_ in CoreData.backgroundContext.saveChanges()})

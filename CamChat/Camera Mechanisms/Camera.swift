@@ -32,7 +32,7 @@ class Camera: NSObject {
     private let cameraCaptureSession = AVCaptureSession()
     private let microphoneCaptureSession = AVCaptureSession()
     
-    var isActive = false
+    private(set) var isActive = false
     
     private var photoCaptureOutput: AVCapturePhotoOutput?
     private var videoCaptureOutput: AVCaptureVideoDataOutput?
@@ -56,11 +56,7 @@ class Camera: NSObject {
         
         
         handleAuthoriziationOfCaptureDevices { (callback) in
-            switch callback{
-            case .success: self.setUp()
-    
-            case .failure: return
-            }
+            if case .success = callback { self.setUp() }
         }
     }
     
@@ -79,6 +75,16 @@ class Camera: NSObject {
         photoWriter = PhotoWriter(photoOutput: self.photoCaptureOutput!)
         isActive = true
         
+        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil){[weak self] _ in
+            guard let self = self else {return}
+            
+            if self.cameraCaptureSession.isRunning.isFalse{
+                self.cameraCaptureSession.startRunning()
+            }
+            
+        }
+        
+        
         #endif
     }
     
@@ -89,6 +95,7 @@ class Camera: NSObject {
         videoCaptureOutput = nil
         photoCaptureOutput = nil
         isActive = false
+        NotificationCenter.default.removeObserver(self)
     }
     
     

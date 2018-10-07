@@ -30,10 +30,13 @@ class SendButton: BouncyButton{
         imageViewPins.right!.constant = -val
         imageViewPins.bottom!.constant = -val
         
-        
         imageView.transform = CGAffineTransform(translationX: bounds.width * 0.05, y: 0)
     }
     
+    func setColorsInverted() {
+        self.imageView.tintColor = BLUECOLOR
+        circleView.backgroundColor = .white
+    }
     
 
     private lazy var imageView: UIImageView = {

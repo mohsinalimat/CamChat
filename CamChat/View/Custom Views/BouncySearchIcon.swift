@@ -9,7 +9,7 @@
 import HelpKit
 
 
-class CCBouncySearchIcon: UIView{
+class BouncySearchIcon: UIView{
     init(){
         super.init(frame: CGRect.zero)
         imageView.pinAllSides(addTo: self, pinTo: self)
