@@ -60,7 +60,7 @@ class MemorySenderBottomBar: UIView{
     }()
     
     
-    private lazy var sendButton: SendButton = {
+    private(set) lazy var sendButton: SendButton = {
         let x = SendButton()
         x.setColorsInverted()
         return x

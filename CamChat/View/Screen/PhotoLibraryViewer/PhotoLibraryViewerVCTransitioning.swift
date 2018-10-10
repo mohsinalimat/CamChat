@@ -97,24 +97,20 @@ private class PhotoLibraryViewerTransitioningBrain: HKVCTransBrain{
         super.cleanUpAfterPresentation()
     }
     
-    
-    
-    
-    
-    
-    
+
     private var originalFingerPositionInPresentedViewBounds: CGPoint?
     
     override func prepareForDismissal() {
         prepareForDismissal(fingerPositionInPresentedView: nil)
-        super.prepareForDismissal()
     }
     
     func prepareForDismissal(fingerPositionInPresentedView: CGPoint? = nil){
-        refreshThumbnailInfo()
+        super.prepareForDismissal()
         originalFingerPositionInPresentedViewBounds = fingerPositionInPresentedView
         container.insertSubview(presenter.view, at: 0)
         presenter.view.isUserInteractionEnabled = false
+        refreshThumbnailInfo()
+
         
         container.addSubview(thumbnailInfo.snapshot)
         thumbnailInfo.snapshot.layer.masksToBounds = true
@@ -174,10 +170,12 @@ private class PhotoLibraryViewerTransitioningBrain: HKVCTransBrain{
     
     
     override func cleanUpAfterDismissal() {
+        
         thumbnailInfo.snapshot.removeFromSuperview()
         dimmerView.removeFromSuperview()
         presented.view.layoutIfNeeded()
         presenter.view.isUserInteractionEnabled = true
+
         super.cleanUpAfterDismissal()
     }
     
@@ -292,15 +290,18 @@ private class PhotoLibraryViewerInteractionController: HKVCTransInteractionContr
     private func finish() {
         interactionInProgress = false
         shouldCompleteAnimation = false
-        
+        self.completeInteraction()
         brain.prepareForEndingDismissalAnimation()
+        
+        
         UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.4, options: [.curveEaseIn], animations: {
             self.brain.carryOutUnanimatedDismissalAction()
-        }) { _ in
+        }) { (success) in
+            
             self.brain.cleanUpAfterDismissal()
             super.completeTransition(true)
         }
-        self.completeInteraction()
+        
     }
     
     @objc private func respondToGesture(gesture: DirectionAwarePanGesture){

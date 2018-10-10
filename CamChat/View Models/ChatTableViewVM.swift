@@ -104,7 +104,7 @@ private enum TableViewChangeType{
 
 /** Note: This function does not notice changes in the individual attributes on objects. It only notices if a new message has been added and sends insertion information accordingly. It is the responsibility of each cell to observe the context for changes in it's message objects.
  
- ... And yes, I acknowledge that this function is absolutely terrible ☹️
+ ... And yes, I acknowledge that this algorithm is absolutely terrible ☹️
  
  **/
 
@@ -153,7 +153,9 @@ private func getTableViewChangeInfoFor(oldMessageSections: [ChatMessageSection],
 
 
 
-
+protocol ChatTableViewVMDelegate: class{
+    func configure(cell: ChatMessagesTableViewCell, for object: ChatMessageBlock, at indexPath: IndexPath)
+}
 
 
 
@@ -167,15 +169,16 @@ class ChatTableViewVM: NSObject, NSFetchedResultsControllerDelegate, UITableView
     
     private let cellID = "CellID"
     private let headerID = "HeaderID"
+    private weak var delegate: ChatTableViewVMDelegate?
     
-    
-    init(tableView: UITableView, user: User){
+    init(tableView: UITableView, user: User, delegate: ChatTableViewVMDelegate){
+        self.delegate = delegate
         self.tableView = tableView
         super.init()
         tableView.dataSource = self
         tableView.register(ChatMessagesTableViewCell.self, forCellReuseIdentifier: cellID)
         let fetch = Message.typedFetchRequest()
-        
+        fetch.returnsObjectsAsFaults = false
         fetch.predicate = NSPredicate(format: "(\(#keyPath(Message.sender.uniqueID)) == %@) OR \(#keyPath(Message.receiver.uniqueID)) == %@", user.uniqueID, user.uniqueID)
         fetch.sortDescriptors = [NSSortDescriptor(key: #keyPath(Message.dateSent), ascending: true)]
         self.controller = NSFetchedResultsController(fetchRequest: fetch, managedObjectContext: CoreData.mainContext, sectionNameKeyPath: nil, cacheName: nil)
@@ -276,7 +279,8 @@ class ChatTableViewVM: NSObject, NSFetchedResultsControllerDelegate, UITableView
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellID, for: indexPath) as! ChatMessagesTableViewCell
-        cell.setWithBlock(block: messageSections[indexPath.section].messageBlocks[indexPath.row])
+        let message = messageSections[indexPath.section].messageBlocks[indexPath.row]
+        delegate?.configure(cell: cell, for: message, at: indexPath)
         return cell
     }
     

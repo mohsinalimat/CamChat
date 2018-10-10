@@ -7,16 +7,14 @@ target 'CamChat' do
 
   # Pods for CamChat
   
-  
-  
-  
-  
+  inhibit_all_warnings!
+ 
   pod 'Firebase/Core'
   pod 'Firebase/Firestore'
   pod 'Firebase/Auth'
   pod 'Firebase/Storage'
   pod 'NVActivityIndicatorView'
-  pod 'Reachability'
+  pod 'ReachabilitySwift'
   
 
   target 'CamChatTests' do

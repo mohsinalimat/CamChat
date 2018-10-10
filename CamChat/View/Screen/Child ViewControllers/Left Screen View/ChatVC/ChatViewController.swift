@@ -38,7 +38,6 @@ class ChatViewController: UIViewController{
         transitioningDelegate = chatTransitioningDelegate
         
         NotificationCenter.default.addObserver(self, selector: #selector(respondToTextViewDidBeginEditing), name: UITextView.textDidBeginEditingNotification, object: self.accessoryView.textView)
-        
     }
 
     
@@ -61,7 +60,7 @@ class ChatViewController: UIViewController{
         additionalSafeAreaInsets.top = topInset
         
         topBarView_typed.topBarRightIcon.addAction({[weak self] in self?.dismiss(animated: true)})
-        tableView.pin(addTo: view, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor, .top: view.safeAreaLayoutGuide.topAnchor])
+        tableView.pin(addTo: view, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor, .top: view.topAnchor], constants: [.top: topInset + APP_INSETS.top])
         NotificationCenter.default.addObserver(self, selector: #selector(respondToKeyboardWillChangeFrame(notification:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
 
         
@@ -102,8 +101,6 @@ class ChatViewController: UIViewController{
     }
     
 
-   
-    
     
     override var canBecomeFirstResponder: Bool{
         return true
@@ -131,7 +128,7 @@ class ChatViewController: UIViewController{
         return x
     }()
    
-    
+
     
     
     
@@ -166,17 +163,21 @@ class ChatViewController: UIViewController{
 
 extension ChatViewController: HKVCTransEventAwareParticipator{
     func prepareForPresentation() {
+        if isBeingPresented.isFalse{return}
         tappedCell = tappedCellProvider?.cellFor(user: user)
     }
     func cleanUpAfterPresentation() {
+        if isBeingPresented.isFalse{return}
         DataCoordinator.performChatPresentationActionsForUser(user: user)
     }
 
     func prepareForDismissal() {
+        if isBeingDismissed.isFalse{return}
         tappedCell = tappedCellProvider?.cellFor(user: user)
     }
     
     func cleanUpAfterDismissal() {
+        if isBeingDismissed.isFalse{return}
         DataCoordinator.performChatDismissalActionsFor(user: user)
     }
 }

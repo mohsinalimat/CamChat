@@ -21,7 +21,7 @@ class MemoryActivityItemProvider: UIActivityItemProvider{
         
     }
     override var item: Any{
-        return memory.info.url
+        return memory.info.urls.main
     }
     
     override var activityType: UIActivity.ActivityType?{
@@ -47,7 +47,8 @@ extension Memory{
         context.perform {
             for memory in memories {
                 handleErrorWithPrintStatement {
-                    try FileManager.default.removeItem(at: memory.info.url)
+                    try FileManager.default.removeItem(at: memory.info.urls.main)
+                    try FileManager.default.removeItem(at: memory.info.urls.thumbnail)
                 }
                 context.delete(memory)
                 
@@ -89,7 +90,7 @@ extension Memory{
         })
     }
     
-    static func getImageForVideoAt(url: URL) -> UIImage{
+    static func getFirstFrameImageForVideoAt(url: URL) -> UIImage{
         
         return getImagesForVideoAt(url: url, atTimes: [0]).first!
         

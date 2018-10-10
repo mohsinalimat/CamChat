@@ -161,7 +161,9 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
                 self.currentSelectedCellIndexPaths.append(indexPath)
             }
         } else {
-            let viewer = PhotoLibraryViewerVC(imageArray: viewModel.objects, currentIndex: indexPath.row, presenter: self)
+            
+            
+            let viewer = PhotoLibraryViewerVC(memoryArray: viewModel.objects, currentIndex: indexPath.row, presenter: self)
             
             DispatchQueue.main.async {
                 self.present(viewer, animated: true, completion: nil)
@@ -331,7 +333,15 @@ extension PhotoLibraryCollectionVC{
     }
     
     private func respondToSendButtonTapped(){
-        self.present(MemorySenderVC(presenter: self))
+        
+        self.present(MemorySenderVC(presenter: self, memories: selectedMemories, sendCompletedAction: {[weak self ] sender in
+            guard let self = self else {return}
+            
+            sender.dismiss(animated: true, completion: {
+                self.selectionDissmissButtonTapped()
+            })
+            
+        }))
     }
     
     

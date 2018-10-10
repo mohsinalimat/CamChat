@@ -10,6 +10,7 @@ import HelpKit
 
 class PhotoLibraryCollectionViewCell: UICollectionViewCell {
     
+    private static var thumbnailCache = HKCache<Memory, UIImage>(objectLimit: 100)
     
     weak var vcOwner: UIViewController?
     weak var screen: Screen?
@@ -34,9 +35,14 @@ class PhotoLibraryCollectionViewCell: UICollectionViewCell {
     
     func setWith(memory: Memory){
         self.currentMemory = memory
-        imageView.image = memory.info.thumbnail
+        if let image = PhotoLibraryCollectionViewCell.thumbnailCache[memory]{
+            self.imageView.image = image
+        } else {
+            let image = UIImage(data: try! Data(contentsOf: memory.info.urls.thumbnail))!
+            PhotoLibraryCollectionViewCell.thumbnailCache[memory] = image
+            self.imageView.image = image
+        }
         slideshowView.stopPreviewing()
-        
         if case let .video(url, _) = memory.info{
             slideshowView.setWithVideo(url: url)
         }

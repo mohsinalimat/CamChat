@@ -24,7 +24,24 @@ public class Message: NSManagedObject, ManagedObjectProtocol{
             
             let x = Message(context: context.context)
             
-            x.text = message.text
+            let messageData: MessageData
+            
+            switch message.data{
+            case .forUpload(let uploadData):
+                switch uploadData{
+                case .photo(let data):messageData = .photo(data)
+                case .video(let data):messageData = .video(data)
+                case .text(let text): messageData = .text(text)
+                }
+            case .forDownload(let downloadData):
+                switch downloadData{
+                case .photo: messageData = .photo(nil)
+                case .video: messageData = .video(nil)
+                case .text(let text): messageData = .text(text)
+                }
+            }
+            
+            x.data = try! JSONEncoder().encode(messageData)
             x.dateSent = message.dateSent
             x.uniqueID = message.uniqueID
             x.sender = sender
@@ -40,10 +57,10 @@ public class Message: NSManagedObject, ManagedObjectProtocol{
     
     /// Is only to be called when network code wishes to update the object according to remote changes.
     func updateFromServerIfNeededWith(tempMessage: TempMessage){
-        
+        precondition(tempMessage.uniqueID == uniqueID)
         if tempMessage.wasSeenByReceiver && self.wasSeenByReceiver.isFalse{
             self.wasSeenByReceiver = true
-            MessageWasSeenNotification.post(with: (message: self.tempMessage, wasSeenLocally: false))
+            MessageWasSeenNotification.post(with: (message: getTempMessage(), wasSeenLocally: false))
         }
         if tempMessage.isOnServer && self.isOnServer.isFalse{
             self.isOnServer = true
@@ -57,7 +74,7 @@ public class Message: NSManagedObject, ManagedObjectProtocol{
     func markAsSeenIfNeeded(){
         if wasSeenByReceiver.isFalse{
             wasSeenByReceiver = true
-            MessageWasSeenNotification.post(with: (message: tempMessage, wasSeenLocally: true))
+            MessageWasSeenNotification.post(with: (message: getTempMessage(), wasSeenLocally: true))
         }
     }
     
@@ -71,20 +88,47 @@ public class Message: NSManagedObject, ManagedObjectProtocol{
     @NSManaged private(set) var wasSeenByReceiver: Bool
     @NSManaged private(set) var isOnServer: Bool
     
-    private var _info: MessageData?
+    
     
     var info: MessageData{
-        if let data = _info{ return data }
-        else {
-            self._info = try! JSONDecoder().decode(MessageData, from: data)
-            return self._info!
+        return try! JSONDecoder().decode(MessageData.self, from: data)
+    }
+    
+    func setMessageDataTo(_ data: PhotoVideoData){
+        if info.hasData.isTrue{return}
+        let newData: MessageData
+        switch info {
+        case .photo: newData = .photo(data)
+        case .video: newData = .video(data)
+        default: fatalError()
         }
+        self.data = try! JSONEncoder().encode(newData)
+    }
+    
+
+    
+    /// this guesses whether you want it to be for upload or download based on the avilabilty of its media information
+    func getTempMessage() -> TempMessage{
+        let tempMessageData: TempMessageData
+        switch info{
+        case .photo(let photoVideoData):
+            if let data = photoVideoData {
+                tempMessageData = .forUpload(.photo(data))
+            } else { tempMessageData = .forDownload(.photo(messageID: uniqueID)) }
+            
+        case .video(let photoVideoData):
+            if let data = photoVideoData{
+                tempMessageData = .forUpload(.video(data))
+            } else { tempMessageData = .forDownload(.video(messageID: uniqueID)) }
+        case .text(let text):
+            tempMessageData = .forUpload(.text(text))
+        }
+        
+        return TempMessage(data: tempMessageData, dateSent: dateSent, uniqueID: uniqueID, senderID: sender.uniqueID, receiverID: receiver.uniqueID, wasSeenByReceiver: wasSeenByReceiver, isOnServer: isOnServer)
     }
     
     
-    var tempMessage: TempMessage{
-        return TempMessage(text: text, dateSent: dateSent, uniqueID: uniqueID, senderID: sender.uniqueID, receiverID: receiver.uniqueID, wasSeenByReceiver: wasSeenByReceiver, isOnServer: isOnServer)
-    }
+
     
     var currentUserIsReceiver: Bool{
         return receiver.uniqueID == DataCoordinator.currentUserUniqueID

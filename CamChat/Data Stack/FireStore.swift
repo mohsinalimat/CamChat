@@ -230,15 +230,15 @@ class FirebaseManager{
             completion(.success)
         }
     
-        if case let .forUpload(.photo(url)) = message.data{
-            if let data = try? Data(contentsOf: url), let image = UIImage(data: data), let compressedData = image.jpegData(compressionQuality: 0.3){
+        if case let .forUpload(.photo(photoVideoData)) = message.data{
+            if let data = try? Data(contentsOf: photoVideoData.urls.main), let image = UIImage(data: data), let compressedData = image.jpegData(compressionQuality: 0.3){
                 messageMediaFoler.child(message.uniqueID).putData(compressedData, metadata: nil) { (metadata, error) in
                     actualCompletion(error)
                 }
             } else { fatalError() }
             
-        } else if case let .forUpload(.video(url)) = message.data{
-            messageMediaFoler.child(message.uniqueID).putFile(from: url, metadata: nil) { (metadata, error) in
+        } else if case let .forUpload(.video(photoVideoData)) = message.data{
+            messageMediaFoler.child(message.uniqueID).putFile(from: photoVideoData.urls.main, metadata: nil) { (metadata, error) in
                 actualCompletion(error)
             }
         } else { fatalError() }
@@ -371,9 +371,23 @@ class FirebaseManager{
                     
                     completion(.success(message))
                 } else { completion(.failure(error ?? HKError.unknownError)) }
-            }
-
+        }
+        
     }
+    
+    
+    func downloadMediaDataFor(message: TempMessage, completion: @escaping (HKCompletionResult<Data>) -> () ){
+        DispatchQueue.main.async {
+            self.messageMediaFoler.child(message.uniqueID).getData(maxSize: Int64.max) { (data, error) in
+                if let data = data{
+                    completion(.success(data))
+                } else {completion(.failure(error ?? HKError.unknownError))}
+            }
+        }
+        
+    }
+    
+    
 }
 
 

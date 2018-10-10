@@ -53,7 +53,8 @@ public class Memory: NSManagedObject, ManagedObjectProtocol {
     /// Please use this function to delete a memory so that the actual videos and photos in the file system will be deleted as well. Note that this function does not save chnages.
     func delete(completion: (() -> Void)? = nil){
         handleErrorWithPrintStatement {
-            try FileManager.default.removeItem(at: info.url)
+            try FileManager.default.removeItem(at: info.urls.main)
+            try FileManager.default.removeItem(at: info.urls.thumbnail)
         }
         context.perform {
             self.context.delete(self)

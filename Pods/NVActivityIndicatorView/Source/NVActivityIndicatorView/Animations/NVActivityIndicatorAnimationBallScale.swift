@@ -50,7 +50,11 @@ class NVActivityIndicatorAnimationBallScale: NVActivityIndicatorAnimationDelegat
         let animation = CAAnimationGroup()
 
         animation.animations = [scaleAnimation, opacityAnimation]
-        animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+        #if swift(>=4.2)
+        animation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        #else
+        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+        #endif
         animation.duration = duration
         animation.repeatCount = HUGE
         animation.isRemovedOnCompletion = false

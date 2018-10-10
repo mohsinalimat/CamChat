@@ -33,7 +33,7 @@ class MemorySenderVM: NSObject{
     private var fetchRequestResultCompletionCount = 0{
         didSet {
             if fetchRequestResultCompletionCount >= 2 {
-                tableView?.insertSections([0, 1], with: .left)
+                tableView?.insertSections([0, 1], with: .bottom)
             }
         }
     }

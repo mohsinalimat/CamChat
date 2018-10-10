@@ -19,7 +19,23 @@ class MemorySenderVC: SearchTableVC{
         return .lightContent
     }
     
-    init(presenter: HKVCTransParticipator){
+
+    private var memories: [Memory]?
+    
+    private let photoVideoObjects: [PhotoVideoData]
+    private let sendCompletionAction: ((MemorySenderVC) -> Void)?
+    
+    var userDidDismissMemorySenderAction: (() -> ())?
+    
+    convenience init(presenter: HKVCTransParticipator, memories: [Memory], sendCompletedAction: ((MemorySenderVC) -> Void)?){
+        self.init(presenter: presenter, photoVideoObjects: memories.map{$0.info}, sendCompletedAction: sendCompletedAction)
+        self.memories = memories
+    }
+    
+    
+    init(presenter: HKVCTransParticipator, photoVideoObjects: [PhotoVideoData], sendCompletedAction: ((MemorySenderVC) -> Void)?){
+        self.sendCompletionAction = sendCompletedAction
+        self.photoVideoObjects = photoVideoObjects
         super.init()
         self.customTransitioningDelegate = MemorySenderTransioningDelegate(presenter: presenter, presented: self)
         self.transitioningDelegate = customTransitioningDelegate
@@ -108,6 +124,7 @@ class MemorySenderVC: SearchTableVC{
         x.addAction({[weak self] in
             self?.searchTextField.resignFirstResponder()
             self?.dismiss()
+            self?.userDidDismissMemorySenderAction?()
         })
         return x
     }()
@@ -163,6 +180,19 @@ class MemorySenderVC: SearchTableVC{
     
     private lazy var bottomBar: MemorySenderBottomBar = {
         let x = MemorySenderBottomBar()
+        
+        x.sendButton.addAction { [weak self] in
+            guard let self = self else {return}
+            if let memories = self.memories {
+                let request = MemoryBatchSendRequest(memories: memories, text: nil, users: self._tableView.selectedUsers.value)
+                try! DataCoordinator.sendBatch(request: request)
+            } else {
+                for object in self.photoVideoObjects{
+                    try! DataCoordinator.sendMessageUsingSingleMediaItem(object, receivers: self._tableView.selectedUsers.value)
+                }
+            }
+            self.sendCompletionAction?(self)
+        }
         return x
     }()
     

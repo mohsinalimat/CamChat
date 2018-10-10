@@ -35,8 +35,18 @@ class CCDataCoordinator{
     
     func send(message: TempMessage, sender: User, receiver: User) throws {
         guard let messageSender = messageSender else {throw HKError.unknownError}
-        do { try messageSender.send(message: message, sender: sender, receiver: receiver) }
-        catch { throw error }
+        try messageSender.send(message: message, sender: sender, receiver: receiver)
+        
+    }
+    
+    func sendBatch(request: MemoryBatchSendRequest) throws {
+        guard let messageSender = messageSender else { throw HKError.unknownError }
+        try messageSender.sendBatch(request: request)
+    }
+    
+    func sendMessageUsingSingleMediaItem(_ media: PhotoVideoData, receivers: [User]) throws {
+        guard let messageSender = messageSender else { throw HKError.unknownError }
+        try messageSender.sendMessageUsingSingleMediaItem(media, receivers: receivers)
     }
 
     
@@ -94,18 +104,24 @@ class CCDataCoordinator{
     
     
     func logOut() throws{
-        do {
-            try Firebase.logOut()
-           
-            InterfaceManager.shared.transitionToLoginInterface()
+        
+        try Firebase.logOut()
+        
+        InterfaceManager.shared.transitionToLoginInterface(completion: {
             UserLoggedOutNotification.post()
-            endSyncing()
-            messageSender = nil
+            self.endSyncing()
+            self.messageSender = nil
             CoreData.performAndSaveChanges(context: .background) {
+                Message.helper(.background).fetchAll().map{$0.info.photoVideodata}
+                    .filterOutNils().forEach{ (data) in
+                        handleErrorWithPrintStatement {
+                            try data.deleteAllCorrespondingData()
+                        }
+                }
                 Message.helper(.background).deleteAllObjects()
                 User.helper(.background).deleteAllObjects()
             }
-        } catch { throw error }
+        })
     }
     
     

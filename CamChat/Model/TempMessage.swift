@@ -16,18 +16,19 @@ enum TempMessageDownloadData: Hashable{
 
 enum TempMessageUploadData: Hashable{
     case text(String)
-    case photo(localURL: URL)
-    case video(localURL: URL)
+    case photo(PhotoVideoData)
+    case video(PhotoVideoData)
 }
 
-enum TempMessageData{
+enum TempMessageData: Hashable{
     case forUpload(TempMessageUploadData)
     case forDownload(TempMessageDownloadData)
 }
 
 
-class TempMessage: NSObject {
-
+class TempMessage: NSObject, Codable{
+    
+   
     init(data: TempMessageData, dateSent: Date, uniqueID: String, senderID: String, receiverID: String, wasSeenByReceiver: Bool, isOnServer: Bool){
         self.data = data
         self.dateSent = dateSent
@@ -78,10 +79,3 @@ class TempMessage: NSObject {
     }
     
 }
-
-
-
-
-
-
-

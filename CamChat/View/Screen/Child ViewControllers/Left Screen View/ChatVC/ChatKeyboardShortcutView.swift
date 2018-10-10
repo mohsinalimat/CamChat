@@ -74,7 +74,8 @@ class ChatKeyboardShortcutView: HKView{
             
             textView.setTextTo(newText: "")
             
-            let message = TempMessage(text: text.withTrimmedWhiteSpaces(), dateSent: Date(), uniqueID: NSUUID().uuidString, senderID: DataCoordinator.currentUserUniqueID!, receiverID: self.user.uniqueID, wasSeenByReceiver: false, isOnServer: false)
+            let message = TempMessage(data: .forUpload(.text(text.withTrimmedWhiteSpaces())), dateSent: Date(), uniqueID: NSUUID().uuidString, senderID: DataCoordinator.currentUserUniqueID!, receiverID: self.user.uniqueID, wasSeenByReceiver: false, isOnServer: false)
+            
             try! DataCoordinator.send(message: message, sender: DataCoordinator.currentUser!, receiver: self.user)
             
         })

@@ -44,7 +44,7 @@ class VideoThumbnailPreview: UIView{
             self.currentImages = images
             action()
         } else {
-            DispatchQueue.global(qos: .userInitiated).async {
+            DispatchQueue.global(qos: .background).async {
                 
                 self.currentImages = Memory.getImagesForVideoAt(url: url, atTimes: self.desiredImageTimes)
                 VideoThumbnailPreview.cachedThumbnailImages[url] = self.currentImages

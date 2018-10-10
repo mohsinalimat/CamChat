@@ -14,18 +14,20 @@ class PhotoLibraryViewerVC: SCPagerViewController{
     override var prefersStatusBarHidden: Bool{return true}
 
     
+    private var memoryArray: [Memory]
     
-    private let itemArray: [Memory]
     private let beginningIndex: Int
-    init(imageArray: [Memory], currentIndex: Int, presenter: PhotoLibraryViewerTransitioningPresenter){
-      
+    
+    init(memoryArray: [Memory], currentIndex: Int, presenter: PhotoLibraryViewerTransitioningPresenter){
+        
+        self.memoryArray = memoryArray
         self.beginningIndex = currentIndex
-        self.itemArray = imageArray
         super.init(desiredCurrentIndex: currentIndex)
-          self.libraryViewerTransitioningDelegate = PhotoLibraryViewerTransitioningDelegate(presenter: presenter, presented: self)
+        self.libraryViewerTransitioningDelegate = PhotoLibraryViewerTransitioningDelegate(presenter: presenter, presented: self)
         self.transitioningDelegate = libraryViewerTransitioningDelegate
         pagerView.interactor.onlyAcceptInteractionInSpecifiedDirection = true
     }
+
     
  
     private var libraryViewerTransitioningDelegate: PhotoLibraryViewerTransitioningDelegate!
@@ -55,23 +57,18 @@ class PhotoLibraryViewerVC: SCPagerViewController{
         else { viewToUse = PagerView() }
         
         viewToUse.delegate = self
-        viewToUse.setWith(memory: itemArray[index])
+        viewToUse.vcOwner = self
+        viewToUse.setWith(memory: self.memoryArray[index])
         return viewToUse
     }
 
-    
-  
-    
-    
-    
-    
-    
+
     private func presentOptions(){
-        self.present(PhotoOptionsVC(memory: self.itemArray[self.currentItemIndex], presenter: self, delegate: self), animated: true, completion: nil)
+        self.present(PhotoOptionsVC(memory: memoryArray[self.currentItemIndex], presenter: self, delegate: self), animated: true, completion: nil)
     }
     
     override func pagerView(numberOfItemsIn pagerView: SCPagerView) -> Int {
-        return itemArray.count
+        return memoryArray.count
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -116,7 +113,7 @@ private class PagerView: SCPagerViewCell{
     }
     
     weak var delegate: PagerViewDelegate?
-    
+    weak var vcOwner: UIViewController?
     private func setUpView() {
         imageView.pinAllSides(addTo: self, pinTo: self)
         videoHolderView.pinAllSides(addTo: self, pinTo: self)
@@ -125,9 +122,11 @@ private class PagerView: SCPagerViewCell{
         threeDotButton.pin(addTo: self, anchors: [.right: rightAnchor, .top: topAnchor], constants: [.right: 15, .top: Variations.notchHeight + 15, .height: 40, .width: 24])
     }
     
+    private weak var currentMemory: Memory?
+    
     
     func setWith(memory: Memory){
-        
+        self.currentMemory = memory
         if let video = currentVideoView{
             video.removeFromSuperview()
             currentVideoView = nil
@@ -197,7 +196,17 @@ private class PagerView: SCPagerViewCell{
     
     private lazy var sendButton: SendButton = {
         let x = SendButton()
+        
         x.addAction({[weak self] in self?.delegate?.sendButtonTapped()})
+        
+        x.addAction { [weak self] in
+            guard let self = self, let memory = self.currentMemory else {return}
+            
+            let sender = MemorySenderVC(presenter: self.vcOwner!, memories: [memory], sendCompletedAction: { (sender1) in
+                sender1.dismiss(animated: true)
+            })
+            self.vcOwner!.present(sender)
+        }
         return x
     }()
     

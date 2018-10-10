@@ -86,7 +86,7 @@ class ChatControllerAnimationPositioningBrain: HKVCTransBrain{
             presentingViewDimmer.pinAllSides(addTo: viewToDim, pinTo: viewToDim)
         }
         
-        presented.topBarView.pin(addTo: container, anchors: [.centerX: container.centerXAnchor, .top: container.safeAreaLayoutGuide.topAnchor])
+        presented.topBarView.pin(addTo: container, anchors: [.centerX: container.centerXAnchor, .top: container.topAnchor], constants: [.top: APP_INSETS.top])
         
         presented.backgroundView.frame = container.bounds
 
@@ -144,6 +144,7 @@ class ChatControllerAnimationPositioningBrain: HKVCTransBrain{
         }
     }
     
+    private var myself: AnyObject?
     
     override func prepareForDismissal(){
         super.prepareForDismissal()
@@ -151,10 +152,12 @@ class ChatControllerAnimationPositioningBrain: HKVCTransBrain{
         
         NotificationCenter.default.removeObserver(self)
 
-        NotificationCenter.default.addObserver(forName: UIResponder.keyboardDidHideNotification, object: nil, queue: nil) { _ in
-            
+        myself = self
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardDidHideNotification, object: nil, queue: nil) { [weak self ] _ in
+            guard let self = self else {return}
             self.adjustKeyboardWindows{ $0.transform = CGAffineTransform.identity }
             NotificationCenter.default.removeObserver(self)
+            self.myself = nil
         }
         
         

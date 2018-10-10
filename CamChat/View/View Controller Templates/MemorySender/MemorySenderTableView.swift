@@ -76,11 +76,7 @@ extension MemorySenderTableView: MemorySenderVMDelegate{
             cell.setCornerRadius(to: radius)
             cell.setShowsBottomLine(to: false)
         }
-        
     }
-    
-    
-    
 }
 
 extension MemorySenderTableView: UITableViewDelegate{

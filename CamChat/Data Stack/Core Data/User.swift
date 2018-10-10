@@ -12,7 +12,7 @@ import HelpKit
 
 
 @objc(User)
-public class User: NSManagedObject, ManagedObjectProtocol{
+public class User: NSManagedObject, ManagedObjectProtocol {
     
     static var entityName: String{
         return "User"

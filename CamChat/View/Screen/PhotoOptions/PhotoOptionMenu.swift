@@ -190,7 +190,8 @@ extension PhotoOptionMenu{
         }
     }
     
-
+    
+    
     private func respondToShareOption(){
         let vc = Memory.getActivityVCFor(memories: [memory])
         if let presenter = vcOwner?.presentingViewController{
@@ -203,9 +204,17 @@ extension PhotoOptionMenu{
         
         if let presenting = vcOwner?.presentingViewController{
             vcOwner?.dismiss(animated: true, completion: {
-                presenting.present(MemorySenderVC(presenter: presenting))
+                self.presentMemorySender(on: presenting)
             })
-        } else {vcOwner!.present(MemorySenderVC(presenter: vcOwner!))}
+        } else {presentMemorySender(on: vcOwner!)}
+    }
+    
+    private func presentMemorySender(on vc: UIViewController){
+        let memorySender = MemorySenderVC(presenter: vc, memories: [memory]) { sender in
+            
+            sender.dismiss()
+        }
+        vc.present(memorySender)
     }
     
 }

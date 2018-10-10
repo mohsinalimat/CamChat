@@ -50,22 +50,29 @@ class InterfaceManager{
         window.makeKeyAndVisible()
     }
     
-    func transitionToLoginInterface(){
+    func transitionToLoginInterface(completion: (() -> Void)? = nil){
         if let mainScreenWindow = mainScreenWindow{
             let loginWindow = initializeLoginWindow()
             transition(from: mainScreenWindow, to: loginWindow){
-                self.mainScreenWindow?.dismissAllPresentedViewControllers()
-                self.mainScreenWindow = nil
+                self.mainScreenWindow?.dismissAllPresentedViewControllers(completion: {
+                    self.mainScreenWindow = nil
+                    completion?()
+                })
+                
+                
             }
         }
     }
     
-    func transitionToMainInterface(){
+    func transitionToMainInterface(completion: (() -> Void)? = nil){
         if let loginWindow = loginWindow{
             let mainScreen = initializeMainScreenWindow()
             transition(from: loginWindow, to: mainScreen) {
-                self.loginWindow?.dismissAllPresentedViewControllers()
-                self.loginWindow = nil
+                self.loginWindow?.dismissAllPresentedViewControllers(completion: {
+                    self.loginWindow = nil
+                    completion?()
+                })
+                
             }
         }
     }
