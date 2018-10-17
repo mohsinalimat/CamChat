@@ -13,12 +13,20 @@ class ChatTopBar: HKView{
     
     private let size: CGSize
     private let user: User
+    
+    private var userObserver: HKManagedObjectObserver!
     init(size: CGSize, user: User){
         self.size = size
         self.user = user
         super.init(frame: CGRect.zero)
         self.topLabel.text = user.fullName
         
+        userObserver = user.observe {[weak self] (change) in
+            guard let self = self else {return}
+            if change == .update{
+                self.topLabel.text = self.user.fullName
+            }
+        }
     }
     
     
@@ -28,7 +36,6 @@ class ChatTopBar: HKView{
     }
     
     override func setUpView() {
-        topBarLeftIcon.pin(addTo: self, anchors: [.left: leftAnchor, .centerY: centerYAnchor], constants: [.left: 10])
         topLabel.pin(addTo: self, anchors: [.centerX: centerXAnchor, .centerY: centerYAnchor])
         topBarRightIcon.pin(addTo: self, anchors: [.right: rightAnchor, .centerY: centerYAnchor], constants: [.right: 10])
     }
@@ -36,7 +43,7 @@ class ChatTopBar: HKView{
     
     lazy var topLabel: UILabel = {
         let x = UILabel()
-        x.font = SCFonts.getFont(type: .medium, size: 20)
+        x.font = CCFonts.getFont(type: .medium, size: 20)
         x.text = "Patrick"
         x.textColor = .white
         return x
@@ -49,11 +56,7 @@ class ChatTopBar: HKView{
         return x
     }()
     
-    lazy var topBarLeftIcon: BouncyImageButton = {
-        let x = BouncyImageButton(image: AssetImages.threeLineMenuIcon)
-        x.pin(constants: [.height: 20, .width: 20])
-        return x
-    }()
+ 
     
     
     

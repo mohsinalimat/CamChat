@@ -61,7 +61,10 @@ class ScreenTopBar: HKView{
         topSearchBar.changeGradientTo(gradient: gradient, direction: direction)
         buttonTopBar.changeIconPositionsAccordingTo(gradient: gradient, direction: direction)
         
+        
         topSearchBar.layer.shadowOpacity = searchBarShadowAlphaEquation.solve(for: Float(gradient))
+        
+        
     }
     
     required init?(coder aDecoder: NSCoder) {

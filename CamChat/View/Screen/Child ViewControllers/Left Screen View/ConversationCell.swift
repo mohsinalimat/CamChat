@@ -77,7 +77,7 @@ class ConversationCell: UITableViewCell{
             bottomIconView.image = AssetImages.errorIcon
             bottomIconView.tintColor = .red
             bottomLabel.textColor = .red
-            bottomLabel.text = "The message could not be sent."
+            bottomLabel.text = "The message will be sent when there is an active internet connection."
         }
     }
     
@@ -109,7 +109,7 @@ class ConversationCell: UITableViewCell{
         bottomIconView.pin(addTo: x, anchors: [.left: x.leftAnchor, .centerY: x.centerYAnchor])
         sendingIndicator.pin(addTo: x, anchors: [.centerX: bottomIconView.centerXAnchor, .centerY: bottomIconView.centerYAnchor], constants: [.width: sendingIndicatorSize.width, .height: sendingIndicatorSize.height])
         bottomLabel.pin(addTo: x, anchors: [.left: bottomIconView.rightAnchor, .centerY: bottomIconView.centerYAnchor], constants: [.left: 6])
-        x.pin(anchors: [.height: bottomIconView.heightAnchor, .right: bottomLabel.rightAnchor])
+        x.pin(anchors: [.height: bottomLabel.heightAnchor, .right: bottomLabel.rightAnchor])
         return x
     }()
     
@@ -137,6 +137,7 @@ class ConversationCell: UITableViewCell{
     private lazy var bottomLabel: UILabel = {
         let x = UILabel()
         x.textColor = UIColor.lightGray
+        x.numberOfLines = 0
         x.font = UIFont.systemFont(ofSize: 13)
         return x
     }()

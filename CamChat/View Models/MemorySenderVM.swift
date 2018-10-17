@@ -11,29 +11,46 @@ import HelpKit
 protocol MemorySenderVMDelegate: class{
     
     func configure(cell: MemorySenderUserCell, using object: User, for indexPath: IndexPath)
-    
+    var messageCell: MemorySenderMessageCell { get }
+    // called whenever the objects to be displayed in the table view changes
+    func contentDidChange()
 }
 
 
 class MemorySenderVM: NSObject{
     
+    private static let messageCellID = "MESSAGE"
+    
+    
     private let searchSectionTitle = "SEARCH RESULTS"
     private let recentsSectionTitle = "RECENTS"
     private let allFriendsSectionTitle = "ALL FRIENDS"
     
-    private let previewCellID = "previewCell"
+    private var messageCellID: String{ return MemorySenderVM.messageCellID }
+    
     private let userCellID = "userCell"
     
     typealias MemorySenderSection = (objects: [User], title: String)
     
     private var users = (recents: [User](), all: [User]())
     
-    private(set) var objects: [MemorySenderSection] = []
+    var hasUsers: Bool {
+        return users.all.isEmpty.isFalse && users.recents.isEmpty.isFalse
+    }
     
-    private var fetchRequestResultCompletionCount = 0{
+    private(set) var objects: [MemorySenderSection] = [([], MemorySenderVM.messageCellID)]{
+        didSet { delegate?.contentDidChange() }
+    }
+    
+    private var fetchRequestResultCompletionCount = 0 {
         didSet {
             if fetchRequestResultCompletionCount >= 2 {
-                tableView?.insertSections([0, 1], with: .bottom)
+                if hasUsers.isFalse {
+                    objects.removeAll()
+                    tableView?.reloadData()
+                    return
+                }
+                tableView?.insertSections([1, 2], with: .bottom)
             }
         }
     }
@@ -47,6 +64,7 @@ class MemorySenderVM: NSObject{
         super.init()
 
         tableView.dataSource = self
+
 
         tableView.register(MemorySenderUserCell.self, forCellReuseIdentifier: userCellID)
         beginFetching()
@@ -72,7 +90,7 @@ class MemorySenderVM: NSObject{
             DispatchQueue.main.async {
                 let users = result.finalResult ?? []
                 self.users.recents = users
-                self.objects.insert((users, self.recentsSectionTitle), at: 0)
+                self.objects.insert((users, self.recentsSectionTitle), at: 1)
                 self.fetchRequestResultCompletionCount += 1
             }
         }
@@ -92,7 +110,7 @@ class MemorySenderVM: NSObject{
                 self.fetchRequestResultCompletionCount += 1
             }
         }
-    
+        
         try! CoreData.mainContext.execute(fetch1!)
         try! CoreData.mainContext.execute(fetch2!)
     }
@@ -100,10 +118,10 @@ class MemorySenderVM: NSObject{
     
     
     func searchTextChanged(to text: String?){
-        
+        if hasUsers.isFalse{return}
         objects.removeAll()
         if text.isNil || text?.withTrimmedWhiteSpaces().isEmpty ?? true{
-            objects = [(users.recents, recentsSectionTitle), (users.all, allFriendsSectionTitle)]
+            objects = [([], messageCellID), (users.recents, recentsSectionTitle), (users.all, allFriendsSectionTitle)]
             tableView?.reloadData()
             return
         }
@@ -112,7 +130,7 @@ class MemorySenderVM: NSObject{
             return $0.fullName.localizedCaseInsensitiveContains(text!)
         }
         
-        self.objects = [(filteredUsers, searchSectionTitle)]
+        self.objects = filteredUsers.isEmpty ? [] : [(filteredUsers, searchSectionTitle)]
         tableView?.reloadData()
     }
     
@@ -131,15 +149,21 @@ extension MemorySenderVM: UITableViewDataSource{
     
     func numberOfSections(in tableView: UITableView) -> Int {
         let count = objects.count
+        
         return count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if objects[section].title == messageCellID{return 1}
+        
         let count = objects[section].objects.count
         return count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if objects[indexPath.section].title == messageCellID{
+            return delegate!.messageCell
+        }
         let cell = tableView.dequeueReusableCell(withIdentifier: userCellID, for: indexPath) as! MemorySenderUserCell
         delegate?.configure(cell: cell, using: objects[indexPath.section].objects[indexPath.row], for: indexPath)
         return cell

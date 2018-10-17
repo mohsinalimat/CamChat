@@ -64,20 +64,17 @@ class ChatKeyboardShortcutView: HKView{
     private lazy var sendButton: SimpleLabelledButton = {
         let x = SimpleLabelledButton()
         x.label.text = "Send"
-        x.label.font = SCFonts.getFont(type: .demiBold, size: 13)
+        x.label.font = CCFonts.getFont(type: .demiBold, size: 13)
         x.backgroundColor = BLUECOLOR
         x.label.textColor = .white
         x.transform = CGAffineTransform(scaleX: 0, y: 0)
         x.isUserInteractionEnabled = false
         x.addAction({[unowned textView, unowned self] in
-            let text = textView.text!
+            let text = textView.text!.withTrimmedWhiteSpaces()
             
             textView.setTextTo(newText: "")
             
-            let message = TempMessage(data: .forUpload(.text(text.withTrimmedWhiteSpaces())), dateSent: Date(), uniqueID: NSUUID().uuidString, senderID: DataCoordinator.currentUserUniqueID!, receiverID: self.user.uniqueID, wasSeenByReceiver: false, isOnServer: false)
-            
-            try! DataCoordinator.send(message: message, sender: DataCoordinator.currentUser!, receiver: self.user)
-            
+            try! DataCoordinator.sendMessage(text: text, receiver: self.user)
         })
         return x
     }()
@@ -179,7 +176,7 @@ class ChatKeyboardShortutTextView: UITextView{
     init(){
         super.init(frame: CGRect.zero, textContainer: nil)
         returnKeyType = .default
-        font = SCFonts.getFont(type: .medium, size: 17.5)
+        font = CCFonts.getFont(type: .medium, size: 17.5)
         tintColor = REDCOLOR
         textContainerInset.left = 4
         textContainerInset.right = 6

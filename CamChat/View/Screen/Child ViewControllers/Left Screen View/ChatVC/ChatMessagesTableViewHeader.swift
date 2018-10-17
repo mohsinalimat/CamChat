@@ -25,7 +25,7 @@ class ChatMessagesSectionHeaderView: UITableViewHeaderFooterView{
     
     
     private lazy var label: UILabel = {
-        let x = UILabel(font: SCFonts.getFont(type: .demiBold, size: 11))
+        let x = UILabel(font: CCFonts.getFont(type: .demiBold, size: 11))
         x.textColor = .lightGray
         return x
     }()

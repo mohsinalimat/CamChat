@@ -64,6 +64,10 @@ struct AssetImages{
     static var downloadIcon = getIcon("downloadIcon")
     static var checkMarkCircle = getIcon("checkMarkCircle")
     
+    static var downloadFinishedIcon = getIcon("downloadFinishedIcon")
+    
+    static var feedbackIcon = getIcon("feedbackIcon")
+    
     static var examplePhotos = [
         getPhoto("iphoneImage0"),
         getPhoto("iphoneImage1"),

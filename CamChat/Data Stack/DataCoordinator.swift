@@ -27,27 +27,28 @@ class CCDataCoordinator{
     var userIsLoggedIn: Bool{
         return currentUserInfo.userIsLoggedIn
     }
+    func changeCurrentUsersNameTo(firstName: String, lastName: String){
+        currentUserInfo.changeCurrentUsersNameTo(firstName: firstName, lastName: lastName)
+    }
+    
     
     func localDateSentForUnsyncedMessageWith(messageID: String) -> Date?{
         guard let messageSender = messageSender else {return nil}
         return messageSender.localDateSentForUnsyncedMessageWith(messageID: messageID)
     }
     
-    func send(message: TempMessage, sender: User, receiver: User) throws {
-        guard let messageSender = messageSender else {throw HKError.unknownError}
-        try messageSender.send(message: message, sender: sender, receiver: receiver)
-        
+    
+    func sendMessage(text: String, receiver: User) throws {
+        guard let messageSender = messageSender else { fatalError() }
+        try messageSender.sendMessages(uploadObjects: [.text(text)], receivers: [receiver])
     }
     
-    func sendBatch(request: MemoryBatchSendRequest) throws {
-        guard let messageSender = messageSender else { throw HKError.unknownError }
-        try messageSender.sendBatch(request: request)
+    func sendMessage(uploadData: [TempMessageUploadData], receivers: [User]) throws {
+        guard let messageSender = messageSender else {fatalError()}
+        try messageSender.sendMessages(uploadObjects: uploadData, receivers: receivers)
     }
     
-    func sendMessageUsingSingleMediaItem(_ media: PhotoVideoData, receivers: [User]) throws {
-        guard let messageSender = messageSender else { throw HKError.unknownError }
-        try messageSender.sendMessageUsingSingleMediaItem(media, receivers: receivers)
-    }
+    
 
     
     private var currentUserInfo = CurrentUserInfo()
@@ -103,7 +104,7 @@ class CCDataCoordinator{
     }
     
     
-    func logOut() throws{
+    func logOut() throws {
         
         try Firebase.logOut()
         
@@ -114,9 +115,7 @@ class CCDataCoordinator{
             CoreData.performAndSaveChanges(context: .background) {
                 Message.helper(.background).fetchAll().map{$0.info.photoVideodata}
                     .filterOutNils().forEach{ (data) in
-                        handleErrorWithPrintStatement {
-                            try data.deleteAllCorrespondingData()
-                        }
+                        data.deleteAllCorrespondingData()
                 }
                 Message.helper(.background).deleteAllObjects()
                 User.helper(.background).deleteAllObjects()
@@ -160,6 +159,7 @@ class CCDataCoordinator{
     }
     
     private func endSyncing(){
+        
         coreDataSyncer = nil
         firebaseSyncer = nil
     }

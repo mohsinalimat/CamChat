@@ -197,17 +197,30 @@ class FirebaseManager{
     
     
     
+    func updateNameOfUser(userID: String, firstName: String, lastName: String){
+        usersCollection.document(userID).setData([UserKeys.firstName: firstName, UserKeys.lastName: lastName], merge: true)
+
+    }
     
+    @discardableResult func observeUserWith(uniqueID: String, userChangeHandler: @escaping (TempUser) -> Void) -> ListenerRegistration {
+        
+        return usersCollection.document(uniqueID).addSnapshotListener(includeMetadataChanges: true, listener: { (snapshot, error) in
+            if let snapshot = snapshot {
+                let user = self.parseUserDocumentInfo(from: snapshot.data()!)!
+                userChangeHandler(user)
+            }
+        })
+    }
 
     
     
-    func send(message: TempMessage, completion: @escaping (HKFailableCompletion) -> ()){
+    @discardableResult func send(message: TempMessage, completion: @escaping (HKFailableCompletion) -> ()) -> StorageUploadTask?{
         guard case let .forUpload(data) = message.data else {fatalError()}
         
         switch data{
         case .photo, .video:
-            uploadMessageMedia(for: message) { callback in
-                switch callback{
+            return uploadMessageMedia(for: message) { callback in
+                switch callback {
                 case .success:
                     self.uploadMessageMetadata(for: message)
                     completion(.success)
@@ -217,29 +230,37 @@ class FirebaseManager{
         case .text:
             uploadMessageMetadata(for: message)
             completion(.success)
+            return nil
         }
         
     }
     
     
     
-    private func uploadMessageMedia(for message: TempMessage, completion: @escaping (HKFailableCompletion) -> Void){
+    private func uploadMessageMedia(for message: TempMessage, completion: @escaping (HKFailableCompletion) -> Void) -> StorageUploadTask{
         
-        let actualCompletion = { (error: Error?) -> Void in
-            if let error = error{completion(.failure(error)); return}
+        let actualCompletion = { (metadata: StorageMetadata?, error: Error?) -> Void in
+            if let error = error{
+                completion(.failure(error))
+                return
+            }
+            if metadata.isNil{
+                completion(.failure(HKError.unknownError))
+                return
+            }
             completion(.success)
         }
     
         if case let .forUpload(.photo(photoVideoData)) = message.data{
             if let data = try? Data(contentsOf: photoVideoData.urls.main), let image = UIImage(data: data), let compressedData = image.jpegData(compressionQuality: 0.3){
-                messageMediaFoler.child(message.uniqueID).putData(compressedData, metadata: nil) { (metadata, error) in
-                    actualCompletion(error)
+                return messageMediaFoler.child(message.uniqueID).putData(compressedData, metadata: nil) { (metadata, error) in
+                    actualCompletion(metadata, error)
                 }
             } else { fatalError() }
             
         } else if case let .forUpload(.video(photoVideoData)) = message.data{
-            messageMediaFoler.child(message.uniqueID).putFile(from: photoVideoData.urls.main, metadata: nil) { (metadata, error) in
-                actualCompletion(error)
+            return messageMediaFoler.child(message.uniqueID).putFile(from: photoVideoData.urls.main, metadata: nil) { (metadata, error) in
+                actualCompletion(metadata, error)
             }
         } else { fatalError() }
     }
@@ -347,30 +368,29 @@ class FirebaseManager{
     private func getMessageFor(messageID: String, completion: @escaping (HKCompletionResult<TempMessage>) -> Void){
         
         messagesCollection.document(messageID).getDocument { (snapshot, error) in
-                if let snapshot = snapshot {
-                    let dict = snapshot.data(with: ServerTimestampBehavior.estimate)!
-                    
-                    let receiver = dict[MessageKeys.receiverID] as! String
-                    let sender = dict[MessageKeys.senderID] as! String
-                    let uniqueID = dict[MessageKeys.uniqueID] as! String
-                    let date = (dict[MessageKeys.dateSent] as! Timestamp).dateValue()
-                    let wasSeen = dict[MessageKeys.wasSeen] as! Bool
-                    let isOnServer = snapshot.metadata.isFromCache.isFalse
-                    
-                    let data: TempMessageDownloadData
-                    switch dict[MessageKeys.messageType] as! String{
-                    case MessageKeys.text: data = .text(dict[MessageKeys.text] as! String)
-                    case MessageKeys.photoText: data = .photo(messageID: uniqueID)
-                    case MessageKeys.videoText: data = .video(messageID: uniqueID)
-                    default: fatalError()
-                    }
-                    
-                    
-                    
-                    let message = TempMessage(data: .forDownload(data), dateSent: date, uniqueID: uniqueID, senderID: sender, receiverID: receiver, wasSeenByReceiver: wasSeen, isOnServer: isOnServer)
-                    
-                    completion(.success(message))
-                } else { completion(.failure(error ?? HKError.unknownError)) }
+            if let snapshot = snapshot {
+                let dict = snapshot.data(with: ServerTimestampBehavior.estimate)!
+                
+                let receiver = dict[MessageKeys.receiverID] as! String
+                let sender = dict[MessageKeys.senderID] as! String
+                let uniqueID = dict[MessageKeys.uniqueID] as! String
+                let date = (dict[MessageKeys.dateSent] as! Timestamp).dateValue()
+                let wasSeen = dict[MessageKeys.wasSeen] as! Bool
+                let isOnServer = snapshot.metadata.isFromCache.isFalse
+                
+                let data: TempMessageDownloadData
+                switch dict[MessageKeys.messageType] as! String{
+                case MessageKeys.text: data = .text(dict[MessageKeys.text] as! String)
+                case MessageKeys.photoText: data = .photo(messageID: uniqueID)
+                case MessageKeys.videoText: data = .video(messageID: uniqueID)
+                default: fatalError()
+                }
+                
+            
+                let message = TempMessage(data: .forDownload(data), dateSent: date, uniqueID: uniqueID, senderID: sender, receiverID: receiver, wasSeenByReceiver: wasSeen, isOnServer: isOnServer)
+                
+                completion(.success(message))
+            } else { completion(.failure(error ?? HKError.unknownError)) }
         }
         
     }

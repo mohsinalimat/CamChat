@@ -60,6 +60,18 @@ public class User: NSManagedObject, ManagedObjectProtocol {
         return receivedMessages.union(sentMessages)
     }
     
+    func updateIfNeeded(with tempUser: TempUser){
+        context.perform {
+            if tempUser.firstName != self.firstName{
+                self.firstName = tempUser.firstName
+            }
+            if tempUser.lastName != self.lastName{
+                self.lastName = tempUser.lastName
+            }
+            self.context.saveChanges()
+        }
+    }
+    
     
     /// This represents the user who's received messages will automtically be seened when received. (Due to their chat currently being open.)
     private static var currentUserIDForSeening: String?
@@ -88,6 +100,17 @@ public class User: NSManagedObject, ManagedObjectProtocol {
     func notifyOfMessageDeletion(message: Message){
         managedObjectContext!.perform {
             self.mostRecentMessage = self.getMostRecentMessage()
+        }
+    }
+    
+    func changeNameTo(firstName: String, lastName: String, completion: (() -> Void)? = nil) throws {
+        guard uniqueID == DataCoordinator.currentUserUniqueID
+            else {throw HKError(description: "You are only allowed to change the name of the current user.")}
+        context.perform {
+            self.firstName = firstName
+            self.lastName = lastName
+            self.context.saveChanges()
+            completion?()
         }
     }
     

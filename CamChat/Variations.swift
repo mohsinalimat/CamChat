@@ -24,6 +24,7 @@ struct Devices: OptionSet {
     static let iPhoneXMax = Devices(rawValue: 128)
     
     
+    
     static let iPhoneWithNotch: Devices = [.iPhoneXMax, .iPhoneX]
 
     static func getFrom(size: CGSize) -> Devices{
@@ -64,14 +65,14 @@ class Variations{
     static var notchHeight: CGFloat{
         if Devices.iPhoneWithNotch.contains(currentDevice){
             return 30
-        } else {return 0}
+        } else { return 0 }
         
     }
     
     static var homeIndicatorHeight: CGFloat{
         if Devices.iPhoneWithNotch.contains(currentDevice){
             return 22
-        } else {return 0}
+        } else { return 0 }
     }
     
     

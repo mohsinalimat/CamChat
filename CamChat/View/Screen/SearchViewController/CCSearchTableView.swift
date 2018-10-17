@@ -34,7 +34,6 @@ class CCSearchTableView: UITableView, UITableViewDelegate, SearchControllerVMDel
         
         showsVerticalScrollIndicator = false
         showsHorizontalScrollIndicator = false
-
     }
     
     private var viewModel: SearchControllerVM<CCSearchTableView>!
@@ -64,12 +63,17 @@ class CCSearchTableView: UITableView, UITableViewDelegate, SearchControllerVMDel
         if let user = User.helper(.main).getObjectWith(uniqueID: object.uniqueID){
             self.vcOwner.present(ChatViewController(presenter: vcOwner, user: user))
         } else {
+            if object.profilePicture.isNil{
+                self.vcOwner.presentOopsAlert(description: "\(object.firstName)'s chat could not be openend. Please check your internet connection and try again.")
+                return
+            }
             object.persist(usingContext: .main){ (callback) in
                 
-                switch callback{
+                switch callback {
                 case .success(let user):
                     self.vcOwner.present(ChatViewController(presenter: self.vcOwner, user: user), animated: true, completion: nil)
                 case .failure(let error): print(error)
+                    
                 }
             }
         }
@@ -81,6 +85,11 @@ class CCSearchTableView: UITableView, UITableViewDelegate, SearchControllerVMDel
         configureTopLine_And_Corners(for: cell, indexPath: indexPath)
         cell.setWithUser(user: object)
         
+        
+    }
+    
+    var hasSearchResults: Bool{
+        return viewModel.currentSections.isEmpty.isFalse
     }
     
     
@@ -166,7 +175,7 @@ private class CCSearchTableViewHeader: UIView{
         x.text = text.uppercased()
         x.textColor = .white
         x.textAlignment = .center
-        x.font = SCFonts.getFont(type: .medium, size: 13)
+        x.font = CCFonts.getFont(type: .medium, size: 13)
         return x
     }()
     

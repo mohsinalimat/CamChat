@@ -23,7 +23,7 @@ class SimpleLabelledButton: SimpleInteractiveButton{
     lazy var label: UILabel = {
         let x = UILabel()
         x.textColor = .white
-        x.font = SCFonts.getFont(type: .demiBold, size: 26)
+        x.font = CCFonts.getFont(type: .demiBold, size: 26)
         return x
         
     }()

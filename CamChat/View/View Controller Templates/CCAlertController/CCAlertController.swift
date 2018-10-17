@@ -10,17 +10,30 @@ import HelpKit
 
 
 extension UIViewController{
+    
     @discardableResult func presentCCAlert(title: String, description: String? = nil, primaryButtonText: String, secondaryButtonText: String? = nil) -> CCAlertController{
         let alert = CCAlertController(presenter: self, title: title, description: description, primaryButtonText: primaryButtonText, secondaryButtonText: secondaryButtonText)
         present(alert, animated: true, completion: nil)
         return alert
     }
+    
 }
 
 
 class CCAlertController: UIViewController{
     
-    private var alertView: CCAlertControllerView{
+    var onDismissalAction: (() -> Void)?
+    
+    override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+        let actualCompletion = { [weak self] in
+            completion?()
+            self?.onDismissalAction?()
+        }
+        super.dismiss(animated: flag, completion: actualCompletion)
+    }
+    
+    
+    private var alertView: CCAlertControllerView {
         return view as! CCAlertControllerView
     }
     
@@ -181,7 +194,7 @@ private class CCAlertControllerView: UIView {
         x.preferredMaxLayoutWidth = labelWidths
         x.text = self.alertTitle
         x.textAlignment = .center
-        x.font = SCFonts.getFont(type: (alertDescription == nil) ? .medium : .demiBold, size: 19.5)
+        x.font = CCFonts.getFont(type: (alertDescription == nil) ? .medium : .demiBold, size: 19.5)
         return x
     }()
     
@@ -198,7 +211,7 @@ private class CCAlertControllerView: UIView {
         x.numberOfLines = 0
         x.textAlignment = .center
         x.preferredMaxLayoutWidth = labelWidths
-        x.font = SCFonts.getFont(type: .medium, size: 14.5)
+        x.font = CCFonts.getFont(type: .medium, size: 14.5)
         return x
     }()
     
@@ -212,7 +225,7 @@ private class CCAlertControllerView: UIView {
     
     lazy var secondaryButton: UIButton = {
         let x = UIButton(type: .system)
-        x.setAttributedTitle(NSAttributedString(string: secondaryButtonText?.uppercased() ?? "", attributes: [.font: SCFonts.getFont(type: .demiBold, size: 13), .foregroundColor: REDCOLOR]), for: .normal)
+        x.setAttributedTitle(NSAttributedString(string: secondaryButtonText?.uppercased() ?? "", attributes: [.font: CCFonts.getFont(type: .demiBold, size: 13), .foregroundColor: REDCOLOR]), for: .normal)
         return x
     }()
 

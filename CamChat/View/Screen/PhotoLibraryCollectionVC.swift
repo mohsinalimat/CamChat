@@ -13,16 +13,31 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
     
     private weak var screen: Screen?
     
+    var selectionButton: BouncyImageButton{
+        return screen!.topBar_typed.buttonTopBar.rightScreenIcon
+    }
+    
     
     init(screen: Screen){
-        
-        
         
         self.screen = screen
         super.init()
         collectionView.alwaysBounceVertical = true
         viewModel = CoreDataListViewVM(delegate: self, context: CoreData.mainContext)
         collectionView.canCancelContentTouches = false
+        
+        emptyBackgroundView.pin(addTo: collectionView, anchors: [.left: collectionView.contentLayoutGuide.leftAnchor, .top: collectionView.contentLayoutGuide.topAnchor], constants: [.top: 40])
+        
+        resetSelectionButtonEnabledState()
+    }
+    
+    private func resetSelectionButtonEnabledState(){
+        
+        let isEmpty = viewModel.objects.isEmpty
+        
+        selectionButton.contentView.alpha = isEmpty ? 0.5 : 1
+        selectionButton.isUserInteractionEnabled = isEmpty.isFalse
+        
     }
     
     private var heightCache = [IndexPath: CGFloat]()
@@ -39,8 +54,6 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
             heightCache[indexPath] = height
             return height
         }
-        
-
     }
     
     private var currentSelectionBottomBar: UIView?
@@ -61,8 +74,15 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
             }
         }
     }
+    
+    
+    
     private var allCellsInUse = Set<PhotoLibraryCollectionViewCell>()
+    
+    
     func selectionButtonTapped(){
+        
+
         isInSelectionMode = true
         currentSelectedCellIndexPaths = []
         let topBar = PhotoSelectionTopBar { [weak self] in
@@ -173,6 +193,16 @@ class PhotoLibraryCollectionVC: SCCollectionView, PhotoLibraryLayoutDelegate {
         
         
     }
+    
+    private lazy var emptyBackgroundView: CCListViewBackgroundView = {
+        
+        let x = CCListViewBackgroundView(labelText: "You don't have any Memories! 😱😱", buttonColor: REDCOLOR, buttonText: "Make a Memory", buttonAction: { [weak self] in
+            guard let self = self else {return}
+            self.screen?.horizontalScrollInteractor.snapGradientTo(screen: .center, animated: true)
+        })
+        x.alpha = viewModel.objects.isEmpty ? 1 : 0
+        return x
+    }()
     
     private lazy var _collectionViewLayout: UICollectionViewLayout = {
         let layout = PhotoLibraryLayout()
@@ -287,6 +317,17 @@ extension PhotoLibraryCollectionVC: CoreDataListViewVMDelegate{
         if self.currentSelectedCellIndexPaths.contains(indexPath){
             cell.setAsSelected(animated: false)
         }
+    }
+    
+    func contentDidChange() {
+        emptyBackgroundView.alpha = viewModel.objects.isEmpty ? 1 : 0
+        
+        resetSelectionButtonEnabledState()
+        
+        if viewModel.objects.isEmpty && isInSelectionMode{
+            self.selectionDissmissButtonTapped()
+        }
+        
     }
 }
 

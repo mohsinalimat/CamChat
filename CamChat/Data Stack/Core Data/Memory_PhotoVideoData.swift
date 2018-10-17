@@ -16,50 +16,70 @@ enum PhotoVideoData: Hashable{
     case video(_ video: URL, _ thumbnail: URL)
     
     
-    static func getFor(image: UIImage) -> PhotoVideoData? {
-        guard let mainURL = writeToAndProduceURLFor(image: image, shouldCompress: false), let thumbnailURL = writeToAndProduceURLFor(image: image, shouldCompress: true) else {return nil}
+    static func getFor(image: UIImage, for urlType: URLManager.URLType) -> PhotoVideoData? {
+        
+        guard let mainURL = writeToAndProduceURLFor(image: image, shouldCompress: false, urlType: urlType),
+            let thumbnailURL = writeToAndProduceURLFor(image: image, shouldCompress: true, urlType: urlType) else {return nil}
         
         return .photo(mainURL, thumbnailURL)
     }
     
-    static func getFor(videoAt url: URL) -> PhotoVideoData? {
+    static func getFor(videoAt url: URL, for urlType: URLManager.URLType) -> PhotoVideoData? {
         let image = Memory.getFirstFrameImageForVideoAt(url: url)
-        guard let thumbnailURL = writeToAndProduceURLFor(image: image, shouldCompress: true) else {return nil}
+        guard let thumbnailURL = writeToAndProduceURLFor(image: image, shouldCompress: true, urlType: urlType) else {return nil}
         return .video(url, thumbnailURL)
     }
     
     
-    private static func writeToAndProduceURLFor(image: UIImage, shouldCompress: Bool) -> URL?{
-        guard let imageData = image.jpegData(compressionQuality: shouldCompress ? 0.05 : 1) else { return nil }
-        let thumbnailURL = getNewURL(extension: "jpeg")
+    private static func writeToAndProduceURLFor(image: UIImage, shouldCompress: Bool, urlType: URLManager.URLType) -> URL?{
+    
+        let imageData = image.jpegData(compressionQuality: shouldCompress ? 0.05 : 1)!
+        let thumbnailURL = URLManager.getNewURLFor(urlType: urlType, extension: .jpeg)!
+
         do { try imageData.write(to: thumbnailURL) }
-        catch { return nil }
+        catch { print(error); return nil }
         return thumbnailURL
     }
     
-    func getCopy() -> PhotoVideoData?{
+    /// Duplicates all files at both urls and returns an object containing the new urls.
+    
+    func getCopy(for urlType: URLManager.URLType) -> PhotoVideoData?{
         
         guard let mainData = try? Data(contentsOf: urls.main), let thumbnailData = try? Data(contentsOf: urls.thumbnail) else {return nil}
+        guard let newThumbnailURL = URLManager.getNewURLFor(urlType: urlType, extension: .jpeg) else {return nil}
+        
+        let newMainURL: URL
+        
+        switch self {
+        case .photo:
+            guard let x = URLManager.getNewURLFor(urlType: urlType, extension: .jpeg) else { return nil }
+            newMainURL = x
+        case .video:
+            guard let x = URLManager.getNewURLFor(urlType: urlType, extension: .mp4) else { return nil }
+            newMainURL = x
+        }
         
         do{
-            
-            let newMainURL = PhotoVideoData.getNewURL(extension: (isVideo) ? "mp4" : "jpeg")
             try mainData.write(to: newMainURL)
-
-            let newThumbnailURL = PhotoVideoData.getNewURL(extension: "jpeg")
             try thumbnailData.write(to: newThumbnailURL)
             
             if isVideo{return .video(newMainURL, newThumbnailURL)}
             else {return .photo(newMainURL, newThumbnailURL)}
             
-            
         } catch {return nil}
         
     }
     
-    func deleteAllCorrespondingData() throws {
-        try FileManager.default.removeItem(at: urls.main)
-        try FileManager.default.removeItem(at: urls.thumbnail)
+    func getTempMessageUploadData() -> TempMessageUploadData{
+        switch self {
+        case .photo: return .photo(self)
+        case .video: return .video(self)
+        }
+    }
+    
+    func deleteAllCorrespondingData() {
+        try? FileManager.default.removeItem(at: urls.main)
+        try? FileManager.default.removeItem(at: urls.thumbnail)
     }
     
     
@@ -70,9 +90,7 @@ enum PhotoVideoData: Hashable{
         }
     }
     
-    private static func getNewURL(extension: String) -> URL{
-        return FileManager.default.documentsDirectoryUrl.appendingPathComponent("\(NSUUID().uuidString)." + `extension`)
-    }
+  
     
     var thumbnail: UIImage {
         return UIImage(data: try! Data.init(contentsOf: urls.thumbnail))!
@@ -117,15 +135,13 @@ extension PhotoVideoData: Codable{
         
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let num = try container.decode(Int.self, forKey: .num)
-        let thumbnailFileTitle = try container.decode(URL.self, forKey: .thumbnailURL).pathComponents.last!
+        let oldThumbnailURL = try container.decode(URL.self, forKey: .thumbnailURL)
         
-        let mainResourceFileTitle = try container.decode(URL.self, forKey: .mainURL).pathComponents.last!
-        let documentsURL = FileManager.default.documentsDirectoryUrl
+        let oldMainResourceURL = try container.decode(URL.self, forKey: .mainURL)
         
-        let thumbnailURL = documentsURL.appendingPathComponent(thumbnailFileTitle)
-        let mainResourceURL = documentsURL.appendingPathComponent(mainResourceFileTitle)
-        
-        
+        let thumbnailURL = URLManager.getUpToDateURLForPersisted(URL: oldThumbnailURL)!
+        let mainResourceURL = URLManager.getUpToDateURLForPersisted(URL: oldMainResourceURL)!
+    
         if num == PhotoVideoData.photoNum { self = .photo(mainResourceURL, thumbnailURL) }
         else if num == PhotoVideoData.videoNum { self = .video(mainResourceURL, thumbnailURL) }
         else { throw HKError(description: "could not decode from decoder") }

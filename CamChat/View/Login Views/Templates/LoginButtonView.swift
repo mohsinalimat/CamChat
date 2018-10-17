@@ -73,7 +73,7 @@ class LoginButtonView: HKView{
     
     func setButtonText(to text: String){
         
-        button.label.attributedText = NSAttributedString(string: text, attributes: [.font: SCFonts.getFont(type: .demiBold, size: 17), .foregroundColor: UIColor.white])
+        button.label.attributedText = NSAttributedString(string: text, attributes: [.font: CCFonts.getFont(type: .demiBold, size: 17), .foregroundColor: UIColor.white])
     }
     
     private lazy var loadingIndicator: NVActivityIndicatorView = {

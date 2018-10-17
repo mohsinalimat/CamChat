@@ -69,10 +69,14 @@ struct ChatMessageBlock: Equatable{
     
     var title: String
     let messages: [Message]
-    fileprivate let sender: User
+    let sender: User
     
     var senderIsCurrentUser: Bool{
         return sender.isCurrentUser
+    }
+    
+    mutating func refreshTitle(){
+        self.title = sender.isCurrentUser ? "ME" : sender.firstName.uppercased()
     }
     
     

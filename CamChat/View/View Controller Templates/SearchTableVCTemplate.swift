@@ -30,17 +30,17 @@ class SearchTableVC: UIViewController{
         tableViewGradient.gradientLayer.locations = [0, middleEndPoint, lastEndpoint]
     }
     
-    private let tableViewPadding: CGFloat = 15
+    static let tableViewPadding: CGFloat = 15
     
     private func setUpViews(){
         
         topBarLayoutGuide.pin(addTo: view, anchors: [.left: view.leftAnchor, .top: view.safeAreaLayoutGuide.topAnchor, .right: view.rightAnchor], constants: [.height: desiredTopBarHeight])
         
-        tableViewHolderView.pin(addTo: view, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor, .top: view.topAnchor], constants: [.left: tableViewPadding, .right: tableViewPadding])
+        tableViewHolderView.pin(addTo: view, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor, .top: view.topAnchor], constants: [.left: SearchTableVC.tableViewPadding, .right: SearchTableVC.tableViewPadding])
     }
     
     private func configure(tableView: UITableView){
-        tableView.contentInset.bottom = self.tableViewPadding
+        tableView.contentInset.bottom = SearchTableVC.tableViewPadding
         tableView.contentInset.top = desiredTopBarHeight - 5
         tableView.keyboardDismissMode = .onDrag
     }

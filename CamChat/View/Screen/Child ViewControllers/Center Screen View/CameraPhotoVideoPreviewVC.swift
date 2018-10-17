@@ -34,19 +34,7 @@ class CameraPhotoVideoPreviewVC: UIViewController{
     }
     
 
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        statusBar.alpha = 0
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        statusBar.alpha = 1
-        
-    }
-    
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
@@ -84,35 +72,32 @@ class CameraPhotoVideoPreviewVC: UIViewController{
         x.pin(constants: [.height: 50, .width: 50])
         x.addAction { [weak self] in
             guard let self = self else {return}
-            
-            let copiedData = self.photoVideoData.getCopy()!
-            
-            let sender = MemorySenderVC(presenter: self, photoVideoObjects: [copiedData], sendCompletedAction: { [weak self] (sender1) in
+        
+            let sender = MemorySenderVC(presenter: self, photoVideoObjects: [self.photoVideoData], sendCompletedAction: { [weak self] (sender1) in
                 sender1.dismiss(animated: true, completion: {
                     self?.dismiss(animated: false)
                 })
             })
-        
-            sender.userDidDismissMemorySenderAction = {
-                handleErrorWithPrintStatement {
-                    try copiedData.deleteAllCorrespondingData()
-                }
+            
+            sender.memorySenderWasDismissedAction = {
+                self.playerView?.play()
             }
+            self.playerView?.pause()
             self.present(sender)
         }
         return x
     }()
     
     private lazy var saveButton: BouncyImageButton = {
-        let x = BouncyImageButton(image: AssetImages.downloadIcon)
+        
+        let x = BouncyImageButton(image: AssetImages.downloadIcon, alternateImage: AssetImages.downloadFinishedIcon)
         x.pin(constants: [.height: 25, .width: 25])
         x.applyShadow(width: 3)
         x.addAction { [weak self] in
             guard let self = self else { return }
             if self.mediaIsSaved { return }
-            
-            Memory.createNew(uniqueID: NSUUID().uuidString, authorID: DataCoordinator.currentUserUniqueID!, type: self.photoVideoData, dateTaken: Date(), context: .background, completion: {_ in CoreData.backgroundContext.saveChanges()})
-            
+            self.saveButton.isUserInteractionEnabled = false
+            Memory.createNew(uniqueID: NSUUID().uuidString, authorID: DataCoordinator.currentUserUniqueID!, type: self.photoVideoData, dateTaken: Date(), context: .main, completion: {_ in CoreData.mainContext.saveChanges()})
             self.mediaIsSaved = true
         }
         return x
@@ -132,9 +117,7 @@ class CameraPhotoVideoPreviewVC: UIViewController{
     deinit {
         playerView?.pause()
         if mediaIsSaved.isFalse {
-            handleErrorWithPrintStatement {
-                try self.photoVideoData.deleteAllCorrespondingData()
-            }
+            self.photoVideoData.deleteAllCorrespondingData()
         }
     }
     

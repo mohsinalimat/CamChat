@@ -205,6 +205,10 @@ private class PagerView: SCPagerViewCell{
             let sender = MemorySenderVC(presenter: self.vcOwner!, memories: [memory], sendCompletedAction: { (sender1) in
                 sender1.dismiss(animated: true)
             })
+            sender.memorySenderWasDismissedAction = {
+                self.currentVideoView?.play()
+            }
+            self.currentVideoView?.pause()
             self.vcOwner!.present(sender)
         }
         return x

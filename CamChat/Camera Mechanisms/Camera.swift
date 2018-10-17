@@ -20,7 +20,6 @@ protocol CameraDelegate: class {
     func didStartRecordingVideo()
     func willFinishRecordingVideo()
     func didFinishRecordingVideo(url: URL)
-
 }
 
 
@@ -67,7 +66,7 @@ class Camera: NSObject {
     private func setUp(){
         
         #if !targetEnvironment(simulator)
-        
+    
         setUpMicrophoneCaptureSession()
         setUpCameraCaptureSession()
         
@@ -81,11 +80,10 @@ class Camera: NSObject {
             if self.cameraCaptureSession.isRunning.isFalse{
                 self.cameraCaptureSession.startRunning()
             }
-            
         }
         
-        
         #endif
+        
     }
     
     private func tearDown(){
@@ -222,7 +220,6 @@ class Camera: NSObject {
     
 
     func flipCamera() {
-        
         guard isActive, let cameraInfo = currentCameraInfo else { return }
         setUpCameraCaptureSesionInputFor(position: cameraInfo.position == .back ? .front : .back)
     }
@@ -276,7 +273,7 @@ class Camera: NSObject {
                 $0.isVideoMirrored = shouldMirrorOutput
             }
         }
-    }
+    }    
     
     
     
@@ -292,8 +289,3 @@ class Camera: NSObject {
         return nil
     }
 }
-
-
-
-
-

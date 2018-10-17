@@ -21,7 +21,7 @@ extension Screen: CCSearchBarDelegate{
 extension Screen: ScreenButtonsTopBarDelegate{
 
     func newChatButtonTapped() {
-
+        leftScreen.respondToNewMessageButtonTapped()
     }
     
     func flashButtonTapped(to isOn: Bool) {
@@ -74,7 +74,7 @@ extension Screen: CameraDelegate{
     
     func didTakePhoto(image: UIImage) {
         UIApplication.shared.endIgnoringInteractionEvents()
-        self.present(CameraPhotoVideoPreviewVC(PhotoVideoData.getFor(image: image)!), animated: false)
+        self.present(CameraPhotoVideoPreviewVC(PhotoVideoData.getFor(image: image, for: .memory)!), animated: false)
     }
     
     func didStartRecordingVideo() {
@@ -86,7 +86,7 @@ extension Screen: CameraDelegate{
     }
     
     func didFinishRecordingVideo(url: URL) {
-        let previewer = CameraPhotoVideoPreviewVC(PhotoVideoData.getFor(videoAt: url)!)
+        let previewer = CameraPhotoVideoPreviewVC(PhotoVideoData.getFor(videoAt: url, for: .memory)!)
         Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) {[weak self] (timer) in
             self?.present(previewer, animated: false)
             self?.performEndingRecordingAnimationActions()

@@ -82,7 +82,7 @@ class CCSearchBar: UIView{
         let x = UILabel()
         x.text = "THIS IS THE BEST APP EVER"
         x.textColor = .white
-        x.font = SCFonts.getFont(type: .demiBold, size: 20)
+        x.font = CCFonts.getFont(type: .demiBold, size: 20)
         x.alpha = 0
         return x
     }()

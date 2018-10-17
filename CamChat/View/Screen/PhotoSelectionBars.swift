@@ -18,7 +18,7 @@ class PhotoSelectionTopBar: UIView{
     }
     
     private lazy var label: UILabel = {
-        let x = UILabel.init(text: "Select...", font: SCFonts.getFont(type: .demiBold, size: 22), textColor: .white)
+        let x = UILabel.init(text: "Select...", font: CCFonts.getFont(type: .demiBold, size: 22), textColor: .white)
         
         return x
     }()
@@ -33,6 +33,7 @@ class PhotoSelectionTopBar: UIView{
         fatalError("init(coder:) has not been implemented")
     }
 }
+
 
 
 

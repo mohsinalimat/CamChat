@@ -58,7 +58,7 @@ class Login_LoginVC: LoginFormVCTemplate{
         form.bottomDescriptionLabel.text = "Forgot password?"
         form.bottomDescriptionLabel.textAlignment = .center
         form.bottomDescriptionLabel.textColor = BLUECOLOR
-        form.bottomDescriptionLabel.font = SCFonts.getFont(type: .medium, size: 12)
+        form.bottomDescriptionLabel.font = CCFonts.getFont(type: .medium, size: 12)
         
         
         form.topTextField.textField.textContentType = .emailAddress

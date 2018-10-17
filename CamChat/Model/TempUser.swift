@@ -13,9 +13,13 @@ class TempUser: Equatable {
     static func == (lhs: TempUser, rhs: TempUser) -> Bool {
         return lhs.uniqueID == rhs.uniqueID
     }
-   
+    
+    
+    
+    
     
     private static var imageCache = HKCache<String, UIImage>(objectLimit: 40)
+    
     
     
     init(firstName: String, lastName: String, username: String, email: String, profilePicture: UIImage? = nil, uniqueID: String){
@@ -33,7 +37,6 @@ class TempUser: Equatable {
         } else if let image = TempUser.imageCache.valueFor(key: uniqueID){
             self.profilePicture = image
         }
-        
     }
     
     var fullName: String{
@@ -76,7 +79,7 @@ class TempUser: Equatable {
     
         setProfileImage { (callBack) in
 
-            switch callBack{
+            switch callBack {
             case .success:
                 if self.profilePicture == nil{fatalError()}
                 User.createNew(fromTempUser: self, context: context, completion: { (user) in

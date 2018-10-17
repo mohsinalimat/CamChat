@@ -8,7 +8,7 @@
 
 import UIKit
 
-enum SCFontType: String{
+enum CCFontType: String{
     case regular = "Regular"
     case demiBold = "DemiBold"
     case bold = "Bold"
@@ -16,11 +16,11 @@ enum SCFontType: String{
     case medium = "Medium"
 }
 
-class SCFonts {
+class CCFonts {
     
     private static var fontTypeString = "AvenirNext"
     
-    static func getFont(type: SCFontType, size: CGFloat) -> UIFont{
+    static func getFont(type: CCFontType, size: CGFloat) -> UIFont{
         return UIFont(name: fontTypeString + "-" + type.rawValue, size: size)!
     }
 }

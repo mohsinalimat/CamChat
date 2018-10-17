@@ -60,7 +60,7 @@ class SearchControllerVM<DelegateType: SearchControllerVMDelegate>:NSObject, UIT
     }
     
     func changeSearchTextTo(_ newText: String?){
-        currentSearchText = newText
+        currentSearchText = newText?.withTrimmedWhiteSpaces()
         refreshSearchResults()
     }
 

@@ -12,16 +12,20 @@ import CoreData
 
 
 class MemoryActivityItemProvider: UIActivityItemProvider{
-    private let memory: Memory
-    init(memory: Memory){
-        self.memory = memory
+    
+    private let photoVideoData: PhotoVideoData
+    
+    init(photoVideoData: PhotoVideoData){
+        self.photoVideoData = photoVideoData
         super.init(placeholderItem: FileManager.default.documentsDirectoryUrl)
-        
-        
-        
     }
+    
+    convenience init(memory: Memory){
+        self.init(photoVideoData: memory.info)
+    }
+    
     override var item: Any{
-        return memory.info.urls.main
+        return photoVideoData.urls.main
     }
     
     override var activityType: UIActivity.ActivityType?{
@@ -46,12 +50,8 @@ extension Memory{
         let context = memories.first!.context!
         context.perform {
             for memory in memories {
-                handleErrorWithPrintStatement {
-                    try FileManager.default.removeItem(at: memory.info.urls.main)
-                    try FileManager.default.removeItem(at: memory.info.urls.thumbnail)
-                }
+                memory.info.deleteAllCorrespondingData()
                 context.delete(memory)
-                
             }
             context.saveChanges()
         }
@@ -60,23 +60,30 @@ extension Memory{
     
     
     static func saveToCameraRoll(memories: [Memory], completion: @escaping (_ success: Bool) -> Void){
-        
+        let photoVideoData = memories.map{$0.info}
+        self.saveToCameraRoll(photoVideoData: photoVideoData, completion: completion)
+    }
+    
+    
+    
+    static func saveToCameraRoll(photoVideoData: [PhotoVideoData], completion: @escaping (_ success: Bool) -> Void){
         switch PHPhotoLibrary.authorizationStatus(){
-        case .authorized: performCameraRollSaveChanges(for: memories, completion: completion)
+        case .authorized: performCameraRollSaveChanges(for: photoVideoData, completion: completion)
         case .notDetermined:
             PHPhotoLibrary.requestAuthorization { (status) in
-                if status == .authorized{self.performCameraRollSaveChanges(for: memories, completion: completion)}
+                if status == .authorized{self.performCameraRollSaveChanges(for: photoVideoData, completion: completion)}
                 else {completion(false)}
             }
         default: completion(false)
         }
     }
+    
 
-    private static func performCameraRollSaveChanges(for memories: [Memory], completion: @escaping (_ success: Bool) -> Void){
+    private static func performCameraRollSaveChanges(for photoVideoData: [PhotoVideoData], completion: @escaping (_ success: Bool) -> Void){
         PHPhotoLibrary.shared().performChanges({
             
-            for memory in memories{
-                switch memory.info {
+            for data in photoVideoData{
+                switch data {
                 case .photo(let url, _):
                     PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: url)
                 case .video(let url, _):
@@ -91,9 +98,7 @@ extension Memory{
     }
     
     static func getFirstFrameImageForVideoAt(url: URL) -> UIImage{
-        
         return getImagesForVideoAt(url: url, atTimes: [0]).first!
-        
     }
     
     

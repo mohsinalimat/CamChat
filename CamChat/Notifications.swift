@@ -18,6 +18,7 @@ let UserLoggedOutNotification = HKNotification<Void>()
 let MessageWasSeenNotification = HKNotification<(message: TempMessage, wasSeenLocally: Bool)>()
 let MessageWasSentNotification = HKNotification<TempMessage>()
 
+let CurrentUsersNameWasChangedNotification = HKNotification<(newFirstName: String, newLastName: String, newFullName: String)>()
 
 
 

@@ -33,11 +33,12 @@ class VideoWriter: NSObject{
         super.init()
         videoOutput.setSampleBufferDelegate(self, queue: queue)
         audioOutput.setSampleBufferDelegate(self, queue: queue)
-        resetAssetWriter()
+        
     }
     
-    private func resetAssetWriter(){
-        assetWriter = try! AVAssetWriter(outputURL: getNewURL(), fileType: .mp4)
+    private func setUpAssetWriter(){
+        let outputURL = URLManager.getNewURLFor(urlType: .memory, extension: .mp4)!
+        assetWriter = try! AVAssetWriter(outputURL: outputURL, fileType: .mp4)
         
         audioAssetInput = AVAssetWriterInput(mediaType: .audio, outputSettings: audioOutput.recommendedAudioSettingsForAssetWriter(writingTo: .mp4) as? [String: Any])
         videoAssetInput = AVAssetWriterInput(mediaType: .video, outputSettings: videoOutput.recommendedVideoSettingsForAssetWriter(writingTo: .mp4))
@@ -49,11 +50,17 @@ class VideoWriter: NSObject{
         assetWriter.startWriting()
     }
     
+    private func tearDownAssetWriter(){
+        assetWriter = nil
+        audioAssetInput = nil
+        videoAssetInput = nil
+    }
+    
     private let queue = DispatchQueue(label: "The best queue in the world!!!!")
     
     func startWriting(){
         if isWriting{ return }
-        if assetWriter.status == .failed{resetAssetWriter()}
+        setUpAssetWriter()
         hasStartedWritingCurrentVideo = false
         isWriting = true
     }
@@ -69,20 +76,10 @@ class VideoWriter: NSObject{
 
         assetWriter.finishWriting {
             completion(url)
-            self.resetAssetWriter()
+            self.tearDownAssetWriter()
         }
         hasStartedWritingCurrentVideo = false
     }
-    
-    
-    
-    func getNewURL() -> URL{
-        let uniqueString = NSUUID().uuidString
-        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let documentsURL = url.appendingPathComponent(uniqueString + ".mp4")
-        return documentsURL
-    }
-
 }
 
 extension VideoWriter: AVCaptureVideoDataOutputSampleBufferDelegate { }
@@ -90,14 +87,15 @@ extension VideoWriter: AVCaptureAudioDataOutputSampleBufferDelegate {
     
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
     
-    
+        guard let assetWriter = assetWriter, let audioAssetInput = audioAssetInput, let videoAssetInput = videoAssetInput else { return }
+
         if isWriting.isFalse{ return }
-        if self.assetWriter.status == .failed { 
-            resetAssetWriter()
+        if self.assetWriter.status == .failed {
+            setUpAssetWriter()
             hasStartedWritingCurrentVideo = false
         }
         
-        if hasStartedWritingCurrentVideo.isFalse && output === audioOutput{return}
+        if hasStartedWritingCurrentVideo.isFalse && output === audioOutput { return }
         
         if hasStartedWritingCurrentVideo.isFalse {
             hasStartedWritingCurrentVideo = true
@@ -105,8 +103,10 @@ extension VideoWriter: AVCaptureAudioDataOutputSampleBufferDelegate {
             assetWriter.startSession(atSourceTime: sourceTime)
         }
         if output === audioOutput && audioAssetInput.isReadyForMoreMediaData{
+            if isWriting.isFalse{return}
             audioAssetInput.append(sampleBuffer)
         } else if output === videoOutput && videoAssetInput.isReadyForMoreMediaData{
+            if isWriting.isFalse{return}
             videoAssetInput.append(sampleBuffer)
         }
     }

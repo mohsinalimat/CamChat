@@ -62,7 +62,7 @@ class LoginTextFieldView: HKView{
     
     private var descriptionLabel: UILabel = {
         let x = UILabel()
-        x.font = SCFonts.getFont(type: .demiBold, size: 11)
+        x.font = CCFonts.getFont(type: .demiBold, size: 11)
         x.textColor = UIColor(red: 160, green: 160, blue: 160)
         x.text = "NO DESCRIPTION PROVIDED"
         return x
@@ -72,7 +72,7 @@ class LoginTextFieldView: HKView{
     
     var textField: UITextField = {
         let x = UITextField()
-        x.font = SCFonts.getFont(type: .medium, size: 17)
+        x.font = CCFonts.getFont(type: .medium, size: 17)
         x.autocorrectionType = .no
         x.spellCheckingType = .no
         x.autocapitalizationType = .none

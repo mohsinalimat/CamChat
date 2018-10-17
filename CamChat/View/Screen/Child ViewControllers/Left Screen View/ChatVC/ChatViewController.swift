@@ -62,8 +62,6 @@ class ChatViewController: UIViewController{
         topBarView_typed.topBarRightIcon.addAction({[weak self] in self?.dismiss(animated: true)})
         tableView.pin(addTo: view, anchors: [.left: view.leftAnchor, .right: view.rightAnchor, .bottom: view.bottomAnchor, .top: view.topAnchor], constants: [.top: topInset + APP_INSETS.top])
         NotificationCenter.default.addObserver(self, selector: #selector(respondToKeyboardWillChangeFrame(notification:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
-
-        
     }
     
 
@@ -87,7 +85,6 @@ class ChatViewController: UIViewController{
     }
     
     @objc private func respondToKeyboardWillChangeFrame(notification: Notification){
-        
         
         let newKeyboardFrame = notification.userInfo!["UIKeyboardFrameEndUserInfoKey"] as! CGRect
         let keyboardHeightOnScreen = max(self.view.bounds.height - newKeyboardFrame.minY, 0)
@@ -157,30 +154,26 @@ class ChatViewController: UIViewController{
         fatalError("init coder has not been implemented")
     }
     
-    
 }
 
 
 extension ChatViewController: HKVCTransEventAwareParticipator{
     func prepareForPresentation() {
-        if isBeingPresented.isFalse{return}
         tappedCell = tappedCellProvider?.cellFor(user: user)
     }
     func cleanUpAfterPresentation() {
-        if isBeingPresented.isFalse{return}
         DataCoordinator.performChatPresentationActionsForUser(user: user)
     }
 
     func prepareForDismissal() {
-        if isBeingDismissed.isFalse{return}
         tappedCell = tappedCellProvider?.cellFor(user: user)
     }
     
     func cleanUpAfterDismissal() {
-        if isBeingDismissed.isFalse{return}
         DataCoordinator.performChatDismissalActionsFor(user: user)
     }
 }
+
 
 extension ChatViewController: ChatControllerProtocol{
     

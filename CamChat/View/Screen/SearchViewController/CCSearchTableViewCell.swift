@@ -105,7 +105,7 @@ class CCSearchTableViewCell: UITableViewCell{
     private lazy var topLabel: UILabel = {
         let x = UILabel()
         x.text = "Patrick"
-        x.font = SCFonts.getFont(type: .demiBold, size: 16)
+        x.font = CCFonts.getFont(type: .demiBold, size: 16)
         x.textColor = .white
         return x
     }()
@@ -113,7 +113,7 @@ class CCSearchTableViewCell: UITableViewCell{
     private lazy var bottomLabel: UILabel = {
         let x = UILabel()
         x.textColor = UIColor.lightGray
-        x.font = SCFonts.getFont(type: .medium, size: 12)
+        x.font = CCFonts.getFont(type: .medium, size: 12)
         x.text = "25m ago in Nassau, New Providence"
         return x
     }()

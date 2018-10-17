@@ -34,6 +34,14 @@ class CurrentUserInfo{
         } else {fatalError()}
     }
     
+    func changeCurrentUsersNameTo(firstName: String, lastName: String){
+        guard let currentUser = currentUser else {fatalError()}
+        try! currentUser.changeNameTo(firstName: firstName, lastName: lastName){[weak currentUser] in
+            CurrentUsersNameWasChangedNotification.post(with: (firstName, lastName, currentUser!.fullName))
+        }
+        
+    }
+    
     
     init(){
         UserLoggedInNotification.listen(sender: self) { [weak self] (user) in

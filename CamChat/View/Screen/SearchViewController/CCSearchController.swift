@@ -45,6 +45,9 @@ class CCSearchController: SearchTableVC, UITextFieldDelegate{
         dissmiss_cancelButton.pin(addTo: view, anchors: [.right: topBarLayoutGuide.rightAnchor, .centerY: topBarLayoutGuide.centerYAnchor], constants: [.right: CCSearchConstants.searchIconLeftPadding])
         
         searchTextField.pin(addTo: view, anchors: [.left: searchIcon.rightAnchor, .centerY: topBarLayoutGuide.centerYAnchor, .right: dissmiss_cancelButton.leftAnchor], constants: [.right: 15, .left: CCSearchConstants.searchIconRightPadding])
+        
+        
+        noResultsLabel.pin(addTo: tableView, anchors: [.top: tableView.contentLayoutGuide.topAnchor, .left: tableView.contentLayoutGuide.leftAnchor], constants: [.left: UIScreen.main.bounds.width.half - SearchTableVC.tableViewPadding - noResultsLabel.intrinsicContentSize.width.half, .top: 40])
     }
 
     
@@ -79,7 +82,20 @@ class CCSearchController: SearchTableVC, UITextFieldDelegate{
     }
     
 
-
+    private func respondToSearchTextDidChange(newText: String?){
+        
+        _tableView.searchTextChanged(to: newText)
+        
+        if searchTextField.hasValidText{
+            dissmiss_cancelButton.showCancelButton()
+            if _tableView.hasSearchResults{
+                noResultsLabel.alpha = 0
+            } else { noResultsLabel.alpha = 1 }
+        } else {
+            dissmiss_cancelButton.showDismissButton()
+            noResultsLabel.alpha = 0
+        }
+    }
     
     
     
@@ -102,11 +118,7 @@ class CCSearchController: SearchTableVC, UITextFieldDelegate{
         x.textColor = CCSearchConstants.searchTintColor
         
         x.addTextDidChangeListener({[weak self] (newText) in
-            guard let self = self else {return}
-            self._tableView.searchTextChanged(to: newText)
-            if self.searchTextField.hasValidText{
-                self.dissmiss_cancelButton.showCancelButton()
-            } else { self.dissmiss_cancelButton.showDismissButton() }
+            self?.respondToSearchTextDidChange(newText: newText)
         })
         return x
     }()
@@ -130,6 +142,12 @@ class CCSearchController: SearchTableVC, UITextFieldDelegate{
     override var tableView: UITableView{
         return _tableView
     }
+    
+    private lazy var noResultsLabel: UILabel = {
+        let x = UILabel(text: "No Results 🙄", font: CCFonts.getFont(type: .medium, size: 15), textColor: .white)
+        x.alpha = 0
+        return x
+    }()
     
 
     required init?(coder aDecoder: NSCoder) {

@@ -10,9 +10,7 @@ import UIKit
 
 
 class SCCollectionView: SCScrollView, UICollectionViewDelegate, UICollectionViewDataSource {
-    
 
-    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 0
     }
@@ -193,7 +191,7 @@ class SCScrollView: UIViewController, UIScrollViewDelegate {
         let x = UILabel()
         x.text = self.topLabelText
         x.textColor = topLabelTextColor
-        x.font = SCFonts.getFont(type: .bold, size: 17)
+        x.font = CCFonts.getFont(type: .bold, size: 17)
         return x
     }()
     

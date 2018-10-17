@@ -71,11 +71,11 @@ class CCAlertControllerTransitioningDelegate: HKVCTransDelegate<CCAlertControlle
 
 class CCAlertControllerTransitioningAnimator: HKVCTransAnimationController<CCAlertControllerTransitioningBrain>{
     
-    override var duration: TimeInterval{return config == .presentation ? 0.5 : 0.3}
+    override var duration: TimeInterval{ return config == .presentation ? 0.5 : 0.3 }
     
     override func getAnimator() -> (TimeInterval, @escaping () -> Void, @escaping (Bool) -> Void) -> Void {
         if config == .presentation {
-            return { UIView.animate(withDuration: $0, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.4, options: [.curveEaseIn], animations: $1, completion: $2)}
+            return { UIView.animate(withDuration: $0, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.4, options: [.curveEaseIn], animations: $1, completion: $2) }
         } else {
             return { UIView.animate(withDuration: $0, delay: 0, options: [.curveEaseOut], animations: $1, completion: $2)}
         }

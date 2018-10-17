@@ -10,8 +10,11 @@ import HelpKit
 
 
 class ConversationsTableVC: SCTableView{
-    
-   
+    private weak var screen: Screen?
+    init(screen: Screen){
+        self.screen = screen
+        super.init()
+    }
   
     private var viewModel: CoreDataListViewVM<ConversationsTableVC>!
     
@@ -21,6 +24,8 @@ class ConversationsTableVC: SCTableView{
         super.viewDidLoad()
         tableView.rowHeight = 70
         tableView.separatorStyle = .none
+        
+        emptyBackgroundView.pin(addTo: tableView, anchors: [.left: tableView.contentLayoutGuide.leftAnchor, .top: tableView.contentLayoutGuide.topAnchor], constants: [.top: 40])
     
     }
     
@@ -37,7 +42,12 @@ class ConversationsTableVC: SCTableView{
         return BLUECOLOR
     }
     
-    
+    func respondToNewMessageButtonTapped(){
+        let vc = MemorySenderVC(presenter: self, memories: []) { (sender) in
+            sender.dismiss()
+        }
+        self.present(vc)
+    }
     
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -49,8 +59,20 @@ class ConversationsTableVC: SCTableView{
         }
     }
     
+    private lazy var emptyBackgroundView: CCListViewBackgroundView = {
+        
+        let x = CCListViewBackgroundView(labelText: "CamChat is for friends! \nFind friends by searching for them.", buttonColor: BLUECOLOR, buttonText: "Search For Friends", buttonAction: { [weak self] in
+            guard let self = self else {return}
+            self.screen?.searchBarTapped()
+        })
+        x.alpha = viewModel.objects.isEmpty ? 1 : 0
+        return x
+    }()
     
     
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init coder has not being implemented")
+    }
 }
 
 extension ConversationsTableVC: ChatViewControllerTappedCellProvider{
@@ -79,6 +101,10 @@ extension ConversationsTableVC: CoreDataListViewVMDelegate{
     
     var listView: UITableView{
         return tableView
+    }
+    
+    func contentDidChange() {
+        emptyBackgroundView.alpha = viewModel.objects.isEmpty ? 1 : 0
     }
     
 }

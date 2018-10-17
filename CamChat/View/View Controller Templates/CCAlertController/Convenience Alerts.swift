@@ -12,19 +12,33 @@ import HelpKit
 
 extension UIViewController {
     
-    /// Presents a CCAlertController with a simple Oops title, the description provided and the primary button, with its text set to "OK."
-    func presentOopsAlert(description: String){
-        let alert = presentCCAlert(title: "Oops! 😣", description: description, primaryButtonText: "OK")
+    @discardableResult func presentAreYouSureAlert(description: String, confirmationText: String, confirmationCompletion: @escaping () -> Void) -> CCAlertController{
+        let alert = presentCCAlert(title: "Are You Sure? 🤔", description: description, primaryButtonText: confirmationText, secondaryButtonText: "CANCEL")
         
-        alert.addPrimaryButtonAction({[unowned alert] in alert.dismiss(animated: true)})
+        alert.addPrimaryButtonAction({[weak alert] in
+            confirmationCompletion()
+            alert?.dismiss(animated: true)
+        })
+        alert.addSecondaryButtonAction({[weak alert] in alert?.dismiss(animated: true) })
+        return alert
     }
     
     
-    func presentSuccessAlert(description: String){
+    /// Presents a CCAlertController with a simple Oops title, the description provided and the primary button, with its text set to "OK."
+    @discardableResult func presentOopsAlert(description: String) -> CCAlertController{
+        let alert = presentCCAlert(title: "Oops! 😣", description: description, primaryButtonText: "OK")
+        
+        alert.addPrimaryButtonAction({[unowned alert] in alert.dismiss(animated: true)})
+        return alert
+    }
+    
+    
+    @discardableResult func presentSuccessAlert(description: String) -> CCAlertController{
         let alert = self.presentCCAlert(title: "Success! 😃", description: description, primaryButtonText: "OK")
         alert.addPrimaryButtonAction { [weak alert] in
             alert?.dismiss()
         }
+        return alert
     }
     
     
@@ -35,5 +49,11 @@ extension UIViewController {
             presentOopsAlert(description: error.localizedDescription)
         }
     }
+    
+    
+    
+    
+    
+    
     
 }

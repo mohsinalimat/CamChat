@@ -55,15 +55,14 @@ class CameraVC: UIViewController {
 
     
     private func setUpPreviewLayer() {
-        
         let layer = camera.getPreviewLayer()
         layer.frame = view.bounds
         view.layer.addSublayer(layer)
     }
     
     var isFlashEnabled: Bool{
-        get{return camera.isFlashEnabled}
-        set{camera.isFlashEnabled = newValue}
+        get{ return camera.isFlashEnabled }
+        set{ camera.isFlashEnabled = newValue }
     }
    
     func flipCamera(){
@@ -97,7 +96,6 @@ extension CameraVC: CameraCaptureButtonDelegate{
         let desiredScale = -translation.y / 4200
         camera.setZoomScaleTo(desiredScale)
     }
-    
     
     func shouldRespondToUserInteraction() -> Bool {
         if camera.isActive.isFalse{

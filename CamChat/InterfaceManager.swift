@@ -13,7 +13,7 @@ private(set) var APP_INSETS: UIEdgeInsets!
 
 class InterfaceManager{
     
-    private init(){ }
+    private init () { }
     
     static var shared = InterfaceManager()
 
@@ -94,10 +94,5 @@ class InterfaceManager{
         }, completion: { (success) in completion(); toWindow.makeKeyAndVisible()})
     }
     
-    
-
-
-
-
 
 }

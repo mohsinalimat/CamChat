@@ -129,7 +129,7 @@ private class PhotoOptionView: SimpleInteractiveButton{
     private lazy var label: UILabel = {
         let x = UILabel()
         x.text = option.text
-        x.font = SCFonts.getFont(type: .medium, size: 17)
+        x.font = CCFonts.getFont(type: .medium, size: 17)
         return x
     }()
     

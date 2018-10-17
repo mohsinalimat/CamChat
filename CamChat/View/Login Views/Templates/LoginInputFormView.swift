@@ -145,7 +145,7 @@ class LoginInputFormView: UIView, UITextFieldDelegate{
     
     var titleLabel: UILabel = {
         let x = UILabel()
-        x.font = SCFonts.getFont(type: .medium, size: 22)
+        x.font = CCFonts.getFont(type: .medium, size: 22)
         x.textAlignment = .center
         return x
     }()
@@ -155,7 +155,7 @@ class LoginInputFormView: UIView, UITextFieldDelegate{
         x.textColor = UIColor.gray
         x.numberOfLines = 0
         x.textAlignment = .center
-        x.font = SCFonts.getFont(type: .medium, size: 14)
+        x.font = CCFonts.getFont(type: .medium, size: 14)
         return x
     }()
     
@@ -196,7 +196,7 @@ class LoginInputFormView: UIView, UITextFieldDelegate{
     lazy var imageBrowseButton: SimpleLabelledButton = {
         let x = SimpleLabelledButton()
         x.backgroundColor = BLUECOLOR
-        x.label.attributedText = NSAttributedString(string: "Browse", attributes: [.font: SCFonts.getFont(type: .demiBold, size: 15), .foregroundColor: UIColor.white])
+        x.label.attributedText = NSAttributedString(string: "Browse", attributes: [.font: CCFonts.getFont(type: .demiBold, size: 15), .foregroundColor: UIColor.white])
         
         return x
     }()
@@ -220,7 +220,7 @@ class LoginInputFormView: UIView, UITextFieldDelegate{
     
     var bottomDescriptionLabel: UILabel = {
         let x = UILabel()
-        x.font = SCFonts.getFont(type: .medium, size: 11)
+        x.font = CCFonts.getFont(type: .medium, size: 11)
         x.numberOfLines = 0
         x.textColor = UIColor.black
         return x

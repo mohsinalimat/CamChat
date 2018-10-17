@@ -32,7 +32,7 @@ class PhotoOptionsVC: UIViewController{
         
         let labelsPadding: CGFloat = 15
         let topPadding = !Variations.currentDevice(is: .iPhoneWithNotch) ? labelsPadding : 0
-        let labelsHeight = labelStackView.spacing + topLabel.intrinsicContentSize.height + bottomLabel.intrinsicContentSize.height
+        let labelsHeight = topLabel.intrinsicContentSize.height
         labelsLayoutGuide.pin(addTo: view, anchors: [.left: view.leftAnchor, .top: view.safeAreaLayoutGuide.topAnchor, .right: view.rightAnchor], constants: [.left: labelsPadding, .top: topPadding, .right: labelsPadding, .height: labelsHeight])
         
         let optionsPadding: CGFloat = 25
@@ -96,7 +96,7 @@ class PhotoOptionsVC: UIViewController{
     }()
     
     private lazy var labelStackView: UIStackView = {
-        let x = UIStackView(arrangedSubviews: [topLabel, bottomLabel])
+        let x = UIStackView(arrangedSubviews: [topLabel])
         x.axis = .vertical
         x.spacing = 2
         return x
@@ -104,19 +104,18 @@ class PhotoOptionsVC: UIViewController{
     
     private lazy var topLabel: UILabel = {
         let x = UILabel()
-        x.font = SCFonts.getFont(type: .regular, size: 16)
+        x.font = CCFonts.getFont(type: .demiBold, size: 16)
         x.textColor = .white
-        x.text = "Nassau, Bahamas"
+//        x.textAlignment = .center
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMMM d, yyyy, h:mm a"
+        let text = formatter.string(from: memory.dateTaken)
+        
+        x.text = text
         return x
     }()
     
-    private lazy var bottomLabel: UILabel = {
-        let x = UILabel()
-        x.textColor = .gray
-        x.font = SCFonts.getFont(type: .medium, size: 12)
-        x.text = "July 5, 2018, 8:45 AM"
-        return x
-    }()
+ 
     
     private lazy var optionsMenu: PhotoOptionMenu = {
         let x = PhotoOptionMenu(memory: memory, vcOwner: self, delegate: photoOptionsDelegate)

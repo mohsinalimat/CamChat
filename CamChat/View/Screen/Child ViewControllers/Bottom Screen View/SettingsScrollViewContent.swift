@@ -7,6 +7,7 @@
 //
 
 import HelpKit
+import MessageUI
 
 
 class SettingsScrollContentView: UIView{
@@ -49,13 +50,16 @@ class SettingsScrollContentView: UIView{
     }()
 
     lazy var topLabel: UILabel = {
-        let x = UILabel(text: DataCoordinator.currentUser!.fullName, font: SCFonts.getFont(type: .demiBold, size: 24))
+        let x = UILabel(text: DataCoordinator.currentUser!.fullName, font: CCFonts.getFont(type: .demiBold, size: 24))
+        CurrentUsersNameWasChangedNotification.listen(sender: self, action: {[weak x] (args) in
+            x?.text = args.newFullName
+        })
         x.textColor = .white
         return x
     }()
     
     lazy var bottomLabel: UILabel = {
-        let x = UILabel(text: DataCoordinator.currentUser!.email, font: SCFonts.getFont(type: .medium, size: 16))
+        let x = UILabel(text: DataCoordinator.currentUser!.email, font: CCFonts.getFont(type: .medium, size: 16))
         x.textColor = UIColor.gray(percentage: 0.6).withAlphaComponent(0.7)
         return x
     }()
@@ -77,15 +81,51 @@ class SettingsScrollContentView: UIView{
         alert.addSecondaryButtonAction({[unowned alert] in alert.dismiss(animated: true)})
     })
     
-    private let settingsblocksInfoObjects = [
-        SettingsBlockInfo(text: "Share Username", image: AssetImages.shareIcon, action: nil),
-        SettingsBlockInfo(text: "Account Info", image: AssetImages.accountUser, action: nil),
-        SettingsBlockInfo(text: "Notifications", image: AssetImages.notification, action: nil),
-        SettingsBlockInfo(text: "Manage Storage", image: AssetImages.storage, action: nil)
+    private lazy var settingsblocksInfoObjects = [
+        SettingsBlockInfo(text: "Share Account", image: AssetImages.shareIcon, action:{
+            [weak self] in self?.respondToShareAccountButtonPressed()
+        }),
+        SettingsBlockInfo(text: "Edit Name", image: AssetImages.accountUser, action: {
+            [weak self] in self?.vcOwner.present(NameChangerVC())
+        }),
+        SettingsBlockInfo(text: "Manage Storage", image: AssetImages.storage, action: {
+            [weak self] in self?.vcOwner.present(StorageManagerVC())
+        }),
+        SettingsBlockInfo(text: "Provide Feedback", image: AssetImages.feedbackIcon, action: {
+            [weak self] in  self?.respondToFeedbackButton()
+        })
     ]
+
+    
+    
+    private func respondToFeedbackButton(){
+        
+        
+        if MFMailComposeViewController.canSendMail(){
+            let newController = MFMailComposeViewController()
+            newController.setSubject("CamChat Feedback")
+            newController.setToRecipients(["patrickjh1998@hotmail.com"])
+            newController.setMessageBody("Hey Patrick, your app is awesome!", isHTML: false)
+            newController.mailComposeDelegate = self
+            vcOwner.present(newController, animated: true, completion: nil)
+        } else {
+            vcOwner.presentOopsAlert(description: "For some reason, iOS is not allowing this app to send emails. Check your email settings.")
+        }
+    }
     
     
     
+
+    
+    
+    
+    private func respondToShareAccountButtonPressed(){
+        let string = "Hey, add me on CamChat! My CamChat name is \(DataCoordinator.currentUser!.fullName)"
+        let activityVC = UIActivityViewController(activityItems: [string], applicationActivities: nil)
+        
+        vcOwner.present(activityVC)
+    }
+
     lazy var settingsblocksStackView: UIStackView = {
         let x = UIStackView()
         x.axis = .vertical
@@ -111,6 +151,23 @@ class SettingsScrollContentView: UIView{
     required init?(coder aDecoder: NSCoder) {
         fatalError("init coder has not being implemented")
     }
+}
+
+
+extension SettingsScrollContentView: MFMailComposeViewControllerDelegate{
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        
+        
+        controller.dismiss(animated: true){
+            if let error = error{
+                self.vcOwner.presentOopsAlert(description: error.localizedDescription)
+            }
+            
+        }
+    }
+    
+    
 }
 
 
@@ -153,7 +210,7 @@ private class SettingsButton: SimpleInteractiveButton {
     }()
     
     fileprivate lazy var label: UILabel = {
-        let x = UILabel(text: info.text, font: SCFonts.getFont(type: .medium, size: 18))
+        let x = UILabel(text: info.text, font: CCFonts.getFont(type: .medium, size: 18))
         x.textColor = .white
         return x
     }()

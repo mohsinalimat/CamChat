@@ -30,8 +30,8 @@ class Screen: UIViewController, PageScrollingInteractorDelegate, SCScrollViewDel
     
 
 
-    lazy var leftScreen: SCScrollView = {
-        let x = ConversationsTableVC()
+    lazy var leftScreen: ConversationsTableVC = {
+        let x = ConversationsTableVC(screen: self)
         self.addChild(x)
         x.delegate = self
         x.additionalSafeAreaInsets.bottom = subviewsBottomSafeAreaInset

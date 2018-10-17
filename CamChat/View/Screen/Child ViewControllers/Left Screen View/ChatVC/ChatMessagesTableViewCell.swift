@@ -20,8 +20,8 @@ private struct CellConstants{
     static let stackViewSpacing: CGFloat = 5
     static let lineWidth: CGFloat = 5.5
     
-    static let messageLabelFont = SCFonts.getFont(type: .medium, size: 16)
-    static let titleLabelFont = SCFonts.getFont(type: .demiBold, size: 12.5)
+    static let messageLabelFont = CCFonts.getFont(type: .medium, size: 16)
+    static let titleLabelFont = CCFonts.getFont(type: .demiBold, size: 12.5)
     static var labelWidth: CGFloat {
         return UIScreen.main.bounds.width - leftInset - lineWidth - rightLineSpacing - rightLabelInset
     }
@@ -160,11 +160,16 @@ class ChatMessagesTableViewCell: UITableViewCell{
     
     
     private var currentBlock: ChatMessageBlock?
-    
+    private var userObserver: HKManagedObjectObserver?
     
     
     func setWithBlock(block: ChatMessageBlock){
-        
+        userObserver?.stopObserving()
+        userObserver = block.sender.observe(usingObjectChangeHandler: {[weak self] (change) in
+            guard let self = self, var block = self.currentBlock else {return}
+            
+            if change == .update{ block.refreshTitle(); self.titleLabel.text = block.title }
+        })
         self.currentBlock = block
         stackView.setWith(messageBlock: block)
         titleLabel.text = block.title
@@ -183,6 +188,9 @@ class ChatMessagesTableViewCell: UITableViewCell{
             animator.addAnimations { self.fingerTranslated(by: 0) }
             animator.startAnimation()
         }
+        
+        
+        
     }
     
 
@@ -256,14 +264,11 @@ private class ChatMessagesStackView: UIStackView{
         
         for message in messageBlock.messages{
             let view: UIView
-            var spinner: NVActivityIndicatorView?
+
             if case let .text(text) = message.info{
                 view = getNewLabel(text: text)
             } else {
-                let views = getAndPreparePhotoVideoPreviewer(for: message)
-                view = views.holder
-                spinner = views.spinner
-                
+                view = getAndPreparePhotoVideoPreviewer(for: message)
             }
             
             addArrangedSubview(view)
@@ -275,13 +280,15 @@ private class ChatMessagesStackView: UIStackView{
             timeLabel.pin(addTo: self, anchors: [.right: self.leftAnchor, .centerY: view.centerYAnchor], constants: [.right: CellConstants.timeStampRightInsetFromStackView])
             
             
-            observers.insert(message.observe(usingObjectChangeHandler: {[weak self, weak view, weak message, weak spinner] (change) in
+            observers.insert(message.observe(usingObjectChangeHandler: {[weak self, weak view, weak message] (change) in
                 guard let self = self, let view = view else {return}
                 if change == .update{self.setDimmingIfNeededOn(view: view, message: message!)}
                 if let previewer = (view.subviews.first as? PhotoVideoThumbnailPreview), previewer.hasData.isFalse {
-                    previewer.setWith(data: message!.info.photoVideodata)
-                    spinner?.stopAnimating()
-                    spinner?.removeFromSuperview()
+                    if let data = message?.info.photoVideodata{
+                        previewer.setWith(data: data, completion: { [weak previewer] in
+                            previewer?.stopShowingLoadingIndicator()
+                        })
+                    }
                 }
             })!)
         }
@@ -303,28 +310,23 @@ private class ChatMessagesStackView: UIStackView{
         let formatter = DateFormatter()
         formatter.dateFormat = "h:mm a"
         let dateText = formatter.string(from: date)
-        let label = UILabel(text: dateText, font: SCFonts.getFont(type: .demiBold, size: 11))
+        let label = UILabel(text: dateText, font: CCFonts.getFont(type: .demiBold, size: 11))
         label.textColor = .lightGray
         return label
     }
     
-    private func getAndPreparePhotoVideoPreviewer(for message: Message) -> (holder: UIView, spinner: NVActivityIndicatorView?){
-        var spinner: NVActivityIndicatorView?
+    private func getAndPreparePhotoVideoPreviewer(for message: Message) -> UIView{
+        
         let previewer = PhotoVideoThumbnailPreview()
+        previewer.startShowingLoadingIndicator(color: message.currentUserIsSender ? BLUECOLOR : REDCOLOR)
         let view = getHolderFor(previewer: previewer)
         previewerDict[previewer] = message
         if let data = message.info.photoVideodata{
-            
-            previewer.setWith(data: data)
-        
-        } else {
-            let spinnerSize: CGFloat = 25
-            let spinner1 = NVActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: spinnerSize, height: spinnerSize), type: .circleStrokeSpin, color: message.currentUserIsSender ? BLUECOLOR : REDCOLOR, padding: nil)
-            spinner = spinner1
-            spinner!.pin(addTo: previewer, anchors: [.centerX: previewer.centerXAnchor, .centerY: previewer.centerYAnchor], constants: [.height: spinnerSize, .width: spinnerSize])
-            spinner?.startAnimating()
+            previewer.setWith(data: data) { [weak previewer] in
+                previewer?.stopShowingLoadingIndicator()
+            }
         }
-        return (view,spinner)
+        return view
     }
     
     private func getHolderFor(previewer: PhotoVideoThumbnailPreview) -> UIView{
@@ -359,10 +361,11 @@ private class ChatMessagesStackView: UIStackView{
         let cornerRadius = tappedPreviewer.layer.cornerRadius
 
         tappedPreviewer?.alpha = 0
+       
         let window = PhotoVideoWindowViewer(currentWindow: self.window!, data: data!, snapshotInfo: (snapshot, frame, cornerRadius, vcOwner!.view.safeAreaInsets.top))
         
     
-        window.presentationDidEndAction = {[weak self, weak tappedPreviewer] in
+        window.dismissalAnimationDidEndAction = {[weak self, weak tappedPreviewer] in
             tappedPreviewer?.alpha = 1
             tappedPreviewer?.layoutIfNeeded()
             self?.currentViewerWindow = nil
@@ -372,15 +375,6 @@ private class ChatMessagesStackView: UIStackView{
         
         
     }
-    
-    
-    
-    
-    
-    
-
-    
-    
 
     required init(coder aDecoder: NSCoder) {
         fatalError("init coder has not being implemented")

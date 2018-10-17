@@ -60,6 +60,15 @@ class MemorySenderBottomBar: UIView{
     }()
     
     
+    func shrinkSendButton () {
+        self.sendButton.transform = CGAffineTransform(scaleX: 0.00001, y: 0.00001)
+    }
+    
+    
+    func growSendButton () {
+        self.sendButton.transform = CGAffineTransform.identity
+    }
+    
     private(set) lazy var sendButton: SendButton = {
         let x = SendButton()
         x.setColorsInverted()
@@ -67,7 +76,7 @@ class MemorySenderBottomBar: UIView{
     }()
     
     private lazy var longLabel: UILabel = {
-        let x = UILabel(font: SCFonts.getFont(type: .demiBold, size: 16), textColor: .white)
+        let x = UILabel(font: CCFonts.getFont(type: .demiBold, size: 16), textColor: .white)
         return x
     }()
     

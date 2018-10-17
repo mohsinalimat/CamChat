@@ -28,7 +28,7 @@ class VideoThumbnailPreview: UIView{
     
     
     
-    func setWithVideo(url: URL){
+    func setWithVideo(url: URL, completion: (() -> ())? = nil){
         currentImageIndex = 0
         currentImages.removeAll()
         
@@ -36,6 +36,7 @@ class VideoThumbnailPreview: UIView{
             DispatchQueue.main.async {
                 self.imageView.image = self.currentImages.first!
                 self.setUpTimer(withImages: self.currentImages)
+                completion?()
             }
         }
         

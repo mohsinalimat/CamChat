@@ -36,7 +36,7 @@ extension TempMessageDownloadData: Codable {
     
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        switch self{
+        switch self {
         case .text(let text):
             try container.encode(TempMessageDownloadData.textNum, forKey: .num)
             try container.encode(text, forKey: .text)

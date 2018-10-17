@@ -12,7 +12,8 @@ import Reachability
 
 class CoreDataSynchronizer{
     
-    private var listener: ListenerRegistration?
+    private var messagesListener: ListenerRegistration?
+    private var usersListeners = [ListenerRegistration]()
     private var reachability = Reachability()!
     
     
@@ -28,32 +29,48 @@ class CoreDataSynchronizer{
         }
     }
     
+    private var syncingHasBegan = false
+    
+    
     
     func beginSynchronization(){
+        if syncingHasBegan { return }
+        syncingHasBegan = true
+        
+        if messagesListener.isNotNil{ return }
         
         UserLoggedOutNotification.listen(sender: self) {
             self.pendingMessages.removeAll()
             self.removeListeners()
         }
 
-        if listener.isNotNil{ return }
         
-        /// I think I should get the data for all items in array here but I need to see if this reachability closure will be called immediately if there is currently a connection to the internet.
-        reachability.whenReachable = { (reach: Reachability) -> Void in
+        
+        
+        reachability.whenReachable = {[weak self] (reach: Reachability) -> Void in
             switch reach.connection{
             case .cellular, .wifi:
-                self.pendingMessages.forEach{self.tryGettingDataFor(tempMessage: $0)}
+                self?.pendingMessages.forEach{self?.tryGettingDataFor(tempMessage: $0)}
             default: break
             }
         }
         try! reachability.startNotifier()
         
         
+        let allUsers = User.helper(.background).fetchAll()
+        
+        for user in allUsers{
+            let listener = Firebase.observeUserWith(uniqueID: user.uniqueID) { (updatedTempUser) in
+                if let user = User.helper(.background).getObjectWith(uniqueID: updatedTempUser.uniqueID){
+                    user.updateIfNeeded(with: updatedTempUser)
+                }
+            }
+            
+            usersListeners.append(listener)
+        }
         
         
-        
-        
-        listener = Firebase.observeMessagesForUser(userID: DataCoordinator.currentUserUniqueID!, action: {[weak self] (callback) in
+        messagesListener = Firebase.observeMessagesForUser(userID: DataCoordinator.currentUserUniqueID!, action: {[weak self] (callback) in
             guard let self = self else { return }
             
             switch callback {
@@ -174,32 +191,42 @@ class CoreDataSynchronizer{
     
     
     private func tryGettingDataFor(tempMessage: TempMessage){
+        DispatchQueue.main.async {
+            self.pendingMessages.insert(tempMessage)
+        }
         
         Firebase.downloadMediaDataFor(message: tempMessage) { (result) in
-            switch result{
+            switch result {
             case .success(let data):
+                
+                defer {
+                    DispatchQueue.main.async {
+                        self.pendingMessages = self.pendingMessages.filter({$0.uniqueID != tempMessage.uniqueID})
+                    }
+                }
+                
                 let message = Message.helper(.background).getObjectWith(uniqueID: tempMessage.uniqueID)!
-                if message.info.hasData{return}
+                if message.info.hasData { return }
+                
                 message.context.perform {
                     switch message.info {
                     case .photo:
                         let image = UIImage(data: data)!
-                        message.setMessageDataTo(PhotoVideoData.getFor(image: image)!)
+                        message.setMessageDataTo(PhotoVideoData.getFor(image: image, for: .messageMedia)!)
                     case .video:
-                        let newURL = FileManager.default.documentsDirectoryUrl.appendingPathComponent("\(NSUUID().uuidString).mp4")
+                        let newURL = URLManager.getNewURLFor(urlType: .messageMedia, extension: .mp4)!
                         try! data.write(to: newURL)
-                        message.setMessageDataTo(PhotoVideoData.getFor(videoAt: newURL)!)
+                        message.setMessageDataTo(PhotoVideoData.getFor(videoAt: newURL, for: .messageMedia)!)
                     default: fatalError()
                     }
                     message.context.saveChanges()
-                    
-                    self.pendingMessages = self.pendingMessages.filter({$0.uniqueID != message.uniqueID})
                 }
                 
             case .failure:
                 switch self.reachability.connection{
-                case .cellular, .wifi: self.tryGettingDataFor(tempMessage: tempMessage)
-                case .none: self.pendingMessages.insert(tempMessage)
+                case .cellular, .wifi:
+                    self.tryGettingDataFor(tempMessage: tempMessage)
+                case .none: break
                 }
             }
         }
@@ -208,7 +235,10 @@ class CoreDataSynchronizer{
     }
     private func removeListeners(){
         reachability.stopNotifier()
-        listener?.remove()
+        messagesListener?.remove()
+        messagesListener = nil
+        usersListeners.forEach{$0.remove()}
+        usersListeners.removeAll()
         UserLoggedOutNotification.removeListener(sender: self)
     }
     

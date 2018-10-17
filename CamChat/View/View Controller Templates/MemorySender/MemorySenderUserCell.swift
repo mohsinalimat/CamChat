@@ -14,8 +14,8 @@ class MemorySenderUserCell: UITableViewCell{
     static var cellHeight: CGFloat = 54
 
     
-    private let unselectedTextFont = SCFonts.getFont(type: .medium, size: 17)
-    private let selectedTextFont = SCFonts.getFont(type: .demiBold, size: 17)
+    private let unselectedTextFont = CCFonts.getFont(type: .medium, size: 17)
+    private let selectedTextFont = CCFonts.getFont(type: .demiBold, size: 17)
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)

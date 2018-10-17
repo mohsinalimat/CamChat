@@ -8,15 +8,18 @@
 
 import HelpKit
 import Reachability
+import FirebaseStorage
 
 class FirebaseSynchronizer {
+    
+
     private let pendingMessagesKey = "PENDING MESSAGES FOR UPLOAD 2134I2O3I4U2"
     private var pendingMessages: Set<TempMessage>{
-        get{
+        get {
             if let data = UserDefaults.standard.data(forKey: pendingMessagesKey){
                 return try! PropertyListDecoder().decode(Set<TempMessage>.self, from: data)
-            } else {return []}
-        } set{
+            } else { return [] }
+        } set {
             let data = try! PropertyListEncoder().encode(newValue)
             UserDefaults.standard.set(data, forKey: pendingMessagesKey)
         }
@@ -24,11 +27,15 @@ class FirebaseSynchronizer {
     
     private var reachability = Reachability()!
     
+    private var syncingHasBegun = false
     
     func beginSynchronization(){
         
+        if syncingHasBegun{return}
+        syncingHasBegun = true
+        
         UserLoggedOutNotification.listen(sender: self) {
-            self.pendingMessages = []
+            self.pendingMessages.removeAll()
             self.removeListeners()
         }
         
@@ -40,17 +47,21 @@ class FirebaseSynchronizer {
         MessageWasSentNotification.listen(sender: self) { (message) in
             self.tryUploading(message: message)
         }
+        CurrentUsersNameWasChangedNotification.listen(sender: self) { (args) in
+            Firebase.updateNameOfUser(userID: DataCoordinator.currentUserUniqueID!, firstName: args.newFirstName, lastName: args.newLastName)
+        }
     
         reachability.whenReachable = {[weak self] (reach: Reachability) -> Void in
-            switch reach.connection{
+            switch reach.connection {
             case .cellular, .wifi: self?.tryUploadingPendingMessages()
-            default: break
+            case .none: break
             }
         }
         handleErrorWithPrintStatement { try reachability.startNotifier() }
         
-        
     }
+    
+
     
     
     
@@ -60,15 +71,15 @@ class FirebaseSynchronizer {
     
     
     private func tryUploading(message: TempMessage){
+        self.pendingMessages.insert(message)
         Firebase.send(message: message) { callback in
-            switch callback{
+            switch callback {
             case .success:
-                self.pendingMessages = self.pendingMessages.filter({$0.uniqueID != message.uniqueID})
+                self.pendingMessages = self.pendingMessages.filter({$0.uniqueID != message.uniqueID })
             case .failure:
                 switch self.reachability.connection{
-                case .cellular, .wifi:
-                    self.tryUploading(message: message)
-                default: self.pendingMessages.insert(message)
+                case .cellular, .wifi: self.tryUploading(message: message)
+                default: break
                 }
             }
         }
@@ -79,9 +90,11 @@ class FirebaseSynchronizer {
         MessageWasSeenNotification.removeListener(sender: self)
         MessageWasSentNotification.removeListener(sender: self)
         UserLoggedOutNotification.removeListener(sender: self)
+        CurrentUsersNameWasChangedNotification.removeListener(sender: self)
+        
     }
     
-    deinit {removeListeners()}
+    deinit { removeListeners() }
     
     
 }
