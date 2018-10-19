@@ -45,6 +45,10 @@ class URLManager {
         guard diff > 0 else { return nil }
         let severedURL = components.lastItems(diff).joined(separator: "/")
         return currentDocumentsURL.appendingPathComponent(severedURL)
+        
+        
+        
+        
     }
     
     static func getSizeOfMessageMediaDirectory() -> Int{

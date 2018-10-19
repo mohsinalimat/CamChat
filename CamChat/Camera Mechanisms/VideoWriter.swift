@@ -69,6 +69,9 @@ class VideoWriter: NSObject{
     
     func finishWriting(_ completion: @escaping (URL) -> Void){
         if isWriting.isFalse{return}
+        
+        
+        
         isWriting = false
         videoAssetInput.markAsFinished()
         audioAssetInput.markAsFinished()

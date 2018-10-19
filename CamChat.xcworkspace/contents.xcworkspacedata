@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:../../Documents/HelpKit/HelpKit.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:CamChat.xcodeproj">
    </FileRef>
    <FileRef

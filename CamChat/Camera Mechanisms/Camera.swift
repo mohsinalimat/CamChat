@@ -12,6 +12,8 @@ import HelpKit
 
 
 
+
+
 protocol CameraDelegate: class {
 
     func willTakePhoto()
