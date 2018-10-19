@@ -54,6 +54,7 @@
 		605F1B8120FCB3E4003CCD0B /* Login_SignUp_Name.swift in Sources */ = {isa = PBXBuildFile; fileRef = 605F1B8020FCB3E4003CCD0B /* Login_SignUp_Name.swift */; };
 		605F1B8320FCB575003CCD0B /* SimpleLabelledButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 605F1B8220FCB575003CCD0B /* SimpleLabelledButton.swift */; };
 		605F1B8520FCC8F1003CCD0B /* Login_SignUp_Email.swift in Sources */ = {isa = PBXBuildFile; fileRef = 605F1B8420FCC8F1003CCD0B /* Login_SignUp_Email.swift */; };
+		60623F30217A45CB003FC9B4 /* HelpKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60623F2F217A45CB003FC9B4 /* HelpKit.framework */; };
 		606FBAD120E9110C00F6FA58 /* ConversationsTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606FBAD020E9110C00F6FA58 /* ConversationsTableView.swift */; };
 		606FBAD320E9112200F6FA58 /* PhotoLibraryCollectionVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606FBAD220E9112200F6FA58 /* PhotoLibraryCollectionVC.swift */; };
 		606FBAD520E91CD800F6FA58 /* PhotoLibraryLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 606FBAD420E91CD800F6FA58 /* PhotoLibraryLayout.swift */; };
@@ -66,9 +67,6 @@
 		608C87B2217217F600276EFE /* URLManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 608C87B1217217F600276EFE /* URLManager.swift */; };
 		60920BD02103722E00B4AFEF /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60920BCF2103722E00B4AFEF /* ChatViewController.swift */; };
 		60920BD22103726500B4AFEF /* ChatKeyboardShortcutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60920BD12103726500B4AFEF /* ChatKeyboardShortcutView.swift */; };
-		609393F92137727500C62671 /* HelpKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 609393F62137725700C62671 /* HelpKit.framework */; };
-		609393FD213778B800C62671 /* HelpKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 609393F62137725700C62671 /* HelpKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		609393FF2137795200C62671 /* HelpKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 609393F62137725700C62671 /* HelpKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		609394072138145C00C62671 /* LoginModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 609394062138145C00C62671 /* LoginModelTests.swift */; };
 		6093940E213818A600C62671 /* Pods_CamChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85F770E7C208483F91509480 /* Pods_CamChat.framework */; };
 		6096CCDD20F15FE30052EE16 /* Images.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6096CCDC20F15FE30052EE16 /* Images.swift */; };
@@ -136,27 +134,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		609393F52137725700C62671 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 609393F02137725700C62671 /* HelpKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 60470E3A20FA31A200C947E6;
-			remoteInfo = HelpKit;
-		};
-		609393F72137725700C62671 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 609393F02137725700C62671 /* HelpKit.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 6061C46E211F3A97002F83CA;
-			remoteInfo = HelpKitTests;
-		};
-		609393FB2137727500C62671 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 609393F02137725700C62671 /* HelpKit.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 60470E3920FA31A200C947E6;
-			remoteInfo = HelpKit;
-		};
 		609394092138145C00C62671 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6044ED6620E44A9700098F22 /* Project object */;
@@ -174,7 +151,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				600190E1215AD58D007F8C1F /* AVFoundation.framework in Embed Frameworks */,
-				609393FD213778B800C62671 /* HelpKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 1;
@@ -185,7 +161,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				609393FF2137795200C62671 /* HelpKit.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -241,6 +216,7 @@
 		605F1B8020FCB3E4003CCD0B /* Login_SignUp_Name.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Login_SignUp_Name.swift; sourceTree = "<group>"; };
 		605F1B8220FCB575003CCD0B /* SimpleLabelledButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleLabelledButton.swift; sourceTree = "<group>"; };
 		605F1B8420FCC8F1003CCD0B /* Login_SignUp_Email.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Login_SignUp_Email.swift; sourceTree = "<group>"; };
+		60623F2F217A45CB003FC9B4 /* HelpKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HelpKit.framework; sourceTree = "<group>"; };
 		606FBAD020E9110C00F6FA58 /* ConversationsTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationsTableView.swift; sourceTree = "<group>"; };
 		606FBAD220E9112200F6FA58 /* PhotoLibraryCollectionVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryCollectionVC.swift; sourceTree = "<group>"; };
 		606FBAD420E91CD800F6FA58 /* PhotoLibraryLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoLibraryLayout.swift; sourceTree = "<group>"; };
@@ -253,7 +229,6 @@
 		608C87B1217217F600276EFE /* URLManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLManager.swift; sourceTree = "<group>"; };
 		60920BCF2103722E00B4AFEF /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		60920BD12103726500B4AFEF /* ChatKeyboardShortcutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatKeyboardShortcutView.swift; sourceTree = "<group>"; };
-		609393F02137725700C62671 /* HelpKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HelpKit.xcodeproj; path = ../HelpKit/HelpKit.xcodeproj; sourceTree = "<group>"; };
 		609394042138145B00C62671 /* CamChatTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CamChatTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		609394062138145C00C62671 /* LoginModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginModelTests.swift; sourceTree = "<group>"; };
 		609394082138145C00C62671 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -331,8 +306,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				600190E0215AD58D007F8C1F /* AVFoundation.framework in Frameworks */,
-				609393F92137727500C62671 /* HelpKit.framework in Frameworks */,
 				41B44AC0775625C522E2A591 /* Pods_CamChat.framework in Frameworks */,
+				60623F30217A45CB003FC9B4 /* HelpKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -515,7 +490,6 @@
 		6044ED6520E44A9700098F22 = {
 			isa = PBXGroup;
 			children = (
-				609393F02137725700C62671 /* HelpKit.xcodeproj */,
 				6044ED7020E44A9700098F22 /* CamChat */,
 				609394052138145C00C62671 /* CamChatTests */,
 				6044ED6F20E44A9700098F22 /* Products */,
@@ -537,6 +511,7 @@
 		6044ED7020E44A9700098F22 /* CamChat */ = {
 			isa = PBXGroup;
 			children = (
+				60623F2F217A45CB003FC9B4 /* HelpKit.framework */,
 				6044ED7120E44A9700098F22 /* AppDelegate.swift */,
 				60BC38182138CA16000833DF /* InterfaceManager.swift */,
 				6037E04B213373850069329F /* Notifications.swift */,
@@ -580,15 +555,6 @@
 				60A5ED32216CD8CD0000BEBC /* PhotoVideoWindowViewer.swift */,
 			);
 			path = ChatVC;
-			sourceTree = "<group>";
-		};
-		609393F12137725700C62671 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				609393F62137725700C62671 /* HelpKit.framework */,
-				609393F82137725700C62671 /* HelpKitTests.xctest */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		609394052138145C00C62671 /* CamChatTests */ = {
@@ -754,7 +720,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				609393FC2137727500C62671 /* PBXTargetDependency */,
 			);
 			name = CamChat;
 			productName = CamChat;
@@ -811,12 +776,6 @@
 			mainGroup = 6044ED6520E44A9700098F22;
 			productRefGroup = 6044ED6F20E44A9700098F22 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 609393F12137725700C62671 /* Products */;
-					ProjectRef = 609393F02137725700C62671 /* HelpKit.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				6044ED6D20E44A9700098F22 /* CamChat */,
@@ -824,23 +783,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		609393F62137725700C62671 /* HelpKit.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = HelpKit.framework;
-			remoteRef = 609393F52137725700C62671 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		609393F82137725700C62671 /* HelpKitTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = HelpKitTests.xctest;
-			remoteRef = 609393F72137725700C62671 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		6044ED6C20E44A9700098F22 /* Resources */ = {
@@ -1129,11 +1071,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		609393FC2137727500C62671 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = HelpKit;
-			targetProxy = 609393FB2137727500C62671 /* PBXContainerItemProxy */;
-		};
 		6093940A2138145C00C62671 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 6044ED6D20E44A9700098F22 /* CamChat */;
@@ -1284,6 +1221,10 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = N44KF5BXBU;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/CamChat",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/CamChat/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1307,6 +1248,10 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = N44KF5BXBU;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/CamChat",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/CamChat/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
 				LD_RUNPATH_SEARCH_PATHS = (
