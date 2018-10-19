@@ -41,6 +41,8 @@
 		6044ED7C20E44A9800098F22 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6044ED7B20E44A9800098F22 /* Assets.xcassets */; };
 		6044ED7F20E44A9800098F22 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6044ED7D20E44A9800098F22 /* LaunchScreen.storyboard */; };
 		6048693E21617CEA00DECBB0 /* Memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6048693C21617CEA00DECBB0 /* Memory.swift */; };
+		604A56AD217A889D001A9865 /* HelpKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 604A56AC217A889D001A9865 /* HelpKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		604A56AF217A890F001A9865 /* HelpKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 604A56AC217A889D001A9865 /* HelpKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		604A789A20FA463D00E5257D /* Login_LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604A789920FA463D00E5257D /* Login_LoginVC.swift */; };
 		604A789C20FA556A00E5257D /* LoginFormVCTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604A789B20FA556A00E5257D /* LoginFormVCTemplate.swift */; };
 		604A789E20FA84C900E5257D /* LoginTextFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 604A789D20FA84C900E5257D /* LoginTextFieldView.swift */; };
@@ -77,8 +79,6 @@
 		60A8955320F572FB00E4E644 /* SCPagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A8955220F572FB00E4E644 /* SCPagerView.swift */; };
 		60A90B352157F07A0023A938 /* CameraCaptureButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A90B342157F07A0023A938 /* CameraCaptureButton.swift */; };
 		60A90EA421363661000205A9 /* LoginVCsTransitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A90EA321363661000205A9 /* LoginVCsTransitioning.swift */; };
-		60AD2507217A8190005E2698 /* HelpKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60AD2506217A8190005E2698 /* HelpKit.framework */; };
-		60AD2508217A8190005E2698 /* HelpKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 60AD2506217A8190005E2698 /* HelpKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		60B0F19D21417AE500D9DDD8 /* TempMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B0F19C21417AE500D9DDD8 /* TempMessage.swift */; };
 		60B0F1A02142126900D9DDD8 /* CoreDataSynchronizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B0F19F2142126900D9DDD8 /* CoreDataSynchronizer.swift */; };
 		60B1078720EA46DA006E0866 /* ConversationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B1078620EA46DA006E0866 /* ConversationCell.swift */; };
@@ -151,11 +151,20 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				60AD2508217A8190005E2698 /* HelpKit.framework in Embed Frameworks */,
 				600190E1215AD58D007F8C1F /* AVFoundation.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 1;
+		};
+		604A56AE217A88D4001A9865 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				604A56AF217A890F001A9865 /* HelpKit.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -196,6 +205,7 @@
 		6044ED7E20E44A9800098F22 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6044ED8020E44A9800098F22 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6048693C21617CEA00DECBB0 /* Memory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Memory.swift; sourceTree = "<group>"; };
+		604A56AC217A889D001A9865 /* HelpKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HelpKit.framework; sourceTree = "<group>"; };
 		604A789920FA463D00E5257D /* Login_LoginVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Login_LoginVC.swift; sourceTree = "<group>"; };
 		604A789B20FA556A00E5257D /* LoginFormVCTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginFormVCTemplate.swift; sourceTree = "<group>"; };
 		604A789D20FA84C900E5257D /* LoginTextFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginTextFieldView.swift; sourceTree = "<group>"; };
@@ -234,7 +244,6 @@
 		60A8955420F5817500E4E644 /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		60A90B342157F07A0023A938 /* CameraCaptureButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCaptureButton.swift; sourceTree = "<group>"; };
 		60A90EA321363661000205A9 /* LoginVCsTransitioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVCsTransitioning.swift; sourceTree = "<group>"; };
-		60AD2506217A8190005E2698 /* HelpKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = HelpKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		60B0F19C21417AE500D9DDD8 /* TempMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempMessage.swift; sourceTree = "<group>"; };
 		60B0F19F2142126900D9DDD8 /* CoreDataSynchronizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataSynchronizer.swift; sourceTree = "<group>"; };
 		60B1078620EA46DA006E0866 /* ConversationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationCell.swift; sourceTree = "<group>"; };
@@ -300,7 +309,7 @@
 			files = (
 				600190E0215AD58D007F8C1F /* AVFoundation.framework in Frameworks */,
 				41B44AC0775625C522E2A591 /* Pods_CamChat.framework in Frameworks */,
-				60AD2507217A8190005E2698 /* HelpKit.framework in Frameworks */,
+				604A56AD217A889D001A9865 /* HelpKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -483,7 +492,6 @@
 		6044ED6520E44A9700098F22 = {
 			isa = PBXGroup;
 			children = (
-				60AD2506217A8190005E2698 /* HelpKit.framework */,
 				6044ED7020E44A9700098F22 /* CamChat */,
 				609394052138145C00C62671 /* CamChatTests */,
 				6044ED6F20E44A9700098F22 /* Products */,
@@ -687,6 +695,7 @@
 		AECC994EA945A06737C7AD39 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				604A56AC217A889D001A9865 /* HelpKit.framework */,
 				600190DE215AD581007F8C1F /* AVFoundation.framework */,
 				85F770E7C208483F91509480 /* Pods_CamChat.framework */,
 				EA4F34E521F2D73C1D0EA8D4 /* Pods_CamChatTests.framework */,
@@ -708,6 +717,7 @@
 				60470E6F20FA367700C947E6 /* Embed Frameworks */,
 				5A4AF1DE014933270E0926D9 /* [CP] Embed Pods Frameworks */,
 				60E2680B2168F20F002E066C /* ShellScript */,
+				604A56AE217A88D4001A9865 /* CopyFiles */,
 			);
 			buildRules = (
 			);
