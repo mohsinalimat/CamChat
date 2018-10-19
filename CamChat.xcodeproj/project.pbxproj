@@ -77,6 +77,8 @@
 		60A8955320F572FB00E4E644 /* SCPagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A8955220F572FB00E4E644 /* SCPagerView.swift */; };
 		60A90B352157F07A0023A938 /* CameraCaptureButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A90B342157F07A0023A938 /* CameraCaptureButton.swift */; };
 		60A90EA421363661000205A9 /* LoginVCsTransitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A90EA321363661000205A9 /* LoginVCsTransitioning.swift */; };
+		60AD2507217A8190005E2698 /* HelpKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60AD2506217A8190005E2698 /* HelpKit.framework */; };
+		60AD2508217A8190005E2698 /* HelpKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 60AD2506217A8190005E2698 /* HelpKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		60B0F19D21417AE500D9DDD8 /* TempMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B0F19C21417AE500D9DDD8 /* TempMessage.swift */; };
 		60B0F1A02142126900D9DDD8 /* CoreDataSynchronizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B0F19F2142126900D9DDD8 /* CoreDataSynchronizer.swift */; };
 		60B1078720EA46DA006E0866 /* ConversationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60B1078620EA46DA006E0866 /* ConversationCell.swift */; };
@@ -149,6 +151,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				60AD2508217A8190005E2698 /* HelpKit.framework in Embed Frameworks */,
 				600190E1215AD58D007F8C1F /* AVFoundation.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -231,6 +234,7 @@
 		60A8955420F5817500E4E644 /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		60A90B342157F07A0023A938 /* CameraCaptureButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCaptureButton.swift; sourceTree = "<group>"; };
 		60A90EA321363661000205A9 /* LoginVCsTransitioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVCsTransitioning.swift; sourceTree = "<group>"; };
+		60AD2506217A8190005E2698 /* HelpKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = HelpKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		60B0F19C21417AE500D9DDD8 /* TempMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempMessage.swift; sourceTree = "<group>"; };
 		60B0F19F2142126900D9DDD8 /* CoreDataSynchronizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataSynchronizer.swift; sourceTree = "<group>"; };
 		60B1078620EA46DA006E0866 /* ConversationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationCell.swift; sourceTree = "<group>"; };
@@ -296,6 +300,7 @@
 			files = (
 				600190E0215AD58D007F8C1F /* AVFoundation.framework in Frameworks */,
 				41B44AC0775625C522E2A591 /* Pods_CamChat.framework in Frameworks */,
+				60AD2507217A8190005E2698 /* HelpKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -478,6 +483,7 @@
 		6044ED6520E44A9700098F22 = {
 			isa = PBXGroup;
 			children = (
+				60AD2506217A8190005E2698 /* HelpKit.framework */,
 				6044ED7020E44A9700098F22 /* CamChat */,
 				609394052138145C00C62671 /* CamChatTests */,
 				6044ED6F20E44A9700098F22 /* Products */,
