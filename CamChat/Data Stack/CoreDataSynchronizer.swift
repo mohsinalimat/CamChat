@@ -205,8 +205,8 @@ class CoreDataSynchronizer{
                     }
                 }
                 
-                let message = Message.helper(.background).getObjectWith(uniqueID: tempMessage.uniqueID)!
-                if message.info.hasData { return }
+                guard let message = Message.helper(.background).getObjectWith(uniqueID: tempMessage.uniqueID), message.info.hasData.isFalse else {return}
+                
                 
                 message.context.perform {
                     switch message.info {
@@ -230,9 +230,11 @@ class CoreDataSynchronizer{
                 }
             }
         }
-        
-        
     }
+    
+    
+    
+    
     private func removeListeners(){
         reachability.stopNotifier()
         messagesListener?.remove()

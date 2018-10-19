@@ -45,39 +45,26 @@ struct AssetImages{
     static var shareIcon = getIcon("shareIcon")
     static var trashIcon = getIcon("trashIcon")
     static var threeDotMoreIcon = getIcon("moreIcon")
-    static var snapCode = getPhoto("snapcode")
-    
     static var emptyTinyMessageIcon = getIcon("emptyTinyMessageIcon")
     static var fullTinyMessageIcon = getIcon("tinyMessageIcon")
-    
     static var emptyTinySendButton = getIcon("emptyTinySendButton")
     static var fullTinySentIcon = getIcon("tinySentIcon")
-    
     static var errorIcon = getIcon("errorIcon")
-    
     static var accountUser = getIcon("accountUser")
     static var notification = getIcon("notification")
     static var logOut = getIcon("logOut")
     static var storage = getIcon("storage")
-    
     static var profilePicturePlaceholder = getIcon("profilePicturePlaceholder")
     static var downloadIcon = getIcon("downloadIcon")
     static var checkMarkCircle = getIcon("checkMarkCircle")
-    
     static var downloadFinishedIcon = getIcon("downloadFinishedIcon")
-    
     static var feedbackIcon = getIcon("feedbackIcon")
     
-    static var examplePhotos = [
-        getPhoto("iphoneImage0"),
-        getPhoto("iphoneImage1"),
-        getPhoto("iphoneImage2"),
-        getPhoto("iphoneImage3"),
-        getPhoto("iphoneImage4")
-    ]
+    
+    static var backgroundImages: [UIImage]{
+        return (1...7).map{getPhoto("background\($0)")}
+        
+    }
+    
     
 }
-
-
-
-

@@ -33,7 +33,7 @@ class ConversationCell: UITableViewCell{
         }
     }
     
-    private var user: User?
+    private(set) var user: User?
     private var observer: HKManagedObjectObserver?
     
     
@@ -49,7 +49,6 @@ class ConversationCell: UITableViewCell{
         
         customImageView.image = user.profilePicture
         resetSubtitleInfo()
-        
     }
     
     

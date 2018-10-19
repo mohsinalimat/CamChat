@@ -11,20 +11,23 @@ import Firebase
 import AVFoundation
 
 
+
+
 @UIApplicationMain
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
 
-    func applicationDidFinishLaunching(_ application: UIApplication) {
-        Firebase.configure()
-        InterfaceManager.shared.launchInterface()
-        DataCoordinator.configure()
-    }
+    
     
     
 
     func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        
+        Firebase.configure()
+        InterfaceManager.shared.launchInterface()
+        DataCoordinator.configure()
+        
         return true
     }
 

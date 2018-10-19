@@ -106,7 +106,6 @@ class PhotoOptionsVC: UIViewController{
         let x = UILabel()
         x.font = CCFonts.getFont(type: .demiBold, size: 16)
         x.textColor = .white
-//        x.textAlignment = .center
         let formatter = DateFormatter()
         formatter.dateFormat = "MMMM d, yyyy, h:mm a"
         let text = formatter.string(from: memory.dateTaken)

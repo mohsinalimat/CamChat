@@ -9,7 +9,7 @@
 import HelpKit
 
 
-class MemorySenderMessageCell: UITableViewCell{
+class MemorySenderMessageCell: UITableViewCell {
     
     private var heightConstraint: NSLayoutConstraint!
     

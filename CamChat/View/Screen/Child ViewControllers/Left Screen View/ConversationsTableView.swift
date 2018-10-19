@@ -50,9 +50,11 @@ class ConversationsTableVC: SCTableView{
     }
     
     
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
-        let vc = ChatViewController(presenter: self, tappedCellProvider: self, user: viewModel.objects[indexPath.row])
+        let cell = tableView.cellForRow(at: indexPath)! as! ConversationCell
+        let object = cell.user ?? viewModel.objects[indexPath.row]
+        let vc = ChatViewController(presenter: self, tappedCellProvider: self, user: object)
 
         DispatchQueue.main.async {
             self.present(vc, animated: true, completion: nil)
@@ -77,12 +79,11 @@ class ConversationsTableVC: SCTableView{
 
 extension ConversationsTableVC: ChatViewControllerTappedCellProvider{
     func cellFor(user: User) -> UITableViewCell? {
-        if let index = viewModel.objects.firstIndex(of: user), let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)){
-            return cell
-        } else {return nil}
+        for cell in tableView.visibleCells as! [ConversationCell]{
+            if cell.user === user{return cell}
+        }
+        return nil
     }
-    
-    
 }
 
 extension ConversationsTableVC: CoreDataListViewVMDelegate{

@@ -192,6 +192,7 @@ class PhotoVideoWindowViewer: UIWindow{
     
     private func finish(){
         shouldCompleteAnimation = false
+        gesture.isEnabled = false
         let animationDuration = 0.4
         Timer.scheduledTimer(withTimeInterval: animationDuration - 0.01, repeats: false) { (timer) in
             // For some reason when I put this in the 'cleanUpAfterDismissal' function, it causes the photoVideoPreview view  to blink... for some stupid reason.

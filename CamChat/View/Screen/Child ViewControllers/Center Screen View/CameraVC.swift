@@ -43,6 +43,7 @@ class CameraVC: UIViewController {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(respondToTapGesture(gesture:)))
         tapGesture.numberOfTapsRequired = 2
         view.addGestureRecognizer(tapGesture)
+        
     }
     
     
