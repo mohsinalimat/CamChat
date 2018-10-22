@@ -92,13 +92,7 @@ class FirebaseManager{
     
     
     
-    func decreaseProfileImageSizes(){
-        
-        
-        
-        
-    }
-    
+
     
     
     
@@ -133,7 +127,7 @@ class FirebaseManager{
     
     private func addUserToDatabase(info: SignUpProgressionOuput, uniqueID: String, completion: ((HKCompletionResult<TempUser>) -> Void)?){
         
-        let compressedImageData = info.profilePicture.jpegData(compressionQuality: 0.5)!
+        let compressedImageData = info.profilePicture.jpegData(compressionQuality: 0.3)!
         
         
         profilePicturesFolder.child(uniqueID).putData(compressedImageData, metadata: nil) { (meta, error) in
