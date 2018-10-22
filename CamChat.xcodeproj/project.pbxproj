@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3F1A8ACE217D5B5000D94B3D /* HelpKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3F1A8ACD217D5B4F00D94B3D /* HelpKit.framework */; };
+		3F1A8ACF217D5B5800D94B3D /* HelpKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3F1A8ACD217D5B4F00D94B3D /* HelpKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3F1A8AD0217D5B5D00D94B3D /* HelpKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3F1A8ACD217D5B4F00D94B3D /* HelpKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		41B44AC0775625C522E2A591 /* Pods_CamChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85F770E7C208483F91509480 /* Pods_CamChat.framework */; };
 		600190DC215ABCB5007F8C1F /* CameraPhotoVideoPreviewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 600190DB215ABCB5007F8C1F /* CameraPhotoVideoPreviewVC.swift */; };
 		600190E0215AD58D007F8C1F /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 600190DE215AD581007F8C1F /* AVFoundation.framework */; };
@@ -14,8 +17,6 @@
 		6001AD50215B24CB00EF2F46 /* SimpleVideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6001AD4F215B24CB00EF2F46 /* SimpleVideoPlayer.swift */; };
 		6010B1C420F288FF00B94289 /* ButtonsTopBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6010B1C320F288FF00B94289 /* ButtonsTopBar.swift */; };
 		6011896B20FEDA3600C87C74 /* BouncyImageButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6011896A20FEDA3600C87C74 /* BouncyImageButton.swift */; };
-		601360B5217D4B52007D6773 /* HelpKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 60F465C3217D4B27005AFC48 /* HelpKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		601360B6217D4BDF007D6773 /* HelpKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 60F465C3217D4B27005AFC48 /* HelpKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6016835B216077C400948791 /* Flasher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6016835A216077C400948791 /* Flasher.swift */; };
 		6016835E2160E3C800948791 /* PhotoWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6016835D2160E3C800948791 /* PhotoWriter.swift */; };
 		601D0D34210DD656007C47C9 /* ChatTopBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 601D0D33210DD656007C47C9 /* ChatTopBar.swift */; };
@@ -152,7 +153,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				600190E1215AD58D007F8C1F /* AVFoundation.framework in Embed Frameworks */,
-				601360B5217D4B52007D6773 /* HelpKit.framework in Embed Frameworks */,
+				3F1A8AD0217D5B5D00D94B3D /* HelpKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 1;
@@ -163,7 +164,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				601360B6217D4BDF007D6773 /* HelpKit.framework in CopyFiles */,
+				3F1A8ACF217D5B5800D94B3D /* HelpKit.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -171,6 +172,7 @@
 
 /* Begin PBXFileReference section */
 		1E3C6D283F8CDAE2806B48A1 /* Pods-CamChat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CamChat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CamChat/Pods-CamChat.debug.xcconfig"; sourceTree = "<group>"; };
+		3F1A8ACD217D5B4F00D94B3D /* HelpKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HelpKit.framework; sourceTree = "<group>"; };
 		4C1FB644DF89A083AF940495 /* Pods-CamChatTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CamChatTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-CamChatTests/Pods-CamChatTests.release.xcconfig"; sourceTree = "<group>"; };
 		600190DB215ABCB5007F8C1F /* CameraPhotoVideoPreviewVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPhotoVideoPreviewVC.swift; sourceTree = "<group>"; };
 		600190DE215AD581007F8C1F /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
@@ -294,7 +296,6 @@
 		60F3F1F221756DC300ABBBE0 /* SettingsNavigationVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsNavigationVC.swift; sourceTree = "<group>"; };
 		60F3F1F421756E3900ABBBE0 /* SettingsScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreenVC.swift; sourceTree = "<group>"; };
 		60F3F1F6217674F000ABBBE0 /* CCListViewBackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CCListViewBackgroundView.swift; sourceTree = "<group>"; };
-		60F465C3217D4B27005AFC48 /* HelpKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HelpKit.framework; sourceTree = "<group>"; };
 		60F4CD0120E47B0000B06458 /* Screen_Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Screen_Storage.swift; sourceTree = "<group>"; };
 		60FFCB72213346750011FBB3 /* FireStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireStore.swift; sourceTree = "<group>"; };
 		85F770E7C208483F91509480 /* Pods_CamChat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CamChat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -310,6 +311,7 @@
 			files = (
 				600190E0215AD58D007F8C1F /* AVFoundation.framework in Frameworks */,
 				41B44AC0775625C522E2A591 /* Pods_CamChat.framework in Frameworks */,
+				3F1A8ACE217D5B5000D94B3D /* HelpKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -695,7 +697,7 @@
 		AECC994EA945A06737C7AD39 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				60F465C3217D4B27005AFC48 /* HelpKit.framework */,
+				3F1A8ACD217D5B4F00D94B3D /* HelpKit.framework */,
 				600190DE215AD581007F8C1F /* AVFoundation.framework */,
 				85F770E7C208483F91509480 /* Pods_CamChat.framework */,
 				EA4F34E521F2D73C1D0EA8D4 /* Pods_CamChatTests.framework */,
