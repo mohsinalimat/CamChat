@@ -92,6 +92,17 @@ class FirebaseManager{
     
     
     
+    func decreaseProfileImageSizes(){
+        
+        
+        
+        
+    }
+    
+    
+    
+    
+    
     func logIn(loginInfo: LoginInfo, completion: @escaping (HKCompletionResult<TempUser>) -> Void){
         Auth.auth().signIn(withEmail: loginInfo.email, password: loginInfo.password) { (result, error) in
             
@@ -179,7 +190,7 @@ class FirebaseManager{
     
     
     
-    
+    /// Filters out the current user before calling the completion with the results
     func getAllUsers(completion: @escaping(HKCompletionResult<[TempUser]>) -> Void){
         guard let currentUserID = DataCoordinator.currentUserUniqueID else {fatalError("There must be a current user for this function to work!")}
         usersCollection.order(by: UserKeys.firstName).getDocuments(completion: { (snapshot, error) in

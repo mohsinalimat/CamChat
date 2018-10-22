@@ -8,6 +8,10 @@
 
 import HelpKit
 
+
+
+
+
 class CurrentUserInfo{
     
     private let IS_USER_LOGGED_IN_KEY = "IS USER LOGGED IN"
