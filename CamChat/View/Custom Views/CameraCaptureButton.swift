@@ -152,12 +152,12 @@ class CameraCaptureButton: UIView{
         addGestureRecognizer(gesture3)
         
         
-        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: nil) {[weak self] _ in
+        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: nil) {[weak self, weak delegate] _ in
             guard let self = self else {return}
             
             if self.isAnimating {
                 self.stopAnimating()
-                delegate.respondToLongPress(event: .ended)
+                delegate?.respondToLongPress(event: .ended)
             }
         }
         

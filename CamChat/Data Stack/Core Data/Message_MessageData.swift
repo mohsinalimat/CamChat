@@ -18,9 +18,7 @@ enum MessageData: Codable, Hashable{
     case photo(PhotoVideoData?)
     case video(PhotoVideoData?)
     
-    
-    
-    
+
     var hasData: Bool{
         switch self{
         case .text: return true
@@ -62,7 +60,7 @@ extension MessageData {
         } else if num == MessageData.photoNum {
             let data = try? container.decode(PhotoVideoData.self, forKey: .memoryData)
             self = .photo(data)
-        } else if num == MessageData.videoNum{
+        } else if num == MessageData.videoNum {
             let data = try? container.decode(PhotoVideoData.self, forKey: .memoryData)
             self = .video(data)
         } else {
