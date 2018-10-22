@@ -98,9 +98,6 @@
 		60D11BB6213B869E00827010 /* ConvenienceExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60D11BB5213B869E00827010 /* ConvenienceExtensions.swift */; };
 		60D11BB8213C3C3300827010 /* TempUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60D11BB7213C3C3300827010 /* TempUser.swift */; };
 		60D11BBA213C41EC00827010 /* DataCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60D11BB9213C41EC00827010 /* DataCoordinator.swift */; };
-		60D5CAD9217D7ACF006B8C4C /* HelpKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60D5CAD8217D7ACF006B8C4C /* HelpKit.framework */; };
-		60D5CADA217D7AD4006B8C4C /* HelpKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 60D5CAD8217D7ACF006B8C4C /* HelpKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		60D5CADB217D7AD7006B8C4C /* HelpKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 60D5CAD8217D7ACF006B8C4C /* HelpKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		60D72CC821698973000C1E78 /* MemorySenderBottomBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60D72CC721698973000C1E78 /* MemorySenderBottomBar.swift */; };
 		60D72CCD216A3809000C1E78 /* MemorySenderTransitioning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60D72CCC216A3809000C1E78 /* MemorySenderTransitioning.swift */; };
 		60D72CCF216A7BE4000C1E78 /* Message_MessageData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60D72CCE216A7BE4000C1E78 /* Message_MessageData.swift */; };
@@ -153,7 +150,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				600190E1215AD58D007F8C1F /* AVFoundation.framework in Embed Frameworks */,
-				60D5CADB217D7AD7006B8C4C /* HelpKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 1;
@@ -164,7 +160,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				60D5CADA217D7AD4006B8C4C /* HelpKit.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -267,7 +262,6 @@
 		60D11BB7213C3C3300827010 /* TempUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempUser.swift; sourceTree = "<group>"; };
 		60D11BB9213C41EC00827010 /* DataCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataCoordinator.swift; sourceTree = "<group>"; };
 		60D5CAD6217D79C9006B8C4C /* HelpKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HelpKit.framework; path = "../../Library/Developer/Xcode/DerivedData/HelpKit-gcgbzznkqdpeupbbsbdsvtppnyfb/Build/Intermediates.noindex/ArchiveIntermediates/HelpKit-Universal/IntermediateBuildFilesPath/UninstalledProducts/iphoneos/HelpKit.framework"; sourceTree = "<group>"; };
-		60D5CAD8217D7ACF006B8C4C /* HelpKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HelpKit.framework; sourceTree = "<group>"; };
 		60D72CC721698973000C1E78 /* MemorySenderBottomBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemorySenderBottomBar.swift; sourceTree = "<group>"; };
 		60D72CCC216A3809000C1E78 /* MemorySenderTransitioning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemorySenderTransitioning.swift; sourceTree = "<group>"; };
 		60D72CCE216A7BE4000C1E78 /* Message_MessageData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message_MessageData.swift; sourceTree = "<group>"; };
@@ -312,7 +306,6 @@
 			files = (
 				600190E0215AD58D007F8C1F /* AVFoundation.framework in Frameworks */,
 				41B44AC0775625C522E2A591 /* Pods_CamChat.framework in Frameworks */,
-				60D5CAD9217D7ACF006B8C4C /* HelpKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -699,7 +692,6 @@
 		AECC994EA945A06737C7AD39 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				60D5CAD8217D7ACF006B8C4C /* HelpKit.framework */,
 				600190DE215AD581007F8C1F /* AVFoundation.framework */,
 				85F770E7C208483F91509480 /* Pods_CamChat.framework */,
 				EA4F34E521F2D73C1D0EA8D4 /* Pods_CamChatTests.framework */,
