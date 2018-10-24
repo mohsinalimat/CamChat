@@ -46,7 +46,7 @@ enum PhotoVideoData: Hashable{
     func getCopy(for urlType: URLManager.URLType) -> PhotoVideoData?{
         
         guard let mainData = try? Data(contentsOf: urls.main), let thumbnailData = try? Data(contentsOf: urls.thumbnail) else {return nil}
-        guard let newThumbnailURL = URLManager.getNewURLFor(urlType: urlType, extension: .jpeg) else {return nil}
+        guard let newThumbnailURL = URLManager.getNewURLFor(urlType: urlType, extension: .jpeg) else { return nil }
         
         let newMainURL: URL
         

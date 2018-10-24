@@ -22,7 +22,7 @@ class URLManager {
         case memory
         case messageMedia
     }
-    
+    // If you want a memory url and there is no current user, this function return nil
     static func getNewURLFor(urlType: URLType, extension: URLExtension) -> URL? {
         let uniqueString = NSUUID().uuidString
         switch urlType {

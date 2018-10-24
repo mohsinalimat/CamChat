@@ -7,7 +7,7 @@
 //
 
 import HelpKit
-import Firebase
+
 import AVFoundation
 
 
@@ -27,7 +27,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Firebase.configure()
         InterfaceManager.shared.launchInterface()
         DataCoordinator.configure()
-        
         return true
     }
 

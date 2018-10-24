@@ -17,9 +17,9 @@ class StorageManagerVC: SettingsNavigationVC{
 }
 
 private func getBytesStringFrom(bytes: Int) -> String{
-    if       bytes < 1000 {return "0 kb"}
-    else if bytes < 1000000 {return "\(bytes / 1000) kb"}
-    else if bytes < 1000000000 {return "\(bytes / 1000000) mb"}
+    if       bytes < 1000 { return "0 kb" }
+    else if bytes < 1000000 { return "\(bytes / 1000) kb" }
+    else if bytes < 1000000000 { return "\(bytes / 1000000) mb" }
     else { return "\(bytes / 1000000000) gb" }
 }
 
