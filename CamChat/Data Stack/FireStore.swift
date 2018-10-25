@@ -91,7 +91,20 @@ class FirebaseManager{
     }
     
     
-    
+
+//    func decreaseQualityOfProfilePictures(){
+//
+//        usersCollection.getDocuments { (snapshot, error) in
+//            if let snapshot = snapshot{
+//                for document in snapshot.documents{
+//                    let id = document.data()[UserKeys.uniqueID]
+//
+//                }
+//            }
+//        }
+//
+//    }
+//
 
     
     

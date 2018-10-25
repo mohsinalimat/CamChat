@@ -17,8 +17,7 @@ class ConversationsTableVC: SCTableView{
     }
   
     private var viewModel: CoreDataListViewVM<ConversationsTableVC>!
-    
-    
+
     override func viewDidLoad() {
 
         super.viewDidLoad()

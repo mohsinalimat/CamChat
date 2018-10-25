@@ -68,6 +68,7 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
     private func getCell(for index: Int) -> SCPagerViewCell{
         let cachedView = cachedCells.first
         let cell = dataSource!.pagerView(self, cellForItemAt: index, cachedView: nil)
+        cell.pagerView = self
         if cell === cachedView{cachedCells.remove(at: 0)}
         return cell
     }
@@ -178,7 +179,15 @@ class SCPagerView: UIView, PageScrollingInteractorDelegate{
         }
     }
     
-   
+    func snapToRightScreen(animated: Bool){
+        if (0...(numberOfItems - 1)).contains(currentItemIndex + 1).isFalse{return}
+        interactor.snapGradientTo(screen: .last, animated: animated)
+    }
+    
+    func snapToLeftScreen(animated: Bool){
+        if (0...(numberOfItems - 1)).contains(currentItemIndex - 1).isFalse{return}
+        interactor.snapGradientTo(screen: .first, animated: animated)
+    }
     
 
     lazy var interactor: PageScrollingInteractor = {
@@ -402,7 +411,7 @@ class SCPagerViewCell: UIView{
     
     required init(){ super.init(frame: CGRect.zero) }
 
-    
+    weak fileprivate(set) var pagerView: SCPagerView?
     
     func willAppear(){ }
     

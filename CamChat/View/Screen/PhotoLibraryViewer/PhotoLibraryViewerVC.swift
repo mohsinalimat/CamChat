@@ -14,7 +14,7 @@ class PhotoLibraryViewerVC: SCPagerViewController{
     override var prefersStatusBarHidden: Bool{return true}
 
     
-    private var memoryArray: [Memory]
+    fileprivate var memoryArray: [Memory]
     
     private let beginningIndex: Int
     
@@ -114,10 +114,11 @@ private class PagerView: SCPagerViewCell{
     
     weak var delegate: PagerViewDelegate?
     weak var vcOwner: UIViewController?
+    
     private func setUpView() {
         imageView.pinAllSides(addTo: self, pinTo: self)
         videoHolderView.pinAllSides(addTo: self, pinTo: self)
-        longTapView.pinAllSides(addTo: self, pinTo: self)
+        gestureView.pinAllSides(addTo: self, pinTo: self)
         sendButton.pin(addTo: self, anchors: [.bottom: bottomAnchor, .right: rightAnchor], constants: [.height: 50, .width: 50, .right: 20, .bottom: Variations.homeIndicatorHeight + 20])
         threeDotButton.pin(addTo: self, anchors: [.right: rightAnchor, .top: topAnchor], constants: [.right: 15, .top: Variations.notchHeight + 15, .height: 40, .width: 24])
     }
@@ -166,11 +167,13 @@ private class PagerView: SCPagerViewCell{
     
     private(set) var currentVideoView: SimpleVideoPlayer?
     
-    private lazy var longTapView: UIView = {
+    private lazy var gestureView: UIView = {
         let x = UIView()
         let gesture = UILongPressGestureRecognizer(target: self, action: #selector(respondToLongPress(gesture:)))
         gesture.minimumPressDuration = 0.15
         x.addGestureRecognizer(gesture)
+        let gesture2 = UITapGestureRecognizer(target: self, action: #selector(respondToTap(gesture:)))
+        x.addGestureRecognizer(gesture2)
         return x
     }()
     
@@ -181,9 +184,22 @@ private class PagerView: SCPagerViewCell{
         return x
     }()
     
+    @objc private func respondToTap(gesture: UITapGestureRecognizer){
+        guard let pagerView = pagerView else {return}
+        let location = gesture.location(in: self)
+        self.layoutIfNeeded()
+        if location.x < frame.width.half{
+            
+            pagerView.snapToLeftScreen(animated: true)
+        } else {
+            pagerView.snapToRightScreen(animated: true)
+        }
+    }
+    
     @objc private func respondToLongPress(gesture: UILongPressGestureRecognizer){
         if gesture.state != .began{return}
         delegate?.viewLongPressed()
+    
     }
     
     private lazy var threeDotButton: BouncyButton = {
