@@ -12,9 +12,7 @@ import HelpKit
 class SearchVCXDeleteButton: UIView{
     init(){
         super.init(frame: CGRect.zero)
-        
         [dismissButton, cancelButton].forEach{$0.pin(addTo: self, anchors: [.centerX: centerXAnchor, .centerY: centerYAnchor])}
-        
         cancelButton.transform = CGAffineTransform(scaleX: 0, y: 0)
     }
     

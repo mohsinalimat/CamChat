@@ -71,7 +71,6 @@ class Camera: NSObject {
     
         setUpMicrophoneCaptureSession()
         setUpCameraCaptureSession()
-        
         videoWriter = VideoWriter(videoOutput: self.videoCaptureOutput!, audioOutput: self.audioCaptureOutput!)
         photoWriter = PhotoWriter(photoOutput: self.photoCaptureOutput!)
         isActive = true
@@ -107,7 +106,6 @@ class Camera: NSObject {
             case .failure(let error): completion(.failure(error))
             }
         }
-        
     }
     
     private func handleAuthorization(for deviceType: AVMediaType, completion: @escaping (HKFailableCompletion) -> Void){

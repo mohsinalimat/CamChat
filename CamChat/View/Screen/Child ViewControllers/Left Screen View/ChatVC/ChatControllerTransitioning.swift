@@ -313,7 +313,7 @@ private class ChatControllerInteractionController: HKVCTransInteractionControlle
     }
     
     private func update(percentage: CGFloat, velocity: CGFloat) {
-        self.shouldCompleteAnimation = percentage >= 0.5 || (velocity >= 500 && percentage > 0.2)
+        self.shouldCompleteAnimation = percentage >= 0.3 || velocity >= 500
         brain.adjustViewPositionsForDismissal(accordingTo: percentage)
         super.update(percentage)
     }

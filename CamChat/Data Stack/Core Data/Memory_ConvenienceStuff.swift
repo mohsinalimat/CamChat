@@ -105,7 +105,7 @@ extension Memory{
     /// The times should be expressed as percentages of the total video duration.
     static func getImagesForVideoAt(url: URL, atTimes times: [Double]) -> [UIImage]{
         let clip = AVURLAsset(url: url)
-
+        
         let generator = AVAssetImageGenerator(asset: clip)
         
         return times.map({ (time) -> UIImage in

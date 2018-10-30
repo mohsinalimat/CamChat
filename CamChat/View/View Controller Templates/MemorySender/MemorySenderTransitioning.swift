@@ -19,28 +19,42 @@ class MemorySenderTransitioningBrain: HKVCTransBrain{
         return _presented
     }
     
-    
+    private lazy var blurView: UIVisualEffectView = {
+        let x = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+        x.alpha = 0
+        return x
+    }()
     
     override func prepareForPresentation(using context: UIViewControllerContextTransitioning) {
         super.prepareForPresentation(using: context)
-        
+        blurView.pinAllSides(addTo: container, pinTo: container)
         container.addSubview(presented.view)
+        
         presented.view.transform = CGAffineTransform(translationX: UIScreen.main.bounds.width, y: 0)
     }
     
     override func carryOutUnanimatedPresentationAction() {
         super.carryOutUnanimatedPresentationAction()
         presented.view.transform = CGAffineTransform.identity
+        blurView.alpha = 1
     }
     
+    /// val represents a value between 0 (start) and 1 (end)
     func adjustViewPositionsForDismissal(accordingTo val: CGFloat){
-        
+        blurView.alpha = 1 - val
         presented.view.transform = CGAffineTransform(translationX: UIScreen.main.bounds.width * val, y: 0)
     }
     
     override func carryOutUnanimatedDismissalAction() {
         super.carryOutUnanimatedDismissalAction()
         adjustViewPositionsForDismissal(accordingTo: 1)
+    }
+    
+    
+    
+    override func cleanUpAfterDismissal() {
+        super.cleanUpAfterDismissal()
+        blurView.removeFromSuperview()
     }
 }
 
@@ -117,7 +131,8 @@ class MemorySenderInteractionController: HKVCTransInteractionController<MemorySe
     }
     
     private func update(percentage: CGFloat, velocity: CGFloat) {
-        self.shouldCompleteAnimation = percentage >= 0.5 || (velocity >= 500 && percentage > 0.2)
+
+        self.shouldCompleteAnimation = percentage >= 0.3 || velocity >= 500
         brain.adjustViewPositionsForDismissal(accordingTo: percentage)
         super.update(percentage)
     }

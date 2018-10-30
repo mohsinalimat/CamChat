@@ -43,9 +43,7 @@ class MemorySenderVC: SearchTableVC {
         self.transitioningDelegate = customTransitioningDelegate
         view.backgroundColor = .clear
         
-        let blur = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
-        blur.pinAllSides(addTo: view, pinTo: view)
-        view.sendSubviewToBack(blur)
+        
         
         backButton.pin(addTo: view, anchors: [.left: view.leftAnchor, .centerY: topBarLayoutGuide.centerYAnchor], constants: [.left: 15])
         searchIcon.pin(addTo: view, anchors: [.left: backButton.rightAnchor, .centerY: topBarLayoutGuide.centerYAnchor], constants: [.left: 10])

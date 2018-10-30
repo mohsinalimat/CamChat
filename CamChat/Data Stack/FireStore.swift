@@ -15,6 +15,7 @@ import FirebaseStorage
 
 
 
+
 let Firebase = FirebaseManager.shared
 
 
@@ -92,23 +93,6 @@ class FirebaseManager{
     
     
 
-//    func decreaseQualityOfProfilePictures(){
-//
-//        usersCollection.getDocuments { (snapshot, error) in
-//            if let snapshot = snapshot{
-//                for document in snapshot.documents{
-//                    let id = document.data()[UserKeys.uniqueID]
-//
-//                }
-//            }
-//        }
-//
-//    }
-//
-
-    
-    
-    
     
     func logIn(loginInfo: LoginInfo, completion: @escaping (HKCompletionResult<TempUser>) -> Void){
         Auth.auth().signIn(withEmail: loginInfo.email, password: loginInfo.password) { (result, error) in

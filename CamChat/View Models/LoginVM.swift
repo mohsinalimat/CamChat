@@ -41,20 +41,6 @@ class UserSignUpProgressionInfo {
     func setLastName(to text: String) throws {
         let trimmedText = text.withTrimmedWhiteSpaces().capitalizingFirstLetter()
     
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         let testResult = testName(text: trimmedText)
         if testResult.isValid.isFalse{throw HKError(description: testResult.errorMessage ?? "An unknown error occured.")}
         self.lastName = trimmedText

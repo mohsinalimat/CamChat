@@ -99,14 +99,26 @@ extension CameraVC: CameraCaptureButtonDelegate{
     }
     
     func shouldRespondToUserInteraction() -> Bool {
+        
+        #if targetEnvironment(simulator)
+        cancelCurrentTouch()
+        presentOopsAlert(description: "Photos and videos cannot be taken in the simulator. Please run this app on an actual device to take advantage of this feature.")
+        return false
+        
+        #else
+        
         if camera.isActive.isFalse{
-            showCameraAccessWarning()
+            cancelCurrentTouch()
+            presentOopsAlert(description: "Please allow CamChat access to the camera and microphone in your privacy settings.")
             return false
-        } else { return true }
+        }
+        return true
+        #endif
     }
     
-    private func showCameraAccessWarning(){
+    private func cancelCurrentTouch(){
         cameraCaptureButton.gestureRecognizers?.forEach{ $0.cancelCurrentTouch() }
-        presentOopsAlert(description: "Please allow CamChat access to the camera and microphone in your privacy settings.")
     }
+    
+    
 }

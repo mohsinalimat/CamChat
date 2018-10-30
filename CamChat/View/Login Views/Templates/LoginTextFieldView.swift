@@ -70,7 +70,7 @@ class LoginTextFieldView: HKView{
     
     
     
-    var textField: UITextField = {
+    private(set)var textField: UITextField = {
         let x = UITextField()
         x.font = CCFonts.getFont(type: .medium, size: 17)
         x.autocorrectionType = .no

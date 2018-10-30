@@ -45,7 +45,12 @@ class CoreDataSynchronizer{
         }
 
         
-        
+        startListeningForNetworkConnectionChanges()
+        startListeningForUserChanges()
+        startListeningForMessages()
+    }
+    
+    private func startListeningForNetworkConnectionChanges(){
         
         reachability.whenReachable = {[weak self] (reach: Reachability) -> Void in
             switch reach.connection{
@@ -57,6 +62,9 @@ class CoreDataSynchronizer{
         try! reachability.startNotifier()
         
         
+    }
+    
+    private func startListeningForUserChanges(){
         let allUsers = User.helper(.background).fetchAll()
         
         for user in allUsers{
@@ -68,8 +76,9 @@ class CoreDataSynchronizer{
             
             usersListeners.append(listener)
         }
-        
-        
+    }
+    
+    private func startListeningForMessages(){
         messagesListener = Firebase.observeMessagesForUser(userID: DataCoordinator.currentUserUniqueID!, action: {[weak self] (callback) in
             guard let self = self else { return }
             

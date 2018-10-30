@@ -117,7 +117,7 @@ public class User: NSManagedObject, ManagedObjectProtocol {
     
     private func getMostRecentMessage() -> Message? {
         let request = Message.typedFetchRequest()
-        request.predicate = NSPredicate(format: "\(#keyPath(Message.sender.uniqueID))  == %@ OR \(#keyPath(Message.receiver.uniqueID)) == %@", self.uniqueID, self.uniqueID)
+        request.predicate = NSPredicate(format: "\(#keyPath(Message.sender.uniqueID)) == %@ OR \(#keyPath(Message.receiver.uniqueID)) == %@", self.uniqueID, self.uniqueID)
         request.sortDescriptors = [NSSortDescriptor(key: #keyPath(Message.dateSent), ascending: false)]
         request.fetchLimit = 1
         

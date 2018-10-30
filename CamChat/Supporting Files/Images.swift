@@ -61,10 +61,7 @@ struct AssetImages{
     static var feedbackIcon = getIcon("feedbackIcon")
     
     
-    static var backgroundImages: [UIImage]{
-        return (1...7).map{getPhoto("background\($0)")}
-        
-    }
+
     
     
 }
